@@ -1,19 +1,28 @@
+#!/usr/bin/env node
+
 'use strict';
 
-const ChainJobQueue = require('./src/chain-job-queue');
-const walk = require('walk'),
+const program = require('commander'),
+  ChainJobQueue = require('./src/chain-job-queue'),
+  walk = require('walk'),
   fs = require('fs'),
-  mime = require('mime'),
-  walker = walk.walk("/home/meja/Data/bmj");
+  mime = require('mime');
 
+program
+  .version('0.0.1')
+  .usage('<path>')
+  .parse(process.argv);
+
+const path = program.args[0];
+const walker = walk.walk(path);
 const chain = new ChainJobQueue();
 chain.addWorker('First Worker', (data, next) => {
   data.count++;
-  console.log(JSON.stringify(data));
+  // console.log(JSON.stringify(data));
   next();
 }).addWorker('Second Worker', (data, next) => {
   data.count++;
-  console.log(JSON.stringify(data));
+  // console.log(JSON.stringify(data));
   next();
 }).initialize();
 
@@ -39,7 +48,7 @@ walker.on("end", function () {
   chain.addTask({
     stop: true
   });
-  console.log("all done whith " + totalFile + " files.");
+  console.log("Generate tasks finished with " + totalFile + " files.");
 });
 
 // setTimeout(() => {
