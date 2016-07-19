@@ -33,6 +33,9 @@ class ChainJobQueue {
           worker.add(job.data);
         })
       }
+      worker.on('completed', () => {
+        this.stopAll();
+      });
       return worker;
     });
     return this;
@@ -43,7 +46,7 @@ class ChainJobQueue {
     return this;
   }
 
-  stop() {
+  stopAll() {
     const countTaskWorker = this.listWorker.map((worker) => worker.count());
     return Promise.all(countTaskWorker)
       .then((arrayCount) => arrayCount.reduce((previous, current) => previous + current))
