@@ -36,6 +36,9 @@ class ChainJobQueue {
       worker.on('completed', () => {
         this.stopAll();
       });
+      worker.on('cleaned', function (job, type) {
+        console.log('Cleaned %s %s jobs', job.length, type);
+      });
       return worker;
     });
     return this;
@@ -55,6 +58,9 @@ class ChainJobQueue {
           const closeWorker = this.listWorker.map((worker) => worker.close());
           return Promise.all(closeWorker);
         }
+      }).then(() => {
+        const cleanWorker = this.listWorker.map((worker) => worker.clean(5000));
+        return Promise.all(cleanWorker);
       });
   }
 }

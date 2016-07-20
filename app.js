@@ -4,8 +4,9 @@
 
 const program = require('commander'),
   ChainJobQueue = require('./src/chain-job-queue'),
+  bluebird = require('bluebird'),
   walk = require('walk'),
-  fs = require('fs'),
+  fs = bluebird.promisifyAll(require('fs')),
   mime = require('mime');
 
 program
@@ -14,16 +15,25 @@ program
   .parse(process.argv);
 
 const path = program.args[0];
+fs.statAsync(path).catch((error) => {
+  console.log(error);
+  process.exit(1);
+});
+
 const walker = walk.walk(path);
 const chain = new ChainJobQueue();
 chain.addWorker('First Worker', (data, next) => {
-  data.count++;
-  // console.log(JSON.stringify(data));
-  next();
+  setTimeout(() => {
+    data.count++;
+    // console.log(data);
+    next();
+  }, 10);
 }).addWorker('Second Worker', (data, next) => {
-  data.count++;
-  // console.log(JSON.stringify(data));
-  next();
+  setTimeout(() => {
+    data.count++;
+    // console.log(data);
+    next();
+  }, 10);
 }).initialize();
 
 let totalFile = 0;
