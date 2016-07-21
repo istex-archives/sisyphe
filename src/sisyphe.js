@@ -16,9 +16,6 @@ class Sisyphe {
     this.numberTask = 0;
   }
 
-
-
-
   registerJob(name, jobQueueFunction) {
     const jobQueue = Queue(name, this.redisPort, this.redisHost);
     jobQueue.process((job, done) => {

@@ -23,7 +23,7 @@ class ChainJobQueue {
     this.listWorker = this.listWorker.map((worker) => {
       const newWorker = Queue(worker.name, this.redisPort, this.redisHost);
       newWorker.process((job, done) => {
-        console.log(job.queue.name, job.jobId);
+        // console.log(job.queue.name, job.jobId);
         if (job.jobId === this.numberTotalTask) newWorker.close();
         worker.jobQueueFunction(job.data, done);
       });

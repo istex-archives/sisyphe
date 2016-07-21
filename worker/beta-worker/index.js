@@ -9,4 +9,4 @@ class Business {
   }
 }
 
-module.export = new Business();
+module.exports = new Business();
