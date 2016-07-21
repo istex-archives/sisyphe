@@ -1,6 +1,6 @@
 'use strict';
 
-const Queue = require('bull'),
+const ChainJobQueue = require('./chain-job-queue'),
   _ = require('lodash'),
   path = require('path'),
   bluebird = require('bluebird'),
@@ -8,13 +8,16 @@ const Queue = require('bull'),
   glob = require('glob');
 
 class Sisyphe {
-  constructor() {
+  constructor(redisPort, redisHost) {
     this.listJobsAvailable = [];
-    this.listFlow = [];
+    this.listWorkFlow = [];
     this.redisPort = 6379;
     this.redisHost = '127.0.0.1';
     this.numberTask = 0;
   }
+
+
+
 
   registerJob(name, jobQueueFunction) {
     const jobQueue = Queue(name, this.redisPort, this.redisHost);
