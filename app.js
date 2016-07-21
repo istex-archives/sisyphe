@@ -4,6 +4,7 @@
 
 const program = require('commander'),
   ChainJobQueue = require('./src/chain-job-queue'),
+  WalkerFS = require('./starter/walker-fs/walker-fs'),
   bluebird = require('bluebird'),
   walk = require('walk'),
   fs = bluebird.promisifyAll(require('fs')),
@@ -20,49 +21,22 @@ fs.statAsync(path).catch((error) => {
   process.exit(1);
 });
 
-const walker = walk.walk(path);
 const chain = new ChainJobQueue();
 chain.addWorker('First Worker', (data, next) => {
   setTimeout(() => {
     data.count++;
-    // console.log(data);
+    console.log(data);
     next();
   }, 10);
 }).addWorker('Second Worker', (data, next) => {
   setTimeout(() => {
     data.count++;
-    // console.log(data);
+    console.log(data);
     next();
   }, 10);
 }).initialize();
 
-let totalFile = 0;
-
-walker.on("file", function (root, stats, next) {
-  totalFile++;
-  let item = {};
-  item.path = root + '/' + stats.name;
-  item.mimetype = mime.lookup(root + '/' + stats.name);
-  item.count = 0;
-  // console.log(JSON.stringify(item));
-  chain.addTask(item);
-  next();
-});
-
-walker.on("errors", function (root, nodeStatsArray, next) {
-  console.log(root);
-  next();
-});
-
-walker.on("end", function () {
-  chain.addTask({
-    stop: true
-  });
-  console.log("Generate tasks finished with " + totalFile + " files.");
-});
-
-// setTimeout(() => {
-//   chain.stopAll().then(() => {
-//     console.log('chain stopped');
-//   });
-// }, 10000);
+const generateTask = new WalkerFS(path);
+generateTask
+  .addChain(chain)
+  .start();
