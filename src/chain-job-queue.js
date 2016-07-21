@@ -13,6 +13,7 @@ class ChainJobQueue {
   addWorker(name, jobQueueFunction) {
     const newWorker = {
       name: name,
+      totalTaskPerformed: 0,
       jobQueueFunction: jobQueueFunction
     };
     this.listWorker.push(newWorker);
@@ -23,8 +24,8 @@ class ChainJobQueue {
     this.listWorker = this.listWorker.map((worker) => {
       const newWorker = Queue(worker.name, this.redisPort, this.redisHost);
       newWorker.process((job, done) => {
-        // console.log(job.queue.name, job.jobId);
-        if (job.jobId === this.numberTotalTask) newWorker.close();
+        worker.totalTaskPerformed++;
+        if (worker.totalTaskPerformed === this.numberTotalTask) newWorker.close();
         worker.jobQueueFunction(job.data, done);
       });
       return newWorker;
@@ -44,6 +45,11 @@ class ChainJobQueue {
   addTask(task) {
     this.listWorker[0].add(task);
     return this;
+  }
+
+  cleanAll() {
+    const cleanTaskCompleted = this.listWorker.map((worker) => worker.clean(10000));
+    return Promise.all(cleanTaskCompleted);
   }
 
   stopAll() {
