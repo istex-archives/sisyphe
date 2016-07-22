@@ -5,6 +5,7 @@ const Queue = require('bull');
 class ChainJobQueue {
   constructor(redisPort, redisHost) {
     this.listWorker = [];
+    this.numberTotalTask = Infinity;
     this.redisPort = redisPort || 6379;
     this.redisHost = redisHost || '127.0.0.1';
   }
@@ -12,6 +13,7 @@ class ChainJobQueue {
   addWorker(name, jobQueueFunction) {
     const newWorker = {
       name: name,
+      totalTaskPerformed: 0,
       jobQueueFunction: jobQueueFunction
     };
     this.listWorker.push(newWorker);
@@ -22,6 +24,8 @@ class ChainJobQueue {
     this.listWorker = this.listWorker.map((worker) => {
       const newWorker = Queue(worker.name, this.redisPort, this.redisHost);
       newWorker.process((job, done) => {
+        worker.totalTaskPerformed++;
+        if (worker.totalTaskPerformed === this.numberTotalTask) newWorker.close();
         worker.jobQueueFunction(job.data, done);
       });
       return newWorker;
@@ -33,12 +37,6 @@ class ChainJobQueue {
           worker.add(job.data);
         })
       }
-      worker.on('completed', () => {
-        this.stopAll();
-      });
-      worker.on('cleaned', function (job, type) {
-        console.log('Cleaned %s %s jobs', job.length, type);
-      });
       return worker;
     });
     return this;
@@ -47,6 +45,11 @@ class ChainJobQueue {
   addTask(task) {
     this.listWorker[0].add(task);
     return this;
+  }
+
+  cleanAll() {
+    const cleanTaskCompleted = this.listWorker.map((worker) => worker.clean(10000));
+    return Promise.all(cleanTaskCompleted);
   }
 
   stopAll() {
