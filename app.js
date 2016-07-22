@@ -5,6 +5,7 @@
 const program = require('commander'),
   ChainJobQueue = require('./src/chain-job-queue'),
   WalkerFS = require('./starter/walker-fs/walker-fs'),
+  Sisyphe = require('./src/sisyphe'),
   path = require('path'),
   bluebird = require('bluebird'),
   fs = bluebird.promisifyAll(require('fs')),
@@ -21,7 +22,7 @@ fs.statAsync(pathInput)
     const sisyphe = new Sisyphe({
       module: "walker-fs",
       options: {
-        path: "/home/meja/Data/bmj"
+        path: pathInput
       }
     });
 
