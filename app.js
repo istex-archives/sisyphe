@@ -16,43 +16,22 @@ program
   .parse(process.argv);
 
 const pathInput = program.args[0];
-fs.statAsync(pathInput).catch((error) => {
-  console.log(error);
-  process.exit(1);
-});
-
-const chain = new ChainJobQueue();
-const dirWorker = path.normalize(__dirname + '/worker');
-
-fs.statAsync(dirWorker).then((stats) => {
-  return new Promise((resolve, reject) => {
-    if (stats.isDirectory()) {
-      resolve()
-    } else {
-      reject('Your path is not a directory')
-    }
-  })
-}).then(() => glob.sync(dirWorker + '/*/'))
-  .then((arrayDirectories) => {
-    return arrayDirectories.map((directory) => {
-      console.log(directory);
-      const jobModule = require(directory);
-      const packageJobModule = require(directory + '/package.json');
-      console.log(packageJobModule.name);
-      console.log(jobModule.doTheJob);
-      return {
-        name: packageJobModule.name,
-        doTheJob: jobModule.doTheJob
-      };
-    })
-  }).then((arrayModule) => {
-    arrayModule.forEach((module) => {
-      chain.addWorker(module.name, module.doTheJob);
+fs.statAsync(pathInput)
+  .then(() => {
+    const sisyphe = new Sisyphe({
+      module: "walker-fs",
+      options: {
+        path: "/home/meja/Data/bmj"
+      }
     });
-    chain.initialize();
+
+    sisyphe
+      .initialize()
+      .then(() => sisyphe.start());
+  })
+  .catch((error) => {
+    console.log(error);
+    process.exit(1);
   });
 
-const generateTask = new WalkerFS(pathInput);
-generateTask
-  .addChain(chain)
-  .start();
+
