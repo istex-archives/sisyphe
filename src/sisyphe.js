@@ -1,105 +1,70 @@
 'use strict';
 
-const Queue = require('bull'),
-  _ = require('lodash'),
+const ChainJobQueue = require('./chain-job-queue'),
   path = require('path'),
   bluebird = require('bluebird'),
-  fs = bluebird.promisifyAll(require('fs')),
-  glob = require('glob');
+  fs = bluebird.promisifyAll(require('fs'));
 
 class Sisyphe {
-  constructor() {
-    this.listJobsAvailable = [];
-    this.listFlow = [];
-    this.redisPort = 6379;
-    this.redisHost = '127.0.0.1';
-    this.numberTask = 0;
-  }
-
-  registerJob(name, jobQueueFunction) {
-    const jobQueue = Queue(name, this.redisPort, this.redisHost);
-    jobQueue.process((job, done) => {
-      jobQueueFunction(job.data, done);
-    });
-    this.listJobsAvailable.push(jobQueue);
-  }
-
-  createFlow(name) {
-    const newFlow = {
-      name: name,
-      listJobs: []
-    };
-    this.listFlow.push(newFlow);
-  }
-
-  addJobInFlow(nameFlow, nameJob) {
-    const keyFlow = _.findKey(this.listFlow, ['name', nameFlow]);
-    const keyJob = _.findKey(this.listJobsAvailable, ['name', nameJob]);
-    if (keyJob && keyFlow) {
-      const myFlow = this.listFlow[keyFlow];
-      const myJob = this.listJobsAvailable[keyJob];
-      myJob.on('ready', () => console.log(myJob.name + ' is ready'));
-      myFlow.listJobs.push(myJob);
-      if (myFlow.listJobs.length > 1) {
-        const jobBefore = myFlow.listJobs[keyJob - 1];
-        jobBefore.on('completed', (job, result) => {
-          myJob.add(job.data);
-        })
+  constructor(starter, workers) {
+    const defaultStarter = {
+      module: "walker-fs",
+      options: {
+        path: path.resolve(__dirname + "/../test/dataset")
       }
-    }
+    };
+    this.starter = starter || defaultStarter;
+    const defaultWorkers = [{
+      name: "Alpha",
+      module: "alpha-worker"
+    }, {
+      name: "Beta",
+      module: "beta-worker"
+    }];
+    this.workers = workers || defaultWorkers;
   }
 
-  addTaskInFlow(nameFlow, task) {
-    const myFlow = _.find(this.listFlow, ['name', nameFlow]);
-    if (myFlow) {
-      myFlow.listJobs[0].add(task);
-      this.numberTask++;
-    }
+  start() {
+    this.starterModule.start();
   }
 
-  addFinishFlow(nameFlow) {
-    const myFlow = _.find(this.listFlow, ['name', nameFlow]);
-    if (myFlow) {
-      const lastIndexJobs = myFlow.listJobs.length - 1;
-      const lastJob = myFlow.listJobs[lastIndexJobs];
-      const finish = _.after(2, function() {
-        myFlow.listJobs.forEach((job) => {
-          job.close().then(() => console.log(job.name, 'terminated'));
-        })
-      });
-      lastJob.on('completed', finish);
-    }
+  initialize() {
+    return this.initializeWorker()
+      .then(() => this.initializeStarter())
   }
 
-  injectJobModules(pathDirModule) {
-    pathDirModule = path.normalize(pathDirModule);
-    fs.statAsync(pathDirModule).then((stats) => {
-      return new Promise((resolve, reject) => {
-        if (stats.isDirectory()) {
-          resolve()
-        } else {
-          reject('Your path is not a directory')
-        }
-      })
-    }).then(() => glob.sync(pathDirModule + '/*/'))
-      .then((arrayDirectories) => {
-        return arrayDirectories.map((directory) => {
-          const jobModule = require(directory);
-          const packageJobModule = require(directory + '/package.json');
-          // console.log(packageJobModule.name);
-          // console.log(jobModule);
+  initializeWorker() {
+    const workerDirectory = path.resolve(__dirname + "/../worker");
+    this.workflow = new ChainJobQueue();
+    return bluebird.map(this.workers, (worker) => fs.accessAsync(workerDirectory + "/" + worker.module))
+      .then(() => {
+        return this.workers.map((worker) => {
+          const pathToWorkerModule = workerDirectory + "/" + worker.module;
+          const workerModule = require(pathToWorkerModule);
+          const packageWorkerModule = require(pathToWorkerModule + '/package.json');
           return {
-            name: packageJobModule.name,
-            module: jobModule
+            name: packageWorkerModule.name,
+            doTheJob: workerModule.doTheJob
           };
-          // this.registerJob(packageJobModule.name, jobModule.doTheJob);
         })
-      }).then((arrayModule) => {
-      // console.log(data);
-      arrayModule.forEach((module) => {
-        this.registerJob(module.name, module.doTheJob);
       })
-    })
+      .then((arrayWorkerModule) => {
+        arrayWorkerModule.map((workerModule) => {
+          this.workflow.addWorker(workerModule.name, workerModule.doTheJob);
+        });
+        this.workflow.initialize();
+      });
+  }
+
+  initializeStarter() {
+    const starterDirectory = path.resolve(__dirname + "/../starter");
+    const pathToStarterModule = starterDirectory + "/" + this.starter.module;
+    return fs.accessAsync(pathToStarterModule)
+      .then(() => {
+        const StarterModule = require(starterDirectory + "/" + this.starter.module);
+        this.starterModule = new StarterModule(this.starter.options.path);
+        this.starterModule.addChain(this.workflow);
+      });
   }
 }
 

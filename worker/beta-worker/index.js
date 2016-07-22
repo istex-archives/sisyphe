@@ -3,10 +3,11 @@
 class Business {
   doTheJob(data, next) {
     setTimeout(() => {
-      console.log('beta-worker : ', data);
+      data.count++;
+      // console.log('beta-worker : ', data);
       next();
     }, 10);
   }
 }
 
-module.export = new Business();
+module.exports = new Business();
