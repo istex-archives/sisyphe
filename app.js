@@ -3,13 +3,9 @@
 'use strict';
 
 const program = require('commander'),
-  ChainJobQueue = require('./src/chain-job-queue'),
-  WalkerFS = require('./starter/walker-fs/walker-fs'),
   Sisyphe = require('./src/sisyphe'),
-  path = require('path'),
   bluebird = require('bluebird'),
-  fs = bluebird.promisifyAll(require('fs')),
-  glob = require('glob');
+  fs = bluebird.promisifyAll(require('fs'));
 
 program
   .version('0.0.1')
@@ -18,6 +14,10 @@ program
 
 const pathInput = program.args[0];
 fs.statAsync(pathInput)
+  .catch((error) => {
+    console.log(error);
+    process.exit(1);
+  })
   .then(() => {
     const sisyphe = new Sisyphe({
       module: "walker-fs",
@@ -29,10 +29,6 @@ fs.statAsync(pathInput)
     sisyphe
       .initialize()
       .then(() => sisyphe.start());
-  })
-  .catch((error) => {
-    console.log(error);
-    process.exit(1);
   });
 
 

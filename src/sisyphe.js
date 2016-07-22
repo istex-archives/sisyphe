@@ -1,11 +1,9 @@
 'use strict';
 
 const ChainJobQueue = require('./chain-job-queue'),
-  _ = require('lodash'),
   path = require('path'),
   bluebird = require('bluebird'),
-  fs = bluebird.promisifyAll(require('fs')),
-  glob = require('glob');
+  fs = bluebird.promisifyAll(require('fs'));
 
 class Sisyphe {
   constructor(starter, workers) {

@@ -17,14 +17,12 @@ class WalkerFS {
       item.path = root + '/' + stats.name;
       item.mimetype = mime.lookup(root + '/' + stats.name);
       item.count = 0;
-      // console.log(JSON.stringify(item));
       if (chain && chain instanceof ChainJobQueue) {
         chain.addTask(item);
       }
       next();
     };
     this.functionEventOnEnd = () => {
-      // chain.stopAll();
       chain.numberTotalTask = this.totalFile;
       console.log('walker finish with ' + this.totalFile + ' files.')
     };
