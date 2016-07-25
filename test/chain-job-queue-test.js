@@ -4,7 +4,6 @@ const pkg = require('./../package.json'),
   chai = require('chai'),
   expect = chai.expect,
   Queue = require('bull'),
-  _ = require('lodash'),
   ChainJobQueue = require('./../src/chain-job-queue');
 
 describe(pkg.name + '/src/chain-job-queue.js', function () {
