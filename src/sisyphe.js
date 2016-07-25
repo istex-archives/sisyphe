@@ -29,8 +29,7 @@ class Sisyphe {
   }
 
   initialize() {
-    return this.initializeWorker()
-      .then(() => this.initializeStarter())
+    return this.initializeWorker().then(() => this.initializeStarter())
   }
 
   initializeWorker() {
@@ -53,6 +52,7 @@ class Sisyphe {
           this.workflow.addWorker(workerModule.name, workerModule.doTheJob);
         });
         this.workflow.initialize();
+        return this;
       });
   }
 
@@ -64,6 +64,7 @@ class Sisyphe {
         const StarterModule = require(starterDirectory + "/" + this.starter.module);
         this.starterModule = new StarterModule(this.starter.options.path);
         this.starterModule.addChain(this.workflow);
+        return this;
       });
   }
 }

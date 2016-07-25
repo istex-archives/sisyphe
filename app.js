@@ -25,10 +25,10 @@ fs.statAsync(pathInput)
         path: pathInput
       }
     });
-  }).then((sisyphe) => {
-    sisyphe
-      .initialize()
-      .then(() => sisyphe.start());
-  });
+  })
+  .then((sisyphe) => {
+    return sisyphe.initialize();
+  })
+  .then((sisyphe) => sisyphe.start());
 
 
