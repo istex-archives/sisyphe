@@ -1,6 +1,7 @@
 'use strict';
 
-const Queue = require('bull');
+const Queue = require('bull'),
+  debounce = require('lodash/debounce');
 
 class ChainJobQueue {
   constructor(redisPort, redisHost) {
@@ -35,9 +36,17 @@ class ChainJobQueue {
 
   addJobProcessToWorkers() {
     this.listWorker.map((worker) => {
+      const debounced = debounce((worker) => {
+        console.log('et la ?');
+        worker.queue.count().then((result) => {
+          if (result === 0) worker.queue.close();
+        })
+      }, 2000);
       worker.queue.process((job, done) => {
         worker.totalTaskPerformed++;
-        if (worker.totalTaskPerformed === this.numberTotalTask) worker.queue.close();
+        // TODO Nettoyer l'ancienne façon de cloturer les workers
+        // if (worker.totalTaskPerformed === this.numberTotalTask) worker.queue.close();
+        debounced(worker);
         worker.jobQueueFunction(job.data, done);
       });
       return worker;
