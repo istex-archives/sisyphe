@@ -29,6 +29,16 @@ class WalkerFS {
     return this;
   }
 
+  addFunctionEventOnFile(functionEventOnFile) {
+    this.functionEventOnFile = functionEventOnFile;
+    return this;
+  }
+
+  addFunctionEventOnEnd(functionEventOnEnd) {
+    this.functionEventOnEnd = functionEventOnEnd;
+    return this;
+  }
+
   start() {
     const walker = walk.walk(this._path);
     walker.on('file', this.functionEventOnFile);

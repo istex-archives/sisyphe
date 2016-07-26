@@ -21,6 +21,7 @@ class ChainJobQueue {
   }
 
   initialize() {
+    // TODO : Redécouper la fonction initialize pour faciliter la clusterisation
     this.listWorker = this.listWorker.map((worker) => {
       const newWorker = Queue(worker.name, this.redisPort, this.redisHost);
       newWorker.process((job, done) => {
