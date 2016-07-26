@@ -1,7 +1,8 @@
 'use strict';
 
 const Queue = require('bull'),
-  debounce = require('lodash/debounce');
+  debounce = require('lodash/debounce'),
+  throttle = require('lodash/throttle');
 
 class ChainJobQueue {
   constructor(redisPort, redisHost) {
@@ -36,17 +37,18 @@ class ChainJobQueue {
 
   addJobProcessToWorkers() {
     this.listWorker.map((worker) => {
-      const debounced = debounce((worker) => {
-        console.log('et la ?');
+      const debouncedQueueClose = debounce((worker) => {
         worker.queue.count().then((result) => {
           if (result === 0) worker.queue.close();
         })
-      }, 2000);
+      }, 5000);
+      const throttledQueueClean = throttle((worker) => {
+        worker.queue.clean(2000);
+      }, 1000);
       worker.queue.process((job, done) => {
         worker.totalTaskPerformed++;
-        // TODO Nettoyer l'ancienne façon de cloturer les workers
-        // if (worker.totalTaskPerformed === this.numberTotalTask) worker.queue.close();
-        debounced(worker);
+        debouncedQueueClose(worker);
+        throttledQueueClean(worker);
         worker.jobQueueFunction(job.data, done);
       });
       return worker;
@@ -71,21 +73,6 @@ class ChainJobQueue {
   cleanAll() {
     const cleanTaskCompleted = this.listWorker.map((worker) => worker.clean(10000));
     return Promise.all(cleanTaskCompleted);
-  }
-
-  stopAll() {
-    const countTaskWorker = this.listWorker.map((worker) => worker.count());
-    return Promise.all(countTaskWorker)
-      .then((arrayCount) => arrayCount.reduce((previous, current) => previous + current))
-      .then((activeWorker) => {
-        if (activeWorker === 0) {
-          const closeWorker = this.listWorker.map((worker) => worker.close());
-          return Promise.all(closeWorker);
-        }
-      }).then(() => {
-        const cleanWorker = this.listWorker.map((worker) => worker.clean(5000));
-        return Promise.all(cleanWorker);
-      });
   }
 }
 
