@@ -26,9 +26,7 @@ fs.statAsync(pathInput)
       }
     });
   })
-  .then((sisyphe) => {
-    return sisyphe.initialize();
-  })
+  .then((sisyphe) => sisyphe.initialize())
   .then((sisyphe) => sisyphe.start());
 
 

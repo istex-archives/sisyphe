@@ -48,8 +48,8 @@ describe(pkg.name + '/src/chain-job-queue.js', function () {
         }, data.time);
       }).initialize();
       chain.listWorker.forEach((worker) => {
-        expect(worker).to.be.an.instanceof(Queue);
-        worker.close();
+        expect(worker.queue).to.be.an.instanceof(Queue);
+        worker.queue.close();
       });
       done();
     });
@@ -78,7 +78,7 @@ describe(pkg.name + '/src/chain-job-queue.js', function () {
         });
 
       const lastWorker = chain.listWorker[chain.listWorker.length - 1];
-      lastWorker.on('completed', () => {
+      lastWorker.queue.on('completed', () => {
         const closeWorker = chain.listWorker.map((worker) => worker.close);
         Promise.all(closeWorker).then(() => {
           done()

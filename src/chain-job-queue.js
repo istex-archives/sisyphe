@@ -21,20 +21,32 @@ class ChainJobQueue {
   }
 
   initialize() {
+    this.createQueueForWorkers().addJobProcessToWorkers();
+    return this;
+  }
+
+  createQueueForWorkers() {
     this.listWorker = this.listWorker.map((worker) => {
-      const newWorker = Queue(worker.name, this.redisPort, this.redisHost);
-      newWorker.process((job, done) => {
+      worker.queue = Queue(worker.name, this.redisPort, this.redisHost);
+      return worker;
+    });
+    return this;
+  }
+
+  addJobProcessToWorkers() {
+    this.listWorker.map((worker) => {
+      worker.queue.process((job, done) => {
         worker.totalTaskPerformed++;
-        if (worker.totalTaskPerformed === this.numberTotalTask) newWorker.close();
+        if (worker.totalTaskPerformed === this.numberTotalTask) worker.queue.close();
         worker.jobQueueFunction(job.data, done);
       });
-      return newWorker;
+      return worker;
     }).map((worker, index, listWorker) => {
       // Link Worker between them
       if (index > 0) {
         const workerBefore = listWorker[index - 1];
-        workerBefore.on('completed', (job) => {
-          worker.add(job.data);
+        workerBefore.queue.on('completed', (job) => {
+          worker.queue.add(job.data);
         })
       }
       return worker;
@@ -43,7 +55,7 @@ class ChainJobQueue {
   }
 
   addTask(task) {
-    this.listWorker[0].add(task);
+    this.listWorker[0].queue.add(task);
     return this;
   }
 
