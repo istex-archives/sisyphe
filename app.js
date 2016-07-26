@@ -19,16 +19,14 @@ fs.statAsync(pathInput)
     process.exit(1);
   })
   .then(() => {
-    const sisyphe = new Sisyphe({
+    return new Sisyphe({
       module: "walker-fs",
       options: {
         path: pathInput
       }
     });
-
-    sisyphe
-      .initialize()
-      .then(() => sisyphe.start());
-  });
+  })
+  .then((sisyphe) => sisyphe.initialize())
+  .then((sisyphe) => sisyphe.start());
 
 

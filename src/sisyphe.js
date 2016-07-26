@@ -3,7 +3,8 @@
 const ChainJobQueue = require('./chain-job-queue'),
   path = require('path'),
   bluebird = require('bluebird'),
-  fs = bluebird.promisifyAll(require('fs'));
+  fs = bluebird.promisifyAll(require('fs')),
+  mime = require('mime');
 
 class Sisyphe {
   constructor(starter, workers) {
@@ -29,8 +30,7 @@ class Sisyphe {
   }
 
   initialize() {
-    return this.initializeWorker()
-      .then(() => this.initializeStarter())
+    return this.initializeWorker().then(() => this.initializeStarter())
   }
 
   initializeWorker() {
@@ -53,6 +53,7 @@ class Sisyphe {
           this.workflow.addWorker(workerModule.name, workerModule.doTheJob);
         });
         this.workflow.initialize();
+        return this;
       });
   }
 
@@ -63,7 +64,23 @@ class Sisyphe {
       .then(() => {
         const StarterModule = require(starterDirectory + "/" + this.starter.module);
         this.starterModule = new StarterModule(this.starter.options.path);
-        this.starterModule.addChain(this.workflow);
+
+        this.starterModule.addFunctionEventOnFile((root, stats, next) => {
+          this.starterModule.totalFile++;
+          const item = {};
+          item.path = root + '/' + stats.name;
+          item.mimetype = mime.lookup(root + '/' + stats.name);
+          item.count = 0;
+          this.workflow.addTask(item);
+          next();
+        });
+
+        this.starterModule.addFunctionEventOnEnd(() => {
+          this.workflow.numberTotalTask = this.starterModule.totalFile;
+          console.log('walker finish with ' + this.starterModule.totalFile + ' files.')
+        });
+
+        return this;
       });
   }
 }
