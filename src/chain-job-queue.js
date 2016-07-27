@@ -7,7 +7,6 @@ const Queue = require('bull'),
 class ChainJobQueue {
   constructor(redisPort, redisHost) {
     this.listWorker = [];
-    this.numberTotalTask = Infinity;
     this.redisPort = redisPort || 6379;
     this.redisHost = redisHost || '127.0.0.1';
   }
@@ -36,12 +35,19 @@ class ChainJobQueue {
   }
 
   addJobProcessToWorkers() {
-    this.listWorker.map((worker) => {
+    this.listWorker.map((worker, index, listWorker) => {
       const debouncedQueueClose = debounce((worker) => {
         worker.queue.count().then((result) => {
-          if (result === 0) worker.queue.close();
+          console.log(worker.totalTaskPerformed, 'tache effectué pour le worker', worker.name);
+          console.log(result, 'tâche restante pour le worker', worker.name);
+          if (result === 0) worker.queue.close().then(() => {
+            console.log(worker.name, 'is closed');
+            const lastIndex = listWorker.length - 1;
+            if (index === lastIndex) process.exit();
+          });
+
         })
-      }, 5000);
+      }, 3000);
       const throttledQueueClean = throttle((worker) => {
         worker.queue.clean(2000);
       }, 1000);

@@ -4,7 +4,9 @@ const ChainJobQueue = require('./chain-job-queue'),
   path = require('path'),
   bluebird = require('bluebird'),
   fs = bluebird.promisifyAll(require('fs')),
-  mime = require('mime');
+  mime = require('mime'),
+  cluster = require('cluster'),
+  numberCPU = require('os').cpus().length / 2;
 
 class Sisyphe {
   constructor(starter, workers) {
@@ -25,12 +27,28 @@ class Sisyphe {
     this.workers = workers || defaultWorkers;
   }
 
-  start() {
+  startToGenerateTask() {
     this.starterModule.start();
   }
 
-  initialize() {
-    return this.initializeWorker().then(() => this.initializeStarter())
+  start() {
+    this.initializeWorker()
+      .then(() => {
+        if (cluster.isMaster) {
+          for (var i = 0; i < numberCPU; i++) {
+            const fork = cluster.fork();
+            fork.on('online', () => {
+              console.log('fork created');
+            });
+            fork.on('exit', () => {
+              console.log('fork exit');
+            });
+          }
+          this.initializeStarter()
+            .then(() => this.startToGenerateTask());
+        }
+        this.activateWorker();
+      });
   }
 
   initializeWorker() {
@@ -52,9 +70,14 @@ class Sisyphe {
         arrayWorkerModule.map((workerModule) => {
           this.workflow.addWorker(workerModule.name, workerModule.doTheJob);
         });
-        this.workflow.initialize();
+        this.workflow.createQueueForWorkers();
         return this;
       });
+  }
+
+  activateWorker() {
+    this.workflow.addJobProcessToWorkers();
+    return this;
   }
 
   initializeStarter() {
@@ -77,7 +100,11 @@ class Sisyphe {
 
         this.starterModule.addFunctionEventOnEnd(() => {
           this.workflow.numberTotalTask = this.starterModule.totalFile;
-          console.log('walker finish with ' + this.starterModule.totalFile + ' files.')
+          console.log('walker finish with ' + this.starterModule.totalFile + ' files.');
+          // Ajout pour la clusterisation
+          // this.workflow.listWorker.map((worker) => {
+          //   worker.queue.close().then(() => console.log(worker.name, 'is closed'));
+          // })
         });
 
         return this;
