@@ -69,11 +69,6 @@ class ChainJobQueue {
     this.listWorker[0].queue.add(task);
     return this;
   }
-
-  cleanAll() {
-    const cleanTaskCompleted = this.listWorker.map((worker) => worker.clean(10000));
-    return Promise.all(cleanTaskCompleted);
-  }
 }
 
 module.exports = ChainJobQueue;

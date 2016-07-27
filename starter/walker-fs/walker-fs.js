@@ -10,25 +10,6 @@ class WalkerFS {
     this.totalFile = 0;
   }
 
-  addChain(chain) {
-    this.functionEventOnFile = (root, stats, next) => {
-      this.totalFile++;
-      const item = {};
-      item.path = root + '/' + stats.name;
-      item.mimetype = mime.lookup(root + '/' + stats.name);
-      item.count = 0;
-      if (chain && chain instanceof ChainJobQueue) {
-        chain.addTask(item);
-      }
-      next();
-    };
-    this.functionEventOnEnd = () => {
-      chain.numberTotalTask = this.totalFile;
-      console.log('walker finish with ' + this.totalFile + ' files.')
-    };
-    return this;
-  }
-
   addFunctionEventOnFile(functionEventOnFile) {
     this.functionEventOnFile = functionEventOnFile;
     return this;
