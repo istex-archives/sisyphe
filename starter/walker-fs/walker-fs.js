@@ -1,8 +1,6 @@
 'use strict';
 
-const walk = require('walk'),
-  mime = require('mime'),
-  ChainJobQueue = require('./../../src/chain-job-queue');
+const walk = require('walk');
 
 class WalkerFS {
   constructor(path) {

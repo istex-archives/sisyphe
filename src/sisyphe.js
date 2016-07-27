@@ -6,7 +6,7 @@ const ChainJobQueue = require('./chain-job-queue'),
   fs = bluebird.promisifyAll(require('fs')),
   mime = require('mime'),
   cluster = require('cluster'),
-  numberCPU = require('os').cpus().length / 2;
+  numberFork = require('os').cpus().length / 2;
 
 class Sisyphe {
   constructor(starter, workers) {
@@ -35,7 +35,7 @@ class Sisyphe {
     this.initializeWorker()
       .then(() => {
         if (cluster.isMaster) {
-          for (var i = 0; i < numberCPU; i++) {
+          for (var i = 0; i < numberFork; i++) {
             const fork = cluster.fork();
             fork.on('online', () => {
               console.log('fork created');
@@ -101,10 +101,6 @@ class Sisyphe {
         this.starterModule.addFunctionEventOnEnd(() => {
           this.workflow.numberTotalTask = this.starterModule.totalFile;
           console.log('walker finish with ' + this.starterModule.totalFile + ' files.');
-          // Ajout pour la clusterisation
-          // this.workflow.listWorker.map((worker) => {
-          //   worker.queue.close().then(() => console.log(worker.name, 'is closed'));
-          // })
         });
 
         return this;

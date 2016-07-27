@@ -38,14 +38,10 @@ class ChainJobQueue {
     this.listWorker.map((worker, index, listWorker) => {
       const debouncedQueueClose = debounce((worker) => {
         worker.queue.count().then((result) => {
-          console.log(worker.totalTaskPerformed, 'tache effectué pour le worker', worker.name);
-          console.log(result, 'tâche restante pour le worker', worker.name);
           if (result === 0) worker.queue.close().then(() => {
-            console.log(worker.name, 'is closed');
             const lastIndex = listWorker.length - 1;
             if (index === lastIndex) process.exit();
           });
-
         })
       }, 3000);
       const throttledQueueClean = throttle((worker) => {
@@ -59,7 +55,6 @@ class ChainJobQueue {
       });
       return worker;
     }).map((worker, index, listWorker) => {
-      // Link Worker between them
       if (index > 0) {
         const workerBefore = listWorker[index - 1];
         workerBefore.queue.on('completed', (job) => {
