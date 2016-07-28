@@ -6,22 +6,28 @@ class WalkerFS {
   constructor(path) {
     this._path = path;
     this.totalFile = 0;
+    this.functionEventOnFile = [];
+    this.functionEventOnEnd = [];
   }
 
   addFunctionEventOnFile(functionEventOnFile) {
-    this.functionEventOnFile = functionEventOnFile;
+    this.functionEventOnFile.push(functionEventOnFile);
     return this;
   }
 
   addFunctionEventOnEnd(functionEventOnEnd) {
-    this.functionEventOnEnd = functionEventOnEnd;
+    this.functionEventOnEnd.push(functionEventOnEnd);
     return this;
   }
 
   start() {
     const walker = walk.walk(this._path);
-    walker.on('file', this.functionEventOnFile);
-    walker.on('end', this.functionEventOnEnd);
+    walker.on('file', (root, stats, next) => {
+      this.functionEventOnFile.map((functionEventOnFile) => functionEventOnFile(root, stats, next));
+    });
+    walker.on('end', () => {
+      this.functionEventOnEnd.map((functionEventOnEnd) => functionEventOnEnd());
+    });
   }
 }
 
