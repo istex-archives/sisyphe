@@ -1,6 +1,6 @@
 {
-  "name": "job-queue",
-  "version": "0.0.1",
+  "name": "sisyphe",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
