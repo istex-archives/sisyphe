@@ -8,57 +8,47 @@ class WalkerFS {
   constructor(pathInput) {
     this._path = pathInput;
     this.totalFile = 0;
-    this.functionEventOnFile = [];
-    this.functionEventOnEnd = [];
 
-    this.addFunctionEventOnFile((root, stats) => {
-      if (path.extname(stats.name) === '.xml') {
-        const filenameXml = stats.name;
-        const filenamePdf = transformFilenameXmlToPdf(filenameXml);
-        const docObject = {
-          metadata: [
-            {
-              path: root + '/' + filenameXml,
-              mime: mime.lookup(root + '/' + filenameXml),
-              original: true
-            }
-          ],
-          fulltext: [
-            {
-              path: root + '/' + filenamePdf,
-              mime: mime.lookup(root + '/' + filenamePdf),
-              original: true
-            }
-          ]
-        };
-        console.log(docObject);
-      }
+    this.functionEventOnFile = (root, stats) => {
+      return {
+        path: root + '/' + stats.name,
+        mimetype: mime.lookup(root + '/' + stats.name),
+        count: 0
+      };
+    };
 
-      function transformFilenameXmlToPdf(filenameXml) {
-        const basenameXml = path.basename(filenameXml, '.xml');
-        return basenameXml + '.pdf';
-      }
-    })
+    this.functionEventOnData = (data) => {
+      console.log(data);
+    };
   }
 
-  addFunctionEventOnFile(functionEventOnFile) {
-    this.functionEventOnFile.push(functionEventOnFile);
+  setFunctionEventOnFile(functionEventOnFile) {
+    this.functionEventOnFile = functionEventOnFile;
     return this;
   }
 
-  addFunctionEventOnEnd(functionEventOnEnd) {
-    this.functionEventOnEnd.push(functionEventOnEnd);
+  setFunctionEventOnData(functionEventOnData) {
+    this.functionEventOnData = functionEventOnData;
+    return this;
+  }
+
+  setFunctionEventOnEnd(functionEventOnEnd) {
+    this.functionEventOnEnd = functionEventOnEnd;
     return this;
   }
 
   start() {
     const walker = walk.walk(this._path);
     walker.on('file', (root, stats, next) => {
-      this.functionEventOnFile.map((functionEventOnFile) => functionEventOnFile(root, stats));
+      const data = this.functionEventOnFile(root, stats);
+      walker.emit('data', data);
       next()
     });
+    walker.on('data', (data) => {
+      this.functionEventOnData(data);
+    });
     walker.on('end', () => {
-      this.functionEventOnEnd.map((functionEventOnEnd) => functionEventOnEnd());
+      this.functionEventOnEnd();
     });
   }
 }

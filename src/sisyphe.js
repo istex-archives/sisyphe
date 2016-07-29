@@ -88,16 +88,12 @@ class Sisyphe {
         const StarterModule = require(starterDirectory + "/" + this.starter.module);
         this.starterModule = new StarterModule(this.starter.options.path);
 
-        this.starterModule.addFunctionEventOnFile((root, stats) => {
+        this.starterModule.setFunctionEventOnData((data) => {
           this.starterModule.totalFile++;
-          const item = {};
-          item.path = root + '/' + stats.name;
-          item.mimetype = mime.lookup(root + '/' + stats.name);
-          item.count = 0;
-          this.workflow.addTask(item);
+          this.workflow.addTask(data);
         });
 
-        this.starterModule.addFunctionEventOnEnd(() => {
+        this.starterModule.setFunctionEventOnEnd(() => {
           this.workflow.numberTotalTask = this.starterModule.totalFile;
           console.log('walker finish with ' + this.starterModule.totalFile + ' files.');
         });
