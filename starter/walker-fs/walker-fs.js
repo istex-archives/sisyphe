@@ -10,11 +10,19 @@ class WalkerFS {
     this.totalFile = 0;
 
     this.functionEventOnFile = (root, stats) => {
-      return {
+      // permet d'identifier les fichiers .nxml (BMJ) et .Meta (Springer) comme mimetype XML
+      mime.define({
+        'application/xml': ["nxml", "meta", "xlink_v03", "prime_v03", "plusxml_v02", "plusprime_v02", "info_V03", "citation_v03", "aux_v03"]
+      });
+      const data = {
+        extenstion: path.extname(stats.name),
         path: root + '/' + stats.name,
         mimetype: mime.lookup(root + '/' + stats.name),
+        size: stats.size,
         count: 0
       };
+
+      return data;
     };
 
     this.functionEventOnData = (data) => {
