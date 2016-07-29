@@ -4,7 +4,6 @@ const ChainJobQueue = require('./chain-job-queue'),
   path = require('path'),
   bluebird = require('bluebird'),
   fs = bluebird.promisifyAll(require('fs')),
-  mime = require('mime'),
   cluster = require('cluster'),
   numberFork = require('os').cpus().length / 2;
 
