@@ -58,7 +58,7 @@ class Sisyphe {
   initializeWorker() {
     const workerDirectory = path.resolve(__dirname + "/../worker");
     this.workflow = new ChainJobQueue();
-    this.workflow.on('finish-him', () => {
+    this.workflow.once('finish-him', () => {
       console.log('et ouais dude');
     });
     return bluebird.map(this.workers, (worker) => fs.accessAsync(workerDirectory + "/" + worker.module))
