@@ -83,13 +83,12 @@ class Sisyphe {
   activateWorker() {
     this.workflow.on('workers-out-of-work', () => {
       console.log('heyho, heyho, on a finis le boulot');
-      // console.log(this.workflow);
-      this.workflow.listWorker.filter((worker) => {
+      bluebird.filter(this.workflow.listWorker, (worker) => {
         return worker.finalFunction !== undefined
       }).map((worker) => {
-        worker.finalFunction((error, result) => {
-          console.log(result)
-        })
+        return bluebird.promisify(worker.finalFunction)();
+      }).then((result) => {
+        console.log(result);
       });
     });
     this.workflow.addJobProcessToWorkers();
