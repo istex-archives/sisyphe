@@ -8,9 +8,9 @@ class Business {
     }, 10);
   }
 
-  finalJob(callback) {
+  finalJob(done) {
     setTimeout(() => {
-      callback(null, 'finalJob from beta-worker executed !')
+      done()
     }, 20)
   }
 }
