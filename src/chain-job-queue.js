@@ -1,11 +1,20 @@
 'use strict';
 
 const Queue = require('bull'),
+  bluebird = require('bluebird'),
+  redis = require('redis'),
+  EventEmitter = require('events'),
+  zipObject = require('lodash/zipObject'),
   debounce = require('lodash/debounce'),
-  throttle = require('lodash/throttle');
+  throttle = require('lodash/throttle'),
+  clientRedis = redis.createClient();
 
-class ChainJobQueue {
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
+
+class ChainJobQueue extends EventEmitter {
   constructor(redisPort, redisHost) {
+    super();
     this.listWorker = [];
     this.redisPort = redisPort || 6379;
     this.redisHost = redisHost || '127.0.0.1';
@@ -14,7 +23,8 @@ class ChainJobQueue {
   addWorker(name, jobQueueFunction) {
     const newWorker = {
       name: name,
-      totalTaskPerformed: 0,
+      totalPerformedTask: 0,
+      totalErrorTask: 0,
       jobQueueFunction: jobQueueFunction
     };
     this.listWorker.push(newWorker);
@@ -35,6 +45,7 @@ class ChainJobQueue {
   }
 
   addJobProcessToWorkers() {
+    const self = this;
     this.listWorker.map((worker, index, listWorker) => {
       const debouncedQueueClose = debounce((worker) => {
         worker.queue.count().then((result) => {
@@ -45,22 +56,46 @@ class ChainJobQueue {
         })
       }, 3000);
       const throttledQueueClean = throttle((worker) => {
-        worker.queue.clean(2000);
+        worker.queue.clean(100);
       }, 1000);
+
       worker.queue.process((job, done) => {
-        worker.totalTaskPerformed++;
-        debouncedQueueClose(worker);
+        // debouncedQueueClose(worker);
         throttledQueueClean(worker);
         worker.jobQueueFunction(job.data, done);
       });
       return worker;
     }).map((worker, index, listWorker) => {
+      worker.queue.on('error', () => worker.totalErrorTask++);
+
+      const isTheLastWorker = listWorker.length === (index + 1);
+      const debounceSetCount = debounce((worker) => {
+        clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask).then(() => {
+          return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask')
+        }).then((value) => {
+          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask'], value);
+          console.log('totalTask :', value);
+          if (metrics.totalGeneratedTask === metrics.totalPerformedTask) {
+            console.log('release finishers !');
+            self.emit('finish-him');
+          }
+        });
+      }, 1000);
+
+      if (isTheLastWorker) {
+        worker.queue.on('completed', () => {
+          worker.totalPerformedTask++;
+          debounceSetCount(worker);
+        });
+      }
+
       if (index > 0) {
         const workerBefore = listWorker[index - 1];
         workerBefore.queue.on('completed', (job) => {
           worker.queue.add(job.data);
         })
       }
+
       return worker;
     });
     return this;

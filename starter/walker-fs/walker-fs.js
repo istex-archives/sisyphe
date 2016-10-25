@@ -16,7 +16,7 @@ class WalkerFS {
       });
       const data = {
         extension: path.extname(stats.name),
-        path: root + '/' + stats.name,
+        path: path.resolve(root + '/' + stats.name),
         mimetype: mime.lookup(root + '/' + stats.name),
         size: stats.size
       };

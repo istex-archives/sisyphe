@@ -13,22 +13,19 @@ program
   .parse(process.argv);
 
 const pathInput = program.args[0];
-fs.statAsync(pathInput)
-  .catch((error) => {
-    console.log(error);
-    process.exit(1);
-  })
-  .then(() => {
-    return new Sisyphe({
-      module: "walker-fs",
-      options: {
-        path: pathInput
-      }
-    });
-  })
-  .then((sisyphe) => {
-    sisyphe.start();
+fs.statAsync(pathInput).catch((error) => {
+  console.log(error);
+  process.exit(1);
+}).then(() => {
+  return new Sisyphe({
+    module: "walker-fs",
+    options: {
+      path: pathInput
+    }
   });
+}).then((sisyphe) => {
+  sisyphe.start();
+});
 
 
 

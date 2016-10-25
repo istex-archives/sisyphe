@@ -3,7 +3,7 @@
 class Business {
   doTheJob(data, next) {
     setTimeout(() => {
-      console.log('alpha-worker : ', data);
+      // console.log('alpha-worker : ', data);
       next();
     }, 10);
   }

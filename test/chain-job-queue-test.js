@@ -10,8 +10,8 @@ describe(pkg.name + '/src/chain-job-queue.js', function () {
   describe('constructor', function () {
     it('Should initialize some variables', function () {
       const chain = new ChainJobQueue();
-      expect(chain.listWorker).to.be.an('array');
-      expect(chain.listWorker).to.be.empty;
+      void expect(chain.listWorker).to.be.an('array');
+      void expect(chain.listWorker).to.be.empty;
     })
   });
 

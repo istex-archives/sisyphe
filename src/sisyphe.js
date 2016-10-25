@@ -4,8 +4,13 @@ const ChainJobQueue = require('./chain-job-queue'),
   path = require('path'),
   bluebird = require('bluebird'),
   fs = bluebird.promisifyAll(require('fs')),
+  redis = require('redis'),
+  clientRedis = redis.createClient(),
   cluster = require('cluster'),
   numberFork = require('os').cpus().length / 2;
+
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
 
 class Sisyphe {
   constructor(starter, workers) {
@@ -53,6 +58,9 @@ class Sisyphe {
   initializeWorker() {
     const workerDirectory = path.resolve(__dirname + "/../worker");
     this.workflow = new ChainJobQueue();
+    this.workflow.on('finish-him', () => {
+      console.log('et ouais dude');
+    });
     return bluebird.map(this.workers, (worker) => fs.accessAsync(workerDirectory + "/" + worker.module))
       .then(() => {
         return this.workers.map((worker) => {
@@ -93,7 +101,9 @@ class Sisyphe {
         });
 
         this.starterModule.setFunctionEventOnEnd(() => {
-          this.workflow.numberTotalTask = this.starterModule.totalFile;
+          this.workflow.totalGeneratedTask = this.starterModule.totalFile;
+          console.log('totalTaskBefore :', this.starterModule.totalFile.toString());
+          clientRedis.set("totalGeneratedTask", this.starterModule.totalFile.toString());
           console.log('walker finish with ' + this.starterModule.totalFile + ' files.');
         });
 
