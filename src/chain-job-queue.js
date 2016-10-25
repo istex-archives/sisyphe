@@ -62,13 +62,16 @@ class ChainJobQueue extends EventEmitter {
 
       const isTheLastWorker = listWorker.length === (index + 1);
       const debounceSetCount = debounce((worker) => {
-        clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask).then(() => {
-          return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask')
+        clientRedis.incrbyAsync('totalErrorTask', worker.totalErrorTask).then(() => {
+          return clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask);
+        }).then(() => {
+          return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalErrorTask')
         }).then((values) => {
-          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask'], values);
-          if (metrics.totalGeneratedTask === metrics.totalPerformedTask) {
+          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalErrorTask'], values);
+          if (+metrics.totalGeneratedTask === +metrics.totalPerformedTask + +metrics.totalErrorTask) {
             console.log('release finishers !');
             self.emit('workers-out-of-work');
+            clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalErrorTask');
           }
         });
       }, 1000);

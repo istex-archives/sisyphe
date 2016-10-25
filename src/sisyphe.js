@@ -87,8 +87,8 @@ class Sisyphe {
         return worker.finalFunction !== undefined
       }).map((worker) => {
         return bluebird.promisify(worker.finalFunction)();
-      }).then((result) => {
-        console.log(result);
+      }).then(() => {
+        console.log('All finalJob executed !');
       });
     });
     this.workflow.addJobProcessToWorkers();

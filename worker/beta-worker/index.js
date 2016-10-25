@@ -5,7 +5,7 @@ class Business {
     setTimeout(() => {
       // console.log('beta-worker : ', data);
       next();
-    }, 10);
+    }, 20);
   }
 
   finalJob(done) {

@@ -5,7 +5,7 @@ class Business {
     setTimeout(() => {
       // console.log('alpha-worker : ', data);
       next();
-    }, 10);
+    }, 30);
   }
 }
 
