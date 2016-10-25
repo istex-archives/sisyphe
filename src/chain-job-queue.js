@@ -24,7 +24,7 @@ class ChainJobQueue extends EventEmitter {
     const newWorker = {
       name: name,
       totalPerformedTask: 0,
-      totalErrorTask: 0,
+      totalFailedTask: 0,
       jobQueueFunction: jobQueueFunction,
       finalFunction: finalFunction
     };
@@ -50,6 +50,7 @@ class ChainJobQueue extends EventEmitter {
     this.listWorker.map((worker) => {
       const throttledQueueClean = throttle((worker) => {
         worker.queue.clean(100);
+        worker.queue.clean(100, 'failed');
       }, 1000);
 
       worker.queue.process((job, done) => {
@@ -58,20 +59,23 @@ class ChainJobQueue extends EventEmitter {
       });
       return worker;
     }).map((worker, index, listWorker) => {
-      worker.queue.on('error', () => worker.totalErrorTask++);
+      worker.queue.on('failed', (job, error) => {
+        worker.totalFailedTask++;
+        console.log(error.message);
+      });
 
       const isTheLastWorker = listWorker.length === (index + 1);
       const debounceSetCount = debounce((worker) => {
-        clientRedis.incrbyAsync('totalErrorTask', worker.totalErrorTask).then(() => {
+        clientRedis.incrbyAsync('totalFailedTask', worker.totalFailedTask).then(() => {
           return clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask);
         }).then(() => {
-          return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalErrorTask')
+          return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask')
         }).then((values) => {
-          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalErrorTask'], values);
-          if (+metrics.totalGeneratedTask === +metrics.totalPerformedTask + +metrics.totalErrorTask) {
+          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask'], values);
+          if (+metrics.totalGeneratedTask === +metrics.totalPerformedTask + +metrics.totalFailedTask) {
             console.log('release finishers !');
             self.emit('workers-out-of-work');
-            clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalErrorTask');
+            clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
           }
         });
       }, 1000);

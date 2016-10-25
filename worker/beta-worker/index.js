@@ -4,7 +4,11 @@ class Business {
   doTheJob(data, next) {
     setTimeout(() => {
       // console.log('beta-worker : ', data);
-      next();
+      if (data.extension === '.xml') {
+        next(new Error("I don't want yours metadata, dude !"));
+      } else {
+        next()
+      }
     }, 20);
   }
 
