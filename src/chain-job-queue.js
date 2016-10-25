@@ -46,21 +46,12 @@ class ChainJobQueue extends EventEmitter {
 
   addJobProcessToWorkers() {
     const self = this;
-    this.listWorker.map((worker, index, listWorker) => {
-      const debouncedQueueClose = debounce((worker) => {
-        worker.queue.count().then((result) => {
-          if (result === 0) worker.queue.close().then(() => {
-            const lastIndex = listWorker.length - 1;
-            if (index === lastIndex) process.exit();
-          });
-        })
-      }, 3000);
+    this.listWorker.map((worker) => {
       const throttledQueueClean = throttle((worker) => {
         worker.queue.clean(100);
       }, 1000);
 
       worker.queue.process((job, done) => {
-        // debouncedQueueClose(worker);
         throttledQueueClean(worker);
         worker.jobQueueFunction(job.data, done);
       });
@@ -72,12 +63,11 @@ class ChainJobQueue extends EventEmitter {
       const debounceSetCount = debounce((worker) => {
         clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask).then(() => {
           return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask')
-        }).then((value) => {
-          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask'], value);
-          console.log('totalTask :', value);
+        }).then((values) => {
+          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask'], values);
           if (metrics.totalGeneratedTask === metrics.totalPerformedTask) {
             console.log('release finishers !');
-            self.emit('finish-him');
+            self.emit('workers-out-of-work');
           }
         });
       }, 1000);
