@@ -57,10 +57,7 @@ class Sisyphe {
   initializeWorker() {
     const workerDirectory = path.resolve(__dirname + "/../worker");
     this.workflow = new ChainJobQueue();
-    this.workflow.on('workers-out-of-work', () => {
-      console.log('heyho, heyho, on a finis le boulot');
-    });
-    
+
     return bluebird.map(this.workers, (worker) => {
       return fs.accessAsync(workerDirectory + "/" + worker.module)
     }).then(() => {
@@ -70,12 +67,13 @@ class Sisyphe {
         const packageWorkerModule = require(pathToWorkerModule + '/package.json');
         return {
           name: packageWorkerModule.name,
-          doTheJob: workerModule.doTheJob
+          doTheJob: workerModule.doTheJob,
+          finalJob: workerModule.finalJob
         };
       })
     }).then((arrayWorkerModule) => {
       arrayWorkerModule.map((workerModule) => {
-        this.workflow.addWorker(workerModule.name, workerModule.doTheJob);
+        this.workflow.addWorker(workerModule.name, workerModule.doTheJob, workerModule.finalJob);
       });
       this.workflow.createQueueForWorkers();
       return this;
@@ -83,6 +81,17 @@ class Sisyphe {
   }
 
   activateWorker() {
+    this.workflow.on('workers-out-of-work', () => {
+      console.log('heyho, heyho, on a finis le boulot');
+      // console.log(this.workflow);
+      this.workflow.listWorker.filter((worker) => {
+        return worker.finalFunction !== undefined
+      }).map((worker) => {
+        worker.finalFunction((error, result) => {
+          console.log(result)
+        })
+      });
+    });
     this.workflow.addJobProcessToWorkers();
     return this;
   }

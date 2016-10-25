@@ -20,12 +20,13 @@ class ChainJobQueue extends EventEmitter {
     this.redisHost = redisHost || '127.0.0.1';
   }
 
-  addWorker(name, jobQueueFunction) {
+  addWorker(name, jobQueueFunction, finalFunction) {
     const newWorker = {
       name: name,
       totalPerformedTask: 0,
       totalErrorTask: 0,
-      jobQueueFunction: jobQueueFunction
+      jobQueueFunction: jobQueueFunction,
+      finalFunction: finalFunction
     };
     this.listWorker.push(newWorker);
     return this;

@@ -7,6 +7,12 @@ class Business {
       next();
     }, 10);
   }
+
+  finalJob(callback) {
+    setTimeout(() => {
+      callback(null, 'finalJob from beta-worker executed !')
+    }, 20)
+  }
 }
 
 module.exports = new Business();
