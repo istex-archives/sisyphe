@@ -72,14 +72,18 @@ class ChainJobQueue extends EventEmitter {
           return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask')
         }).then((values) => {
           const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask'], values);
-          logger.info(metrics);
+          // logger.info("Total jobs completed = " + metrics.totalPerformedTask);
+          // logger.info("Total jobs failed = " + metrics.totalFailedTask);
+          // const totalJobs = +metrics.totalPerformedTask + +metrics.totalFailedTask;
+          // logger.info("Total jobs = " + totalJobs);
           if (+metrics.totalPerformedTask + +metrics.totalFailedTask >= +metrics.totalGeneratedTask) {
             logger.info('release finishers !');
             self.emit('workers-out-of-work');
-            clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
+            // clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
           }
         });
-      }, 1000);
+        // Generate a delay random number for avoid multiple call to finalJob execution
+      }, Math.floor(Math.random() * 500 + 500));
 
       if (isTheLastWorker) {
         worker.queue.on('completed', () => {
