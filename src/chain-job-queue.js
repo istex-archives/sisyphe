@@ -3,6 +3,7 @@
 const Queue = require('bull'),
   bluebird = require('bluebird'),
   redis = require('redis'),
+  logger = require('winston'),
   EventEmitter = require('events'),
   zipObject = require('lodash/zipObject'),
   debounce = require('lodash/debounce'),
@@ -61,7 +62,6 @@ class ChainJobQueue extends EventEmitter {
     }).map((worker, index, listWorker) => {
       worker.queue.on('failed', (job, error) => {
         worker.totalFailedTask++;
-        console.log(error.message);
       });
 
       const isTheLastWorker = listWorker.length === (index + 1);
@@ -72,8 +72,9 @@ class ChainJobQueue extends EventEmitter {
           return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask')
         }).then((values) => {
           const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask'], values);
-          if (+metrics.totalGeneratedTask === +metrics.totalPerformedTask + +metrics.totalFailedTask) {
-            console.log('release finishers !');
+          logger.info(metrics);
+          if (+metrics.totalPerformedTask + +metrics.totalFailedTask >= +metrics.totalGeneratedTask) {
+            logger.info('release finishers !');
             self.emit('workers-out-of-work');
             clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
           }

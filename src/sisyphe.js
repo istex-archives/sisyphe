@@ -3,6 +3,7 @@
 const ChainJobQueue = require('./chain-job-queue'),
   path = require('path'),
   bluebird = require('bluebird'),
+  logger = require('winston'),
   fs = bluebird.promisifyAll(require('fs')),
   redis = require('redis'),
   clientRedis = redis.createClient(),
@@ -41,10 +42,10 @@ class Sisyphe {
         for (var i = 0; i < numberFork; i++) {
           const fork = cluster.fork();
           fork.on('online', () => {
-            console.log('fork created');
+            logger.info('fork created');
           });
           fork.on('exit', () => {
-            console.log('fork exit');
+            logger.info('fork exit');
           });
         }
         this.initializeStarter()
@@ -82,13 +83,12 @@ class Sisyphe {
 
   activateWorker() {
     this.workflow.on('workers-out-of-work', () => {
-      console.log('heyho, heyho, on a finis le boulot');
       bluebird.filter(this.workflow.listWorker, (worker) => {
         return worker.finalFunction !== undefined
       }).map((worker) => {
         return bluebird.promisify(worker.finalFunction)();
       }).then(() => {
-        console.log('All finalJob executed !');
+        logger.info('All finalJob executed !');
       });
     });
     this.workflow.addJobProcessToWorkers();
@@ -109,9 +109,8 @@ class Sisyphe {
 
       this.starterModule.setFunctionEventOnEnd(() => {
         this.workflow.totalGeneratedTask = this.starterModule.totalFile;
-        console.log('totalTaskBefore :', this.starterModule.totalFile.toString());
         clientRedis.set("totalGeneratedTask", this.starterModule.totalFile.toString());
-        console.log('walker finish with ' + this.starterModule.totalFile + ' files.');
+        logger.info("the starter module has generated " + this.starterModule.totalFile + ' jobs.');
       });
 
       return this;
