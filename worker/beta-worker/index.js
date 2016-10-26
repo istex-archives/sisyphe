@@ -9,13 +9,13 @@ class Business {
       } else {
         next()
       }
-    }, 20);
+    }, Math.floor(Math.random() * 80 + 20));
   }
 
   finalJob(done) {
     setTimeout(() => {
       done()
-    }, 20)
+    }, Math.floor(Math.random() * 80 + 20))
   }
 }
 

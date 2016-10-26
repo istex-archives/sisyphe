@@ -90,14 +90,6 @@ class Sisyphe {
         return bluebird.promisify(worker.finalFunction)();
       }).then(() => {
         logger.info('All finalJob executed !');
-        return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask')
-      }).then((values) => {
-        const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask'], values);
-        const totalJobs = +metrics.totalPerformedTask + +metrics.totalFailedTask;
-        logger.info("Total jobs = " + totalJobs);
-        logger.info("Total jobs completed = " + metrics.totalPerformedTask);
-        logger.info("Total jobs failed = " + metrics.totalFailedTask);
-        clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
       });
     });
     this.workflow.addJobProcessToWorkers();

@@ -60,30 +60,36 @@ class ChainJobQueue extends EventEmitter {
       });
       return worker;
     }).map((worker, index, listWorker) => {
+      const sendCountToRedis = throttle((count, key) => {
+        clientRedis.incrbyAsync(key, count).then(() => {
+          worker[key] = 0;
+        })
+      }, 500);
+
       worker.queue.on('failed', (job, error) => {
         worker.totalFailedTask++;
+        sendCountToRedis(worker.totalFailedTask, 'totalFailedTask');
       });
 
       const isTheLastWorker = listWorker.length === (index + 1);
       const debounceSetCount = debounce((worker) => {
-        clientRedis.incrbyAsync('totalFailedTask', worker.totalFailedTask).then(() => {
-          return clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask);
-        }).then(() => {
+        clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask).then(() => {
+          worker.totalPerformedTask = 0;
           return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask')
         }).then((values) => {
           const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask'], values);
-          // logger.info("Total jobs completed = " + metrics.totalPerformedTask);
-          // logger.info("Total jobs failed = " + metrics.totalFailedTask);
-          // const totalJobs = +metrics.totalPerformedTask + +metrics.totalFailedTask;
-          // logger.info("Total jobs = " + totalJobs);
           if (+metrics.totalPerformedTask + +metrics.totalFailedTask >= +metrics.totalGeneratedTask) {
+            logger.info("Total jobs completed = " + metrics.totalPerformedTask);
+            logger.info("Total jobs failed = " + metrics.totalFailedTask);
+            const totalJobs = +metrics.totalPerformedTask + +metrics.totalFailedTask;
+            logger.info("Total jobs = " + totalJobs);
             logger.info('release finishers !');
             self.emit('workers-out-of-work');
-            // clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
+            clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
           }
         });
         // Generate a delay random number for avoid multiple call to finalJob execution
-      }, Math.floor(Math.random() * 500 + 500));
+      }, Math.floor(Math.random() * 500 + 1000));
 
       if (isTheLastWorker) {
         worker.queue.on('completed', () => {
