@@ -9,11 +9,13 @@ class Business {
       } else {
         next()
       }
-    }, Math.floor(Math.random() * 80 + 20));
+    }, 50);
+    // Math.floor(Math.random() * 80 + 20)
   }
 
   finalJob(done) {
     setTimeout(() => {
+      console.log('this is the final countdown');
       done()
     }, Math.floor(Math.random() * 80 + 20))
   }

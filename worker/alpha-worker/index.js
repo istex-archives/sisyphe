@@ -10,7 +10,8 @@ class Business {
         next()
       }
       next();
-    }, Math.floor(Math.random() * 80 + 20));
+    }, 80);
+    // Math.floor(Math.random() * 80 + 20)
   }
 }
 
