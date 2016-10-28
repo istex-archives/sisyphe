@@ -71,31 +71,10 @@ class ChainJobQueue extends EventEmitter {
         sendCountToRedis(worker.totalFailedTask, 'totalFailedTask');
       });
 
-      const debounceSetCount = debounce((worker) => {
-        clientRedis.incrbyAsync('totalPerformedTask', worker.totalPerformedTask).then(() => {
-          worker.totalPerformedTask = 0;
-          return clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask')
-        }).then((values) => {
-          const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask'], values);
-          logger.info("Total jobs created = " + metrics.totalGeneratedTask);
-          logger.info("Total jobs completed = " + metrics.totalPerformedTask);
-          logger.info("Total jobs failed = " + metrics.totalFailedTask);
-          const totalJobs = +metrics.totalPerformedTask + +metrics.totalFailedTask;
-          logger.info("Total jobs = " + totalJobs);
-          if (+metrics.totalPerformedTask + +metrics.totalFailedTask >= +metrics.totalGeneratedTask) {
-            logger.info('release finishers !');
-            self.emit('workers-out-of-work');
-            clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
-          }
-        });
-      }, 1000);
-      // Math.floor(Math.random() * 500 + 1000)
-
       const isTheLastWorker = listWorker.length === (index + 1);
       if (isTheLastWorker) {
         worker.queue.on('completed', () => {
           worker.totalPerformedTask++;
-          // debounceSetCount(worker);
           sendCountToRedis(worker.totalPerformedTask, 'totalPerformedTask');
         });
       }
