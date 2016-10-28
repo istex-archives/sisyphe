@@ -4,7 +4,6 @@ const Queue = require('bull'),
   bluebird = require('bluebird'),
   redis = require('redis'),
   logger = require('winston'),
-  EventEmitter = require('events'),
   zipObject = require('lodash/zipObject'),
   debounce = require('lodash/debounce'),
   throttle = require('lodash/throttle'),
@@ -13,9 +12,8 @@ const Queue = require('bull'),
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
-class ChainJobQueue extends EventEmitter {
+class ChainJobQueue {
   constructor(redisPort, redisHost) {
-    super();
     this.listWorker = [];
     this.redisPort = redisPort || 6379;
     this.redisHost = redisHost || '127.0.0.1';
@@ -47,7 +45,6 @@ class ChainJobQueue extends EventEmitter {
   }
 
   addJobProcessToWorkers() {
-    const self = this;
     this.listWorker.map((worker) => {
       const throttledQueueClean = throttle((worker) => {
         worker.queue.clean(100);
@@ -60,31 +57,22 @@ class ChainJobQueue extends EventEmitter {
       });
       return worker;
     }).map((worker, index, listWorker) => {
-      const sendCountToRedis = throttle((count, key) => {
-        clientRedis.incrbyAsync(key, count).then(() => {
-          worker[key] = 0;
-        })
-      }, 500);
-
-      worker.queue.on('failed', (job, error) => {
+      worker.queue.on('failed', () => {
         worker.totalFailedTask++;
-        sendCountToRedis(worker.totalFailedTask, 'totalFailedTask');
+        clientRedis.incr('totalFailedTask');
       });
 
-      const isTheLastWorker = listWorker.length === (index + 1);
-      if (isTheLastWorker) {
-        worker.queue.on('completed', () => {
+      worker.queue.on('completed', (job) => {
+        const isTheLastWorker = listWorker.length === (index + 1);
+        if (isTheLastWorker) {
           worker.totalPerformedTask++;
-          sendCountToRedis(worker.totalPerformedTask, 'totalPerformedTask');
-        });
-      }
-
-      if (index > 0) {
-        const workerBefore = listWorker[index - 1];
-        workerBefore.queue.on('completed', (job) => {
-          worker.queue.add(job.data);
-        })
-      }
+          clientRedis.incr('totalPerformedTask');
+          worker.totalPerformedTask = 0;
+        } else {
+          const workerAfter = listWorker[index + 1];
+          workerAfter.queue.add(job.data);
+        }
+      });
 
       return worker;
     });

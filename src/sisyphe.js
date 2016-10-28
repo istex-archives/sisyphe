@@ -49,8 +49,7 @@ class Sisyphe {
             logger.info('fork exit');
           });
         }
-        this.initializeStarter()
-          .then(() => this.startToGenerateTask());
+        this.initializeStarter().then(() => this.startToGenerateTask());
       }
       this.activateWorker();
     });
@@ -83,16 +82,6 @@ class Sisyphe {
   }
 
   activateWorker() {
-    this.workflow.on('workers-out-of-work', () => {
-      bluebird.filter(this.workflow.listWorker, (worker) => {
-        return worker.finalFunction !== undefined
-      }).map((worker) => {
-        return bluebird.promisify(worker.finalFunction)();
-      }).then(() => {
-        logger.info('All finalJob executed !');
-      });
-    });
-
     const callFinishers = () => {
       return bluebird.filter(this.workflow.listWorker, (worker) => {
         return worker.finalFunction !== undefined
@@ -101,6 +90,7 @@ class Sisyphe {
       })
     };
 
+    // Heartbeat
     if (cluster.isMaster) {
       setInterval(function () {
         clientRedis.mgetAsync('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask').then((values) => {
@@ -112,7 +102,6 @@ class Sisyphe {
             logger.info("Total jobs failed = " + metrics.totalFailedTask);
             logger.info("Total jobs = " + totalJobs);
             logger.info('release finishers !');
-            // self.emit('workers-out-of-work');
             callFinishers().then(() => logger.info('All finalJob executed !'));
             clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
             clearInterval(this);
