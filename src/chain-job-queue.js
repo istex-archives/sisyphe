@@ -55,7 +55,7 @@ class ChainJobQueue extends EventEmitter {
       }, 1000);
 
       worker.queue.process((job, done) => {
-        // throttledQueueClean(worker);
+        throttledQueueClean(worker);
         worker.jobQueueFunction(job.data, done);
       });
       return worker;
