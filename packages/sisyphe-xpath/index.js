@@ -1,5 +1,25 @@
 'use strict';
 
-const FromXml = require('xpath-generator').FromXml;
+const redisHost = process.env.REDIS_HOST || 'localhost',
+      redisPort = process.env.REDIS_PORT || '6379';
 
-console.log(FromXml);
+const FromXml = require('xpath-generator').FromXml,
+      redis = require('redis'),
+      redisClient = redis.createClient(`//${redisHost}:${redisPort}`);
+
+
+function doTheJob(data,next) {
+  if(data.mimeType != 'application/xml' ){
+    return next();
+  };
+  let xml = new FromXml().generate('./test.xml',true).then(result=>{
+    console.log(result);
+  })
+}
+
+function finalJob(){
+  // When no more data in queue, sisyphe will execute it
+}
+
+exports.doTheJob = doTheJob;
+exports.finalJob = finalJob;
