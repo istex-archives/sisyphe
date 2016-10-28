@@ -30,10 +30,3 @@ describe('Redis', () => {
     })
   })
 });
-
-function createClient() {
-  let client = redis.createClient(`//${redisHost}:${redisPort}`)
-  client.on('error',(err) =>{
-    consoel.log('err', err)
-  });
-}
