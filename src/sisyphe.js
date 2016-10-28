@@ -97,6 +97,7 @@ class Sisyphe {
           const metrics = zipObject(['totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask'], values);
           const totalJobs = +metrics.totalPerformedTask + +metrics.totalFailedTask;
           if (+metrics.totalGeneratedTask && totalJobs >= +metrics.totalGeneratedTask) {
+            console.log();
             logger.info("Total jobs created = " + metrics.totalGeneratedTask);
             logger.info("Total jobs completed = " + metrics.totalPerformedTask);
             logger.info("Total jobs failed = " + metrics.totalFailedTask);

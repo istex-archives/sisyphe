@@ -3,6 +3,7 @@
 class Business {
   doTheJob(data, next) {
     setTimeout(() => {
+      process.stdout.write('.');
       // console.log('beta-worker : ', data);
       if (data.extension === '.xml') {
         next(new Error("I don't want yours metadata, dude !"));

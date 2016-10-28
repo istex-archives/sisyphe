@@ -3,6 +3,7 @@
 class Business {
   doTheJob(data, next) {
     setTimeout(() => {
+      process.stdout.write('.');
       // console.log('alpha-worker : ', data);
       // if (data.size < 500 ) {
       //   next(new Error("I don't want yours smallfile, dude !"));
