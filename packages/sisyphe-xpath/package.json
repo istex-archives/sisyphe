@@ -1,0 +1,19 @@
+{
+  "name": "sisyphe-xpath",
+  "version": "0.0.1",
+  "description": "Module for sisyphe to geenrate list of xpath on the fly",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/istex/sisyphe-xpath.git"
+  },
+  "author": "rmeja matthd",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/istex/sisyphe-xpath/issues"
+  },
+  "homepage": "https://github.com/istex/sisyphe-xpath#readme"
+}
