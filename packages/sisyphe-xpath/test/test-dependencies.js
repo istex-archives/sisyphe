@@ -1,5 +1,6 @@
 const chai = require('chai'),
       kuler = require('kuler'),
+      doTheJob = require('../index.js').doTheJob,
       expect = chai.expect;
 
 const redisHost = process.env.REDIS_HOST || 'localhost',
@@ -7,8 +8,6 @@ const redisHost = process.env.REDIS_HOST || 'localhost',
 
 const FromXml = require('xpath-generator').FromXml,
       redis = require('redis');
-
-
 
 describe('Redis', () => {
   it('Should have redis env placed' , (done)=>{
@@ -28,5 +27,22 @@ describe('Redis', () => {
     client.on('connect',()=>{
       done();
     })
+  })
+});
+
+describe('DoTheJob',()=>{
+  it('Should not doing work if mimetype is not xml',(done)=>{
+    var objTest = { extension: '.xml',
+      path: 'test.pdf',
+      mimetype: 'application/pdf',
+      size: 500 
+    }
+    doTheJob(objTest, (err,data)=>{
+      if(err){
+        return done(err);
+      }
+      expect(data).to.deep.equal(objTest);
+      return done();
+    });
   })
 });
