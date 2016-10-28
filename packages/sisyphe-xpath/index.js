@@ -9,11 +9,12 @@ const FromXml = require('xpath-generator').FromXml,
 
 
 function doTheJob(data,next) {
-  if(data.mimeType != 'application/xml' ){
-    return next();
+  if(data.mimeType != 'application/xml'){
+    return next(null,data);
   };
   let xml = new FromXml().generate('./test.xml',true).then(result=>{
-    console.log(result);
+    data.xpaths = result;
+    next(null,data);
   })
 }
 
