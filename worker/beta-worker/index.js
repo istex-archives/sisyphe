@@ -1,25 +1,22 @@
 'use strict';
 
-class Business {
-  doTheJob(data, next) {
-    setTimeout(() => {
-      process.stdout.write('.');
-      // console.log('beta-worker : ', data);
-      if (data.extension === '.xml') {
-        next(new Error("I don't want yours metadata, dude !"));
-      } else {
-        next()
-      }
-    }, 50);
-    // Math.floor(Math.random() * 80 + 20)
-  }
-
-  finalJob(done) {
-    setTimeout(() => {
-      console.log('this is the final countdown');
-      done()
-    }, Math.floor(Math.random() * 80 + 20))
-  }
-}
-
-module.exports = new Business();
+const betaWorker = {};
+betaWorker.doTheJob = function (data, next) {
+  setTimeout(() => {
+    process.stdout.write('.');
+    // console.log('beta-worker : ', data);
+    if (data.extension === '.xml') {
+      next(new Error("I don't want yours metadata, dude !"));
+    } else {
+      next()
+    }
+  }, 50);
+  // Math.floor(Math.random() * 80 + 20)
+};
+betaWorker.finalJob = function (done) {
+  setTimeout(() => {
+    console.log('this is the final countdown');
+    done()
+  }, Math.floor(Math.random() * 80 + 20))
+};
+module.exports = betaWorker;

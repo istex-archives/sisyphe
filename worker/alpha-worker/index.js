@@ -1,19 +1,11 @@
 'use strict';
 
-class Business {
-  doTheJob(data, next) {
-    setTimeout(() => {
-      process.stdout.write('.');
-      // console.log('alpha-worker : ', data);
-      // if (data.size < 500 ) {
-      //   next(new Error("I don't want yours smallfile, dude !"));
-      // } else {
-      //   next()
-      // }
-      next();
-    }, 80);
-    // Math.floor(Math.random() * 80 + 20)
-  }
-}
+const alphaWorker = {};
+alphaWorker.doTheJob = function(data, next) {
+  setTimeout(() => {
+    process.stdout.write('.');
+    next();
+  }, 40);
+};
 
-module.exports = new Business();
+module.exports = alphaWorker;
