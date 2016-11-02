@@ -11,12 +11,12 @@ const FromXml = require('xpath-generator').FromXml,
 const sisypheXpath = {};
 
 sisypheXpath.doTheJob = function (data, next) {
-  if (data.mimeType != 'application/xml') {
+  if (data.mimetype != 'application/xml') {
     return next(null, data);
   }
   const xml = new FromXml();
-  xml.generate('./test.xml', true).then((result) => {
-    data.xpaths = result;
+  xml.generate(data.path, true).then((result) => {
+    data.xpath = result;
     next(null, data);
   })
 };
