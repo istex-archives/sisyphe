@@ -46,6 +46,24 @@ describe('DoTheJob', () => {
       done();
     });
   })
+  it('Should not doing job if file does not exist', (done) => {
+    let objTest = {
+      extension: '.xml',
+      path: 'test/test-nofile.xml',
+      mimetype: 'application/xml',
+      size: 500
+    };
+    doTheJob(objTest, (err, data)=> {
+      try{
+        expect(function (){if(err && err.instanceof(Error) ){throw err}}).to.throw(Error);
+
+      }
+      catch(err){
+        return done(err)
+      }
+      done()
+    });
+  })
   it('Should generate xpath obj', (done) => {
     let objTest = {
       extension: '.xml',
@@ -60,8 +78,7 @@ describe('DoTheJob', () => {
       expect(data.xpath).to.exist;
       expect(data.xpath).to.be.an('object');
       expect(data.xpath).to.be.not.empty;
-      expect(data.xpath[Object.keys(data.xpath)[0]]).to.have.property('foo')
-
+      expect(data.xpath[Object.keys(data.xpath)[0]]).to.have.property('count')
       return done();
     });
   })
