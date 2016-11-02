@@ -59,14 +59,14 @@ class ChainJobQueue {
     }).map((worker, index, listWorker) => {
       worker.queue.on('failed', () => {
         worker.totalFailedTask++;
-        clientRedis.incr('totalFailedTask');
+        clientRedis.incr('sisyphe:totalFailedTask');
       });
 
       worker.queue.on('completed', (job) => {
         const isTheLastWorker = listWorker.length === (index + 1);
         if (isTheLastWorker) {
           worker.totalPerformedTask++;
-          clientRedis.incr('totalPerformedTask');
+          clientRedis.incr('sisyphe:totalPerformedTask');
           worker.totalPerformedTask = 0;
         } else {
           const workerAfter = listWorker[index + 1];
