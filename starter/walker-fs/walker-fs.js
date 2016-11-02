@@ -7,15 +7,17 @@ const walk = require('walk'),
 class WalkerFS {
   constructor(options) {
     this._path = options.path;
+    this.corpusname = options.corpusname;
     this.totalFile = 0;
-
+    this.now = Date.now();
     this.functionEventOnFile = (root, stats) => {
       // Permet d'identifier les fichiers .nxml (BMJ) et .Meta (Springer) comme mimetype XML
       mime.define({
         'application/xml': ["nxml", "meta", "xlink_v03", "prime_v03", "plusxml_v02", "plusprime_v02", "info_V03", "citation_v03", "aux_v03"]
       });
       const data = {
-        corpusname: options.corpusname,
+        corpusname: this.corpusname,
+        startAt: this.now,
         extension: path.extname(stats.name),
         path: path.resolve(root + '/' + stats.name),
         mimetype: mime.lookup(root + '/' + stats.name),
