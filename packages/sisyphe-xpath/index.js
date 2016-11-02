@@ -15,9 +15,11 @@ sisypheXpath.doTheJob = function (data, next) {
     return next(null, data);
   }
   const xml = new FromXml();
-  xml.generate(data.path, true).then((result) => {
+  xml.generate(data.path, true).then(result => {
     data.xpath = result;
     next(null, data);
+  }).catch(err => {
+    next(err);
   })
 };
 
