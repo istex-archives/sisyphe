@@ -4,7 +4,6 @@ const Queue = require('bull'),
   bluebird = require('bluebird'),
   redis = require('redis'),
   logger = require('winston'),
-  zipObject = require('lodash/zipObject'),
   debounce = require('lodash/debounce'),
   throttle = require('lodash/throttle'),
   clientRedis = redis.createClient();
@@ -57,16 +56,18 @@ class ChainJobQueue {
       });
       return worker;
     }).map((worker, index, listWorker) => {
-      worker.queue.on('failed', () => {
+      worker.queue.on('failed', (job) => {
         worker.totalFailedTask++;
-        clientRedis.incr('sisyphe:totalFailedTask');
+        clientRedis.hincrby('sisyphe', job.queue.name + ':totalFailedTask', 1);
+        clientRedis.hincrby('sisyphe', 'totalFailedTask', 1);
       });
 
       worker.queue.on('completed', (job) => {
         const isTheLastWorker = listWorker.length === (index + 1);
         if (isTheLastWorker) {
           worker.totalPerformedTask++;
-          clientRedis.incr('sisyphe:totalPerformedTask');
+          clientRedis.hincrby('sisyphe',  job.queue.name + ':totalPerformedTask', 1);
+          clientRedis.hincrby('sisyphe', 'totalPerformedTask', 1);
           worker.totalPerformedTask = 0;
         } else {
           const workerAfter = listWorker[index + 1];
