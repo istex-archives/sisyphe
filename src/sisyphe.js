@@ -103,9 +103,14 @@ class Sisyphe {
             logger.info("Total jobs failed = " + metrics.totalFailedTask);
             logger.info("Total jobs = " + totalJobs);
             logger.info('release finishers !');
-            callFinishers().then(() => logger.info('All finalJob executed !'));
-            clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
-            clearInterval(this);
+            callFinishers().then(() => {
+              logger.info('All finalJob executed !');
+              clientRedis.del('totalGeneratedTask', 'totalPerformedTask', 'totalFailedTask');
+              clearInterval(this);
+            }).catch((error) => {
+              // TODO : rajouter une gestion des erreur pour les logs
+              logger.info(error);
+            });
           }
         });
       }, 1000);
