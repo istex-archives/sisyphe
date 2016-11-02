@@ -5,8 +5,8 @@ const walk = require('walk'),
   mime = require('mime');
 
 class WalkerFS {
-  constructor(pathInput) {
-    this._path = pathInput;
+  constructor(options) {
+    this._path = options.path;
     this.totalFile = 0;
 
     this.functionEventOnFile = (root, stats) => {
@@ -15,6 +15,7 @@ class WalkerFS {
         'application/xml': ["nxml", "meta", "xlink_v03", "prime_v03", "plusxml_v02", "plusprime_v02", "info_V03", "citation_v03", "aux_v03"]
       });
       const data = {
+        corpusname: options.corpusname,
         extension: path.extname(stats.name),
         path: path.resolve(root + '/' + stats.name),
         mimetype: mime.lookup(root + '/' + stats.name),

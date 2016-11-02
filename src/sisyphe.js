@@ -123,7 +123,7 @@ class Sisyphe {
     const pathToStarterModule = starterDirectory + "/" + this.starter.module;
     return fs.accessAsync(pathToStarterModule).then(() => {
       const StarterModule = require(starterDirectory + "/" + this.starter.module);
-      this.starterModule = new StarterModule(this.starter.options.path);
+      this.starterModule = new StarterModule(this.starter.options);
 
       this.starterModule.setFunctionEventOnData((data) => {
         this.starterModule.totalFile++;

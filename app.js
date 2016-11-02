@@ -9,8 +9,13 @@ const program = require('commander'),
 
 program
   .version('0.0.1')
-  .usage('<path>')
+  .usage('[options] <path>')
+  .option('-c, --corpusname <name>', 'Choose a corpus\'s name', 'default')
   .parse(process.argv);
+
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}
 
 const pathInput = program.args[0];
 fs.statAsync(pathInput).catch((error) => {
@@ -20,7 +25,8 @@ fs.statAsync(pathInput).catch((error) => {
   return new Sisyphe({
     module: "walker-fs",
     options: {
-      path: pathInput
+      path: pathInput,
+      corpusname: program.corpusname
     }
   });
 }).then((sisyphe) => {
