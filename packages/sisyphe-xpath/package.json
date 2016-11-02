@@ -18,7 +18,7 @@
   "homepage": "https://github.com/istex/sisyphe-xpath#readme",
   "dependencies": {
     "redis": "^2.6.2",
-    "xpath-generator": "0.0.3"
+    "xpath-generator": "^0.0.4"
   },
   "devDependencies": {
     "chai": "^3.5.0",

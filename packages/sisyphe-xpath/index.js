@@ -3,7 +3,8 @@
 const redisHost = process.env.REDIS_HOST || 'localhost',
   redisPort = process.env.REDIS_PORT || '6379';
 
-const FromXml = require('xpath-generator').FromXml,
+const FromXml = require('/Users/dieudonn/Documents/INIST/xpath-generator').FromXml,
+  // FromXml = require('xpath-generator').FromXml,
   redis = require('redis'),
   redisClient = redis.createClient(`//${redisHost}:${redisPort}`);
 
