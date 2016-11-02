@@ -1,6 +1,7 @@
 const chai = require('chai'),
   kuler = require('kuler'),
   doTheJob = require('../index.js').doTheJob,
+  finalJob = require('../index.js').finalJob,
   expect = chai.expect;
 
 const redisHost = process.env.REDIS_HOST || 'localhost',
@@ -82,4 +83,10 @@ describe('DoTheJob', () => {
       return done();
     });
   })
-});
+})
+
+describe('FinalJob', () => {
+  it('Expect a list of all keys in redis', (done) => {
+    finalJob()
+  })
+})
