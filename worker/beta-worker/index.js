@@ -3,8 +3,6 @@
 const betaWorker = {};
 betaWorker.doTheJob = function (data, next) {
   setTimeout(() => {
-    process.stdout.write('.');
-    // console.log('beta-worker : ', data);
     if (data.extension === '.xml') {
       next(new Error("I don't want yours metadata, dude !"));
     } else {

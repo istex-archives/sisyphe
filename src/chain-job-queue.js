@@ -3,6 +3,7 @@
 const Queue = require('bull'),
   bluebird = require('bluebird'),
   redis = require('redis'),
+  kuler = require('kuler'),
   logger = require('winston'),
   debounce = require('lodash/debounce'),
   throttle = require('lodash/throttle'),
@@ -57,12 +58,14 @@ class ChainJobQueue {
       return worker;
     }).map((worker, index, listWorker) => {
       worker.queue.on('failed', (job) => {
+        process.stdout.write(kuler('|', 'red'));
         worker.totalFailedTask++;
         clientRedis.hincrby('sisyphe', job.queue.name + ':totalFailedTask', 1);
         clientRedis.hincrby('sisyphe', 'totalFailedTask', 1);
       });
 
       worker.queue.on('completed', (job) => {
+        process.stdout.write(kuler('-', 'green'));
         const isTheLastWorker = listWorker.length === (index + 1);
         if (isTheLastWorker) {
           worker.totalPerformedTask++;
