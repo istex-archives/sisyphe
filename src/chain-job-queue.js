@@ -4,11 +4,19 @@ const Queue = require('bull'),
   bluebird = require('bluebird'),
   redis = require('redis'),
   kuler = require('kuler'),
-  logger = require('winston'),
+  winston = require('winston'),
   debounce = require('lodash/debounce'),
   throttle = require('lodash/throttle'),
   clientRedis = redis.createClient();
 
+const logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.File)({
+      filename: 'logs/sisyphe.log',
+      level: 'info'
+    })
+  ]
+});
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
@@ -57,7 +65,8 @@ class ChainJobQueue {
       });
       return worker;
     }).map((worker, index, listWorker) => {
-      worker.queue.on('failed', (job) => {
+      worker.queue.on('failed', (job, error) => {
+        logger.error(error);
         process.stdout.write(kuler('|', 'red'));
         worker.totalFailedTask++;
         clientRedis.hincrby('sisyphe', job.queue.name + ':totalFailedTask', 1);

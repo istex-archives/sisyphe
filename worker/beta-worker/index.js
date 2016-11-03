@@ -13,7 +13,7 @@ betaWorker.doTheJob = function (data, next) {
 };
 betaWorker.finalJob = function (done) {
   setTimeout(() => {
-    console.log('this is the final countdown');
+    // console.log('this is the final countdown');
     done()
   }, Math.floor(Math.random() * 80 + 20))
 };
