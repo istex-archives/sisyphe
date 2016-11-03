@@ -87,6 +87,8 @@ describe('DoTheJob', () => {
 
 describe('FinalJob', () => {
   it('Expect a list of all keys in redis', (done) => {
-    finalJob()
+    finalJob((err)=>{
+      console.log(err)
+    })
   })
 })

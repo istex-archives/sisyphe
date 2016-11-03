@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/istex/sisyphe-xpath#readme",
   "dependencies": {
+    "mkdirp": "^0.5.1",
     "redis": "^2.6.2",
     "xpath-generator": "^0.0.4"
   },
