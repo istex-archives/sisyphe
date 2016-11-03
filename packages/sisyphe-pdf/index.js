@@ -1,16 +1,18 @@
 'use strict';
 
-const bluebird = require('bluebird'),
-  fs = require('fs');
+const bluebird = require('bluebird');
+const fs = bluebird.promisifyAll(require('fs'));
 require('pdfjs-dist');
-global.DOMParser = require('xmldom').DOMParser
+global.DOMParser = require('xmldom').DOMParser;
 
 const sisyphePdf = {};
 sisyphePdf.doTheJob = function (data, next) {
   if (data.mimetype === 'application/pdf') {
-    const pdfData = new Uint8Array(fs.readFileSync(data.path));
 
-    const getPdfWordCount = PDFJS.getDocument(pdfData).then((doc) => {
+    const getPdfWordCount = fs.readFileAsync(data.path).then((data) => {
+      const pdfData = new Uint8Array(data);
+      return PDFJS.getDocument(pdfData);
+    }).then((doc) => {
       const numPages = doc.numPages;
       data.pdfPageTotal = numPages;
       const numPagesArr = Array.from(new Array(numPages), (val, index)=>index + 1);
