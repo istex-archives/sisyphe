@@ -32,7 +32,10 @@ sisyphePdf.doTheJob = function (data, next) {
       }).reduce((previous, current) => previous + current)
     });
 
-    const getPdfMetaData = PDFJS.getDocument(pdfData).then((doc) => {
+    const getPdfMetaData = fs.readFileAsync(data.path).then((data) => {
+      const pdfData = new Uint8Array(data);
+      return PDFJS.getDocument(pdfData);
+    }).then((doc) => {
       return doc.getMetadata()
     });
 
