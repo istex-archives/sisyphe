@@ -2,7 +2,8 @@
 
 const DOMParser = require('xmldom').DOMParser,
   bluebird = require('bluebird'),
-  fs = bluebird.promisifyAll(require('fs'));
+  fs = bluebird.promisifyAll(require('fs')),
+  getDoctype = bluebird.promisifyAll(require("get-doctype"));
 
 const sisypheXml = {};
 sisypheXml.doTheJob = function (data, next) {
@@ -26,14 +27,19 @@ sisypheXml.doTheJob = function (data, next) {
       }
     });
 
-    fs.readFileAsync(data.path, 'utf8').then((xmlContent) => {
-      parser.parseFromString(xmlContent, 'application/xml');
-      data.isWellFormed = Object.keys(wellFormedError).length === 0;
-      if (!data.isWellFormed) {
-        data.wellFormedError = wellFormedError;
+    bluebird.join(
+      fs.readFileAsync(data.path, 'utf8'),
+      getDoctype.parseFileAsync(data.path),
+      function(xmlContent, doctype) {
+        data.doctype = doctype;
+        parser.parseFromString(xmlContent, 'application/xml');
+        data.isWellFormed = Object.keys(wellFormedError).length === 0;
+        if (!data.isWellFormed) {
+          data.wellFormedError = wellFormedError;
+        }
+        next(null, data);
       }
-      next(null, data);
-    }).catch((error) => {
+    ).catch((error) => {
       next(error);
     });
   } else {
