@@ -13,9 +13,9 @@ sisypheXml.doTheJob = function (data, next) {
         wellFormedErrorObj[level] = {
           message: msg,
           locator
-        };
-      };
-    }
+        }
+      }
+    };
 
     const parser = new DOMParser({
       locator: {},
@@ -32,7 +32,6 @@ sisypheXml.doTheJob = function (data, next) {
       if (!data.isWellFormed) {
         data.wellFormedError = wellFormedError;
       }
-      if (data.name === '10.1177_030437548000600201.xml') console.log(data);
       next(null, data);
     }).catch((error) => {
       next(error);
