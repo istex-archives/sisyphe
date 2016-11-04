@@ -21,6 +21,7 @@ class WalkerFS {
         extension: path.extname(stats.name),
         path: path.resolve(root + '/' + stats.name),
         mimetype: mime.lookup(root + '/' + stats.name),
+        name: stats.name,
         size: stats.size
       };
 
