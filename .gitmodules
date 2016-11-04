@@ -1,0 +1,6 @@
+[submodule "worker/sisyphe-xml"]
+	path = worker/sisyphe-xml
+	url = https://github.com/istex/sisyphe-xml.git
+[submodule "worker/sisyphe-pdf"]
+	path = worker/sisyphe-pdf
+	url = https://github.com/istex/sisyphe-pdf.git
