@@ -41,7 +41,7 @@ sisyphePdf.doTheJob = function (data, next) {
 
     bluebird.join(getPdfMetaData, getPdfWordCount, (pdfMetadata, pdfWordCount) => {
       data.pdfWordCount = pdfWordCount;
-      data.pdfWordByPage = data.pdfWordCount / data.pdfPageTotal;
+      data.pdfWordByPage = (data.pdfWordCount / data.pdfPageTotal).toFixed(2);
       data.pdfMetadata = pdfMetadata.info;
       next(null, data);
     }).catch((error) => {
