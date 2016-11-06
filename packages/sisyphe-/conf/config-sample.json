@@ -2,10 +2,13 @@
   "xpath": [
     {
       "name": "someInfos",
+      "regex": "^([a-z]{8})$",
+      "type": "String",
       "xpath": "/xpath/to/my/infos"
     },
     {
       "name": "otherSomeInfos",
+      "type": "Number",
       "xpath": "/xpath/to/my/other/infos"
     }
   ]
