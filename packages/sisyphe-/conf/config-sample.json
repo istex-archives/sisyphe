@@ -1,0 +1,12 @@
+{
+  "xpath": [
+    {
+      "name": "someInfos",
+      "xpath": "/xpath/to/my/infos"
+    },
+    {
+      "name": "otherSomeInfos",
+      "xpath": "/xpath/to/my/other/infos"
+    }
+  ]
+}

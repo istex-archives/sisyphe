@@ -11,6 +11,7 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "get-doctype": "^1.0.0",
-    "xmldom": "git+https://github.com/rmeja/xmldom.git"
+    "xmldom": "git+https://github.com/rmeja/xmldom.git",
+    "xpath": "0.0.23"
   }
 }
