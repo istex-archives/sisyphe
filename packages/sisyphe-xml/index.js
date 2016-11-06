@@ -1,6 +1,7 @@
 'use strict';
 
 const DOMParser = require('xmldom').DOMParser,
+  xpath = require('xpath'),
   bluebird = require('bluebird'),
   fs = bluebird.promisifyAll(require('fs')),
   getDoctype = bluebird.promisifyAll(require("get-doctype"));
@@ -27,17 +28,46 @@ sisypheXml.doTheJob = function (data, next) {
       }
     });
 
+    const getConf = (corpusname) => {
+      const pathToConf = __dirname + '/conf/' + corpusname + '.json';
+      return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
+        return fs.readFileAsync(pathToConf)
+      }).then((dataConf) => {
+        return JSON.parse(dataConf);
+      });
+    };
+
     bluebird.join(
       fs.readFileAsync(data.path, 'utf8'),
       getDoctype.parseFileAsync(data.path),
       function(xmlContent, doctype) {
         data.doctype = doctype;
-        parser.parseFromString(xmlContent, 'application/xml');
+        const xmlDom = parser.parseFromString(xmlContent, 'application/xml');
         data.isWellFormed = Object.keys(wellFormedError).length === 0;
         if (!data.isWellFormed) {
           data.wellFormedError = wellFormedError;
+          next(null, data);
+        } else {
+          getConf(data.corpusname).then((conf) => {
+            conf.metadata.map((metadata) => {
+              let value = xpath.select(metadata.xpath, xmlDom);
+              if (metadata.type === 'String' || metadata.type === 'Number') value = value.toString();
+              if (metadata.hasOwnProperty('regex')) {
+                const regex = new RegExp(metadata.regex);
+                const isValueValid = regex.test(value);
+                if (isValueValid) {
+                  data[metadata.name + 'IsValid'] = isValueValid;
+                  data[metadata.name] = value;
+                } else {
+                  data[metadata.name + 'IsValid'] = isValueValid;
+                }
+              } else {
+                data[metadata.name] = value;
+              }
+            });
+            next(null, data);
+          });
         }
-        next(null, data);
       }
     ).catch((error) => {
       next(error);
