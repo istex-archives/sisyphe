@@ -19,7 +19,7 @@
   "dependencies": {
     "mkdirp": "^0.5.1",
     "redis": "^2.6.2",
-    "xpath-generator": "^0.0.4"
+    "xpath-generator": "^0.0.5"
   },
   "devDependencies": {
     "chai": "^3.5.0",
