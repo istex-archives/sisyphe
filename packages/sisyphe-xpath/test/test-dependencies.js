@@ -88,7 +88,7 @@ describe('DoTheJob', () => {
 describe('FinalJob', () => {
   it('Expect a list of all keys in redis', (done) => {
     finalJob((err)=>{
-      console.log(err)
+      // Check if path was created and have text
     })
   })
 })
