@@ -3,13 +3,14 @@
 const redisHost = process.env.REDIS_HOST || 'localhost',
   redisPort = process.env.REDIS_PORT || '6379';
 
-const FromXml = require('/Users/dieudonn/Documents/INIST/xpath-generator').FromXml,
-  // FromXml = require('xpath-generator').FromXml,
+const config = require('./config.json'),
+  FromXml = require('xpath-generator').FromXml,
   Promise = require('bluebird'),
   redis = Promise.promisifyAll(require('redis')),
   fs = Promise.promisifyAll(require('fs')),
+  path = require('path'),
   mkdirp = Promise.promisifyAll(require('mkdirp')),
-  redisClient = redis.createClient(`//${redisHost}:${redisPort}`,{db : '1'}),
+  redisClient = redis.createClient(`//${redisHost}:${redisPort}`,{db : config.redisDB}),
   redisScan = require('redisscan');
 
 const sisypheXpath = {},
@@ -35,9 +36,10 @@ sisypheXpath.doTheJob = function (data, next) {
 
 sisypheXpath.finalJob = function (done) {
   // When no more data in queue, sisyphe will execute it
-  let date = Date.now();
-  mkdirp.mkdirpAsync(`applis/istex/job/${date}`).then(()=>{
-    let xpathsStream = fs.createWriteStream(`applis/istex/job/${date}/xpaths-list.txt`);
+  let outPutPath = path.resolve(config.xpathsOutput,Date.now().toString()),
+      outputFile = path.resolve(outPutPath,'xpaths-list.txt');
+  mkdirp.mkdirpAsync(outPutPath).then(()=>{
+    let xpathsStream = fs.createWriteStream(outputFile);
     xpathsStream
     .on('error', (err) =>{
       return done(err);
