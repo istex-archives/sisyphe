@@ -15,6 +15,8 @@ const FromXml = require('/Users/dieudonn/Documents/INIST/xpath-generator').FromX
 const sisypheXpath = {},
   xml = new FromXml();
 
+var fullXpaths = {};
+
 sisypheXpath.doTheJob = function (data, next) {
   if (data.mimetype != 'application/xml') {
     return next(null, data);
@@ -33,48 +35,47 @@ sisypheXpath.doTheJob = function (data, next) {
 
 sisypheXpath.finalJob = function (done) {
   // When no more data in queue, sisyphe will execute it
-  mkdirp(`applis/istex/job/${Date.now()}`).then(()=>{
-    console.log('test')
+  let date = Date.now();
+  mkdirp.mkdirpAsync(`applis/istex/job/${date}`).then(()=>{
+    let xpathsStream = fs.createWriteStream(`applis/istex/job/${date}/xpaths-list.txt`);
+    xpathsStream
+    .on('error', (err) =>{
+      return done(err);
+    })
+    .on('open', ()=>{
+      scanAsync('0', '*')
+      .map((value,index)=>{
+        return xpathsStream.writeAsync(`${fullXpaths[index]} ${value}\n`);
+      })
+      .then(()=>{
+        xpathsStream.close();
+        done();
+      }).catch(err=>{
+        done(err)
+      })
+    })
+    .on('close', ()=>{
+      redisClient.flushdb();
+    })
   })
   .catch(err=>{
     return done(err);
-  })
-  let xpathsStream = fs.createWriteStream(`/applis/istex/job/${Date.now()}/xpaths.txt`, {'flags': 'w'});
-  xpathsStream.on('error', function(err) {
-    return done(err);
-  });
-  scanAsync('0', '*').then((result)=>{
-    xpathsStream.write(result.toString());
-    console.log('result ',result)
-    done();
   });
 };
 
 function scanAsync(cursor, pattern){
   return redisClient.scanAsync(cursor, 'MATCH', pattern).then(reply => {
     cursor = reply[0];
-    let keys = reply[1],
-        obj = {};
+    fullXpaths = reply[1];
 
-    return Promise.map(keys,(key)=>{
+    return Promise.map(fullXpaths,(key)=>{
       return redisClient.getAsync(key);
-    }).then((results)=>{
-      for (var i = 0; i < keys.length; i++) {
-        obj[keys[i]] = results[i]
-      }
-      return obj;
     })
-
-    //console.log([keys])
-    //console.log(reply)
-    // keys.forEach(function(key,i){
-    //   redisClient.getAsync(key).then(function(val) {
-    //     obj[key] = val;
-    //   });
-    // });
-    // redisClient.mgetAsync(keys).then(function(res) {
-    //   console.log(res); // => 'bar' 
-    // });
+    // .then((results)=>{
+    //   for (var i = 0; i < keys.length; i++) {
+    //     fullPaths[keys[i]] = results[i]
+    //   }
+    // })
   });
 }
 
