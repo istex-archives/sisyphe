@@ -1,4 +1,4 @@
 {
-  "redisBase" : 1,
+  "redisDB" : 1,
   "xpathsOutput" : "applis/istex/job/"
 }
