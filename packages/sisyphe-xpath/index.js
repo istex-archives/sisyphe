@@ -9,14 +9,18 @@ const config = require('./config.json'),
   redis = Promise.promisifyAll(require('redis')),
   fs = Promise.promisifyAll(require('fs')),
   path = require('path'),
-  mkdirp = Promise.promisifyAll(require('mkdirp')),
-  redisClient = redis.createClient(`//${redisHost}:${redisPort}`,{db : config.redisDB}),
-  redisScan = require('redisscan');
+  mkdirp = Promise.promisifyAll(require('mkdirp'));
+
+config.xpathsOutput = config.xpathsOutput || '/applis/istex/job/';
+config.redisDB = config.redisDB || config.redisDB;
+
+const redisClient = redis.createClient(`//${redisHost}:${redisPort}`,{db : config.redisDB});
 
 const sisypheXpath = {},
   xml = new FromXml();
 
 var fullXpaths = {};
+
 
 sisypheXpath.doTheJob = function (data, next) {
   if (data.mimetype != 'application/xml') {
@@ -38,6 +42,7 @@ sisypheXpath.finalJob = function (done) {
   // When no more data in queue, sisyphe will execute it
   let outPutPath = path.resolve(config.xpathsOutput,Date.now().toString()),
       outputFile = path.resolve(outPutPath,'xpaths-list.txt');
+
   mkdirp.mkdirpAsync(outPutPath).then(()=>{
     let xpathsStream = fs.createWriteStream(outputFile);
     xpathsStream
@@ -45,11 +50,9 @@ sisypheXpath.finalJob = function (done) {
       return done(err);
     })
     .on('open', ()=>{
-      scanAsync('0', '*')
-      .map((value,index)=>{
+      scanAsync('0', '*').map((value,index)=>{
         return xpathsStream.writeAsync(`${fullXpaths[index]} ${value}\n`);
-      })
-      .then(()=>{
+      }).then(()=>{
         xpathsStream.close();
         done();
       }).catch(err=>{
@@ -73,11 +76,6 @@ function scanAsync(cursor, pattern){
     return Promise.map(fullXpaths,(key)=>{
       return redisClient.getAsync(key);
     })
-    // .then((results)=>{
-    //   for (var i = 0; i < keys.length; i++) {
-    //     fullPaths[keys[i]] = results[i]
-    //   }
-    // })
   });
 }
 

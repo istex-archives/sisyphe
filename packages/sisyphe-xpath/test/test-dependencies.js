@@ -2,13 +2,13 @@ const chai = require('chai'),
   kuler = require('kuler'),
   doTheJob = require('../index.js').doTheJob,
   finalJob = require('../index.js').finalJob,
-  expect = chai.expect;
+  expect = chai.expect,
+  FromXml = require('xpath-generator').FromXml,
+  redis = require('redis');
 
 const redisHost = process.env.REDIS_HOST || 'localhost',
-  redisPort = process.env.REDIS_PORT || '6379';
-
-const FromXml = require('xpath-generator').FromXml,
-  redis = require('redis');
+  redisPort = process.env.REDIS_PORT || '6379',
+  config = require('../config.json');
 
 describe('Redis', () => {
   it('Should have redis env placed', (done)=> {
@@ -86,9 +86,12 @@ describe('DoTheJob', () => {
 })
 
 describe('FinalJob', () => {
-  it('Expect a list of all keys in redis', (done) => {
+  it('Final Job should not failed during work', (done) => {
     finalJob((err)=>{
-      // Check if path was created and have text
+      if(err){
+        return done(err)
+      }
+      done();
     })
   })
 })
