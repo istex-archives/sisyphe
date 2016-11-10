@@ -103,6 +103,7 @@ class Sisyphe {
         clientRedis.hgetallAsync('sisyphe').then((values) => {
           const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
           if (+values.totalGeneratedTask && totalJobs >= +values.totalGeneratedTask) {
+            clearInterval(this);
             logger.info("Total jobs created = " + values.totalGeneratedTask);
             logger.info("Total jobs completed = " + values.totalPerformedTask);
             logger.info("Total jobs failed = " + values.totalFailedTask);
@@ -111,7 +112,6 @@ class Sisyphe {
             callFinishers().then(() => {
               logger.info('All finalJob executed !');
               clientRedis.del('sisyphe');
-              clearInterval(this);
               console.log('');
               console.log('This is the end !');
             }).catch((error) => {
