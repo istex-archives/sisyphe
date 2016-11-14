@@ -54,13 +54,7 @@ class ChainJobQueue {
 
   addJobProcessToWorkers() {
     this.listWorker.map((worker) => {
-      const throttledQueueClean = throttle((worker) => {
-        worker.queue.clean(100);
-        worker.queue.clean(100, 'failed');
-      }, 1000);
-
       worker.queue.process((job, done) => {
-        throttledQueueClean(worker);
         worker.jobQueueFunction(job.data, done);
       });
       return worker;
@@ -73,7 +67,7 @@ class ChainJobQueue {
         clientRedis.hincrby('sisyphe', 'totalFailedTask', 1);
       });
 
-      worker.queue.on('completed', (job) => {
+      worker.queue.on('completed', (job, result) => {
         process.stdout.write(kuler('-', 'green'));
         const isTheLastWorker = listWorker.length === (index + 1);
         if (isTheLastWorker) {
@@ -83,7 +77,7 @@ class ChainJobQueue {
           worker.totalPerformedTask = 0;
         } else {
           const workerAfter = listWorker[index + 1];
-          workerAfter.queue.add(job.data);
+          workerAfter.queue.add(result, {removeOnComplete: true});
         }
       });
 
@@ -93,7 +87,7 @@ class ChainJobQueue {
   }
 
   addTask(task) {
-    this.listWorker[0].queue.add(task);
+    this.listWorker[0].queue.add(task, {removeOnComplete: true});
     return this;
   }
 }
