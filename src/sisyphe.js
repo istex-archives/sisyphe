@@ -44,6 +44,39 @@ class Sisyphe {
     this.starterModule.start();
   }
 
+  heartbeat() {
+    const callFinishers = () => {
+      return bluebird.filter(this.workflow.listWorker, (worker) => {
+        return worker.finalFunction !== undefined
+      }).map((worker) => {
+        return bluebird.promisify(worker.finalFunction)();
+      })
+    };
+
+    setInterval(function () {
+      clientRedis.hgetallAsync('sisyphe').then((values) => {
+        const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
+        if (+values.totalGeneratedTask && totalJobs >= +values.totalGeneratedTask) {
+          clearInterval(this);
+          logger.info("Total jobs created = " + values.totalGeneratedTask);
+          logger.info("Total jobs completed = " + values.totalPerformedTask);
+          logger.info("Total jobs failed = " + values.totalFailedTask);
+          logger.info("Total jobs = " + totalJobs);
+          logger.info('release finishers !');
+          callFinishers().then(() => {
+            logger.info('All finalJob executed !');
+            clientRedis.del('sisyphe');
+            console.log('');
+            console.log('This is the end !');
+          }).catch((error) => {
+            // TODO : rajouter une gestion des erreur pour les logs
+            logger.info(error);
+          });
+        }
+      });
+    }, 1000);
+  }
+
   start() {
     this.initializeWorker().then(() => {
       if (cluster.isMaster) {
@@ -56,9 +89,11 @@ class Sisyphe {
             logger.info('fork exit');
           });
         }
+        this.heartbeat();
         this.initializeStarter().then(() => this.startToGenerateTask());
+      } else {
+        this.activateWorker();
       }
-      this.activateWorker();
     });
   }
 
@@ -89,40 +124,6 @@ class Sisyphe {
   }
 
   activateWorker() {
-    const callFinishers = () => {
-      return bluebird.filter(this.workflow.listWorker, (worker) => {
-        return worker.finalFunction !== undefined
-      }).map((worker) => {
-        return bluebird.promisify(worker.finalFunction)();
-      })
-    };
-
-    // Heartbeat
-    if (cluster.isMaster) {
-      setInterval(function () {
-        clientRedis.hgetallAsync('sisyphe').then((values) => {
-          const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
-          if (+values.totalGeneratedTask && totalJobs >= +values.totalGeneratedTask) {
-            clearInterval(this);
-            logger.info("Total jobs created = " + values.totalGeneratedTask);
-            logger.info("Total jobs completed = " + values.totalPerformedTask);
-            logger.info("Total jobs failed = " + values.totalFailedTask);
-            logger.info("Total jobs = " + totalJobs);
-            logger.info('release finishers !');
-            callFinishers().then(() => {
-              logger.info('All finalJob executed !');
-              clientRedis.del('sisyphe');
-              console.log('');
-              console.log('This is the end !');
-            }).catch((error) => {
-              // TODO : rajouter une gestion des erreur pour les logs
-              logger.info(error);
-            });
-          }
-        });
-      }, 1000);
-    }
-
     this.workflow.addJobProcessToWorkers();
     return this;
   }
