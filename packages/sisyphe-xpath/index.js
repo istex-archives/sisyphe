@@ -19,22 +19,22 @@ const redisClient = redis.createClient(`//${redisHost}:${redisPort}`,{db : confi
 const sisypheXpath = {},
   xml = new FromXml();
 
-var fullXpaths = {};
-
+var fullXpaths = new Set();
 
 sisypheXpath.doTheJob = function (data, next) {
-  if (data.mimetype != 'application/xml') {
+  if (data.mimetype !== 'application/xml') {
     return next(null, data);
   }
+  console.log('Not Ignored: ', data.name)
   xml.generate(data.path, true).then(result => {
     data.xpath = result;
     let keys = Object.keys(result);
     for(var i=0; i < keys.length; i++){
       redisClient.incrby(keys[i],result[keys[i]].count);
     }
-    next(null, data);
+    return next(null, data);
   }).catch(err => {
-    next(err);
+    return next(err);
   })
 };
 
@@ -50,8 +50,8 @@ sisypheXpath.finalJob = function (done) {
       return done(err);
     })
     .on('open', ()=>{
-      scanAsync('0', '*').map((value,index)=>{
-        return xpathsStream.writeAsync(`${fullXpaths[index]} ${value}\n`);
+      scanAsync('0', '*').map((result)=>{
+        return xpathsStream.writeAsync(`${result.key} ${result.val}\n`);
       }).then(()=>{
         xpathsStream.close();
         done();
@@ -70,11 +70,17 @@ sisypheXpath.finalJob = function (done) {
 
 function scanAsync(cursor, pattern){
   return redisClient.scanAsync(cursor, 'MATCH', pattern).then(reply => {
-    cursor = reply[0];
-    fullXpaths = reply[1];
-
+    cursor = +reply[0];
+    for (var i = 0; i < reply[1].length; i++) {
+      fullXpaths.add(reply[1][i]);
+    }
+    if(cursor !== 0){
+      return scanAsync(cursor,'*');
+    }
     return Promise.map(fullXpaths,(key)=>{
-      return redisClient.getAsync(key);
+      return redisClient.getAsync(key).then(value=>{
+        return {key: key, val: value}
+      });
     })
   });
 }
