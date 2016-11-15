@@ -57,9 +57,10 @@ sisypheXml.doTheJob = function (data, next) {
                 const isValueValid = regex.test(value);
                 if (isValueValid) {
                   data[metadata.name + 'IsValid'] = isValueValid;
-                  data[metadata.name] = value;
+                  data[metadata.name] = parseInt(value, 10);
                 } else {
                   data[metadata.name + 'IsValid'] = isValueValid;
+                  data[metadata.name + 'Error'] = value;
                 }
               } else {
                 data[metadata.name] = value;
