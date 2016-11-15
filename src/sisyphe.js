@@ -58,9 +58,9 @@ class Sisyphe {
         const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
         if (+values.totalGeneratedTask && totalJobs >= +values.totalGeneratedTask) {
           clearInterval(this);
-          logger.info("Total jobs created = " + values.totalGeneratedTask);
-          logger.info("Total jobs completed = " + values.totalPerformedTask);
-          logger.info("Total jobs failed = " + values.totalFailedTask);
+          logger.info("Total jobs created = " + +[values.totalGeneratedTask]);
+          logger.info("Total jobs completed = " + +[values.totalPerformedTask]);
+          logger.info("Total jobs failed = " + +[values.totalFailedTask]);
           logger.info("Total jobs = " + totalJobs);
           logger.info('release finishers !');
           callFinishers().then(() => {
