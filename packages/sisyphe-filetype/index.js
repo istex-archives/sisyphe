@@ -23,6 +23,8 @@ sisypheXml.doTheJob = function (data, next) {
     'application/xml': ["nxml", "meta", "xlink_v03", "prime_v03", "plusxml_v02", "plusprime_v02", "info_V03", "citation_v03", "aux_v03"]
   });
 
+  var datapath = data.path.replace(/ /g,'\\ ');
+  console.log('path',datapath)
   let mimetype = mime.lookup(data.path);
 
   console.log(data.name, mimetype)
@@ -31,7 +33,6 @@ sisypheXml.doTheJob = function (data, next) {
     data.mimetype = mimetype;
     return next(null,data);
   }
-
 
   firstline(data.path).then(line1=>{
     if(isXml(line1)){
@@ -45,7 +46,7 @@ sisypheXml.doTheJob = function (data, next) {
     console.log(data.name, 'CatchFirstline', 'application/octet-stream');
     return 'application/octet-stream'
   }).then(mimeResult=>{
-    // Will now check all data of file
+    // Could now check all data of file
     if(mimeResult === 'application/octet-stream'){
       return fs.readFileAsync(data.path).then(dataFile=>{
         if(isXml(dataFile)){
@@ -63,33 +64,34 @@ sisypheXml.doTheJob = function (data, next) {
     return mimeResult;
   })
   // This is in test building ...
-  // .then(mimeResult=>{
-  //   //will detect wia filesystem Info
-  //   if(mimeResult === 'application/octet-stream'){
-  //     console.log(data.path, 'fileMime', mimeResult, platform);
-  //     switch(platform){
-  //       //OSX
-  //       case 'darwin':
-  //         return child_process.execAsync(`file -b --mime-type ${data.path}`).then((stdout, stderr)=>{
-  //           if(stderr){
-  //             // add corupt message here to data
-  //             return mimeResult;
-  //           }
-  //           return stdout;
-  //         }).catch(err=>{
-  //           console.log('errFile',err)
-  //           return mimeResult
-  //         })
-  //       //Windows
-  //       case 'win32':
-  //         return 
-  //       //Linux
-  //       default:
-  //         return 
-  //     }
-  //   }
-  //   return mimeResult
-  // })
+  .then(mimeResult=>{
+    //will detect wia filesystem Info
+    if(mimeResult === 'application/octet-stream'){
+      switch(platform){
+        //OSX
+        case 'darwin':
+          return child_process.execAsync(`file -b --mime-type ${datapath}`)
+          .then((stdout, stderr)=>{
+            if(stderr){
+              // add corrupt message here to data
+              return mimeResult;
+            }
+            console.log(data.name, 'fileMime', mimeResult);
+            return stdout;
+          }).catch(err=>{
+            console.log('errFile',err)
+            return mimeResult
+          })
+        //Windows
+        case 'win32':
+          return 
+        //Linux
+        default:
+          return 
+      }
+    }
+    return mimeResult
+  })
   .then(filetype=>{
     console.log('FileType', data.name, filetype);
     data.mimetype = filetype;
