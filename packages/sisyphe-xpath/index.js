@@ -14,23 +14,23 @@ const config = require('./config.json'),
 config.xpathsOutput = config.xpathsOutput || '/applis/istex/job/';
 config.redisDB = config.redisDB || config.redisDB;
 
-const redisClient = redis.createClient(`//${redisHost}:${redisPort}`,{db : config.redisDB});
+const redisClient = redis.createClient(`//${redisHost}:${redisPort}`, {db: config.redisDB});
 
 const sisypheXpath = {},
   xml = new FromXml();
 
-var fullXpaths = new Set();
+const fullXpaths = new Set();
 
 sisypheXpath.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml') {
     return next(null, data);
   }
-  console.log('Not Ignored: ', data.name)
+  // console.log('Not Ignored: ', data.name);
   xml.generate(data.path, true).then(result => {
     data.xpath = result;
     let keys = Object.keys(result);
-    for(var i=0; i < keys.length; i++){
-      redisClient.incrby(keys[i],result[keys[i]].count);
+    for (let i = 0; i < keys.length; i++) {
+      redisClient.incrby(keys[i], result[keys[i]].count);
     }
     return next(null, data);
   }).catch(err => {
@@ -40,45 +40,41 @@ sisypheXpath.doTheJob = function (data, next) {
 
 sisypheXpath.finalJob = function (done) {
   // When no more data in queue, sisyphe will execute it
-  let outPutPath = path.resolve(config.xpathsOutput,Date.now().toString()),
-      outputFile = path.resolve(outPutPath,'xpaths-list.txt');
+  let outputPath = path.resolve(config.xpathsOutput, Date.now().toString()),
+    outputFile = path.resolve(outputPath, 'xpaths-list.txt');
 
-  mkdirp.mkdirpAsync(outPutPath).then(()=>{
+  mkdirp.mkdirpAsync(outputPath).then(() => {
     let xpathsStream = fs.createWriteStream(outputFile);
-    xpathsStream
-    .on('error', (err) =>{
+    xpathsStream.on('error', (err) => {
       return done(err);
-    })
-    .on('open', ()=>{
-      scanAsync('0', '*').map((result)=>{
+    });
+    xpathsStream.on('open', () => {
+      scanAsync('0', '*').map((result) => {
         return xpathsStream.writeAsync(`${result.key} ${result.val}\n`);
-      }).then(()=>{
+      }).then(() => {
         xpathsStream.close();
         done();
-      }).catch(err=>{
+      }).catch(err => {
         done(err)
       })
-    })
-    .on('close', ()=>{
+    });
+    xpathsStream.on('close', () => {
       redisClient.flushdb();
     })
-  })
-  .catch(err=>{
+  }).catch(err => {
     return done(err);
   });
 };
 
-function scanAsync(cursor, pattern){
+function scanAsync(cursor, pattern) {
   return redisClient.scanAsync(cursor, 'MATCH', pattern).then(reply => {
     cursor = +reply[0];
-    for (var i = 0; i < reply[1].length; i++) {
+    for (let i = 0; i < reply[1].length; i++) {
       fullXpaths.add(reply[1][i]);
     }
-    if(cursor !== 0){
-      return scanAsync(cursor,'*');
-    }
-    return Promise.map(fullXpaths,(key)=>{
-      return redisClient.getAsync(key).then(value=>{
+    if (cursor !== 0) return scanAsync(cursor, '*');
+    return Promise.map(fullXpaths, (key) => {
+      return redisClient.getAsync(key).then(value => {
         return {key: key, val: value}
       });
     })
