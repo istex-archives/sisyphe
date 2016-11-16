@@ -51,20 +51,23 @@ sisypheXml.doTheJob = function (data, next) {
           getConf(data.corpusname).then((conf) => {
             conf.metadata.map((metadata) => {
               let value = xpath.select(metadata.xpath, xmlDom);
-              if (metadata.type === 'String' || metadata.type === 'Number') value = value.toString();
-              if (metadata.hasOwnProperty('regex')) {
-                const regex = new RegExp(metadata.regex);
-                const isValueValid = regex.test(value);
-                if (metadata.type === 'Number') value = parseInt(value, 10);
-                if (isValueValid) {
-                  data[metadata.name + 'IsValid'] = isValueValid;
-                  data[metadata.name] = value;
+              if (value.length !== 0) {
+                if (metadata.type === 'String' || metadata.type === 'Number') value = value.toString();
+                if (metadata.hasOwnProperty('regex')) {
+                  const regex = new RegExp(metadata.regex);
+                  const isValueValid = regex.test(value);
+                  if (isValueValid) {
+                    data[metadata.name + 'IsValid'] = isValueValid;
+                    if (metadata.type === 'Number') value = parseInt(value, 10);
+                    data[metadata.name] = value;
+                  } else {
+                    data[metadata.name + 'IsValid'] = isValueValid;
+                    data[metadata.name + 'Error'] = value;
+                  }
                 } else {
-                  data[metadata.name + 'IsValid'] = isValueValid;
-                  data[metadata.name + 'Error'] = value;
+                  if (metadata.type === 'Number') value = parseInt(value, 10);
+                  data[metadata.name] = value;
                 }
-              } else {
-                data[metadata.name] = value;
               }
             });
             next(null, data);
