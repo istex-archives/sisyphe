@@ -62,13 +62,13 @@ describe(pkg.name + '/src/chain-job-queue.js', function () {
         setTimeout(() => {
           data.count++;
           expect(data.count).to.equal(1);
-          next();
+          next(null, data);
         }, data.time);
       }).addWorker('Second Worker', (data, next) => {
         setTimeout(() => {
           data.count++;
           expect(data.count).to.equal(2);
-          next();
+          next(null, data);
         }, data.time);
       }).initialize()
         .addTask({
