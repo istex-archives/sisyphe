@@ -4,3 +4,6 @@
 [submodule "worker/sisyphe-pdf"]
 	path = worker/sisyphe-pdf
 	url = https://github.com/istex/sisyphe-pdf.git
+[submodule "worker/sisyphe-xpath"]
+	path = worker/sisyphe-xpath
+	url = https://github.com/istex/sisyphe-xpath.git
