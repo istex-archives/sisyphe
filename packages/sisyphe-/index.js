@@ -55,9 +55,10 @@ sisypheXml.doTheJob = function (data, next) {
               if (metadata.hasOwnProperty('regex')) {
                 const regex = new RegExp(metadata.regex);
                 const isValueValid = regex.test(value);
+                if (metadata.type === 'Number') value = parseInt(value, 10);
                 if (isValueValid) {
                   data[metadata.name + 'IsValid'] = isValueValid;
-                  data[metadata.name] = parseInt(value, 10);
+                  data[metadata.name] = value;
                 } else {
                   data[metadata.name + 'IsValid'] = isValueValid;
                   data[metadata.name + 'Error'] = value;
