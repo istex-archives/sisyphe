@@ -1,14 +1,21 @@
+'use strict';
+
 const chai = require('chai'),
   kuler = require('kuler'),
   doTheJob = require('../index.js').doTheJob,
   finalJob = require('../index.js').finalJob,
   expect = chai.expect,
+  path = require('path'),
+  rimraf = require('rimraf'),
   FromXml = require('xpath-generator').FromXml,
   redis = require('redis');
 
 const redisHost = process.env.REDIS_HOST || 'localhost',
   redisPort = process.env.REDIS_PORT || '6379',
-  config = require('../config.json');
+  config = {
+    "redisDB" : 1,
+    "xpathsOutput" : "job/"
+  }; // Override configuration file for tests
 
 describe('Redis', () => {
   it('Should have redis env placed', (done) => {
@@ -91,7 +98,7 @@ describe('DoTheJob', () => {
       expect(data.xpath[Object.keys(data.xpath)[0]]).to.have.property('count');
       return done();
     })
-  })
+  });
 });
 
 describe('FinalJob', () => {
@@ -102,5 +109,10 @@ describe('FinalJob', () => {
       }
       done();
     })
+  });
+
+  after(function () {
+    const dirToDelete = path.resolve(__dirname + '/../' + config.xpathsOutput);
+    rimraf.sync(dirToDelete);
   })
 });
