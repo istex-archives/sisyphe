@@ -11,7 +11,7 @@ const redisHost = process.env.REDIS_HOST || 'localhost',
   config = require('../config.json');
 
 describe('Redis', () => {
-  it('Should have redis env placed', (done)=> {
+  it('Should have redis env placed', (done) => {
     if (!process.env.REDIS_HOST) {
       console.warn(kuler('No REDIS_HOST env defined, so localhost is used', 'orange'));
     }
@@ -20,7 +20,8 @@ describe('Redis', () => {
     }
     done();
   });
-  it('Should have a redis lauched to worked', (done)=> {
+
+  it('Should have a redis lauched to worked', (done) => {
     let client = redis.createClient(`//${redisHost}:${redisPort}`);
     client.on('error', (err) => {
       return done(err)
@@ -39,14 +40,16 @@ describe('DoTheJob', () => {
       mimetype: 'application/xxx',
       size: 500
     };
-    doTheJob(objTest, (err, data)=> {
+
+    doTheJob(objTest, (err, data) => {
       if (err) {
         return done(err);
       }
       expect(data).to.deep.equal(objTest);
       done();
-    });
-  })
+    })
+  });
+
   it('Should not doing job if file does not exist', (done) => {
     let objTest = {
       extension: '.xml',
@@ -54,17 +57,22 @@ describe('DoTheJob', () => {
       mimetype: 'application/xml',
       size: 500
     };
-    doTheJob(objTest, (err, data)=> {
-      try{
-        expect(function (){if(err && err.instanceof(Error) ){throw err}}).to.throw(Error);
 
+    doTheJob(objTest, (err, data) => {
+      try {
+        expect(function () {
+          if (err && err.instanceof(Error)) {
+            throw err
+          }
+        }).to.throw(Error);
       }
-      catch(err){
+      catch (err) {
         return done(err)
       }
       done()
-    });
-  })
+    })
+  });
+
   it('Should generate xpath obj', (done) => {
     let objTest = {
       extension: '.xml',
@@ -72,26 +80,27 @@ describe('DoTheJob', () => {
       mimetype: 'application/xml',
       size: 500
     };
-    doTheJob(objTest, (err, data)=> {
+
+    doTheJob(objTest, (err, data) => {
       if (err) {
         return done(err);
       }
       expect(data.xpath).to.exist;
       expect(data.xpath).to.be.an('object');
       expect(data.xpath).to.be.not.empty;
-      expect(data.xpath[Object.keys(data.xpath)[0]]).to.have.property('count')
+      expect(data.xpath[Object.keys(data.xpath)[0]]).to.have.property('count');
       return done();
-    });
+    })
   })
-})
+});
 
 describe('FinalJob', () => {
   it('Final Job should not failed during work', (done) => {
-    finalJob((err)=>{
-      if(err){
+    finalJob((err) => {
+      if (err) {
         return done(err)
       }
       done();
     })
   })
-})
+});
