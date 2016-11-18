@@ -38,7 +38,3 @@ jspm_packages
 
 # Webstorm
 .idea
-
-# Configuration files
-conf/*.json
-!conf/config-sample.json
