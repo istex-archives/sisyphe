@@ -1,6 +1,11 @@
 {
   "metadata": [
     {
+      "name": "articleCategory",
+      "type": "String",
+      "xpath": "/article/front/article-meta/article-categories/subj-group/subject/text()"
+    },
+    {
       "name": "articlePubYear",
       "regex": "^([0-9]{4})$",
       "type": "Number",
@@ -13,26 +18,10 @@
       "xpath": "/article/front/article-meta/article-id[@pub-id-type=\"doi\"]/text()"
     },
     {
-      "name": "issn",
-      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
-      "type": "String",
-      "xpath": "/article/front/journal-meta/issn[@pub-type=\"ppub\"]/text()"
-    },
-    {
       "name": "eissn",
       "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
       "type": "String",
       "xpath": "/article/front/journal-meta/issn[@pub-type=\"epub\"]/text()"
-    },
-    {
-      "name": "journalTitle",
-      "type": "String",
-      "xpath": "/article/front/journal-meta/journal-title/text()"
-    },
-    {
-      "name": "articleCategory",
-      "type": "String",
-      "xpath": "/article/front/article-meta/article-categories/subj-group/subject/text()"
     },
     {
       "name": "hasAbstract",
@@ -40,14 +29,15 @@
       "xpath": "boolean(/article/front/article-meta/abstract)"
     },
     {
-      "name": "nbRefBibs",
-      "type": "Count",
-      "xpath": "count(/article/back/ref-list/ref)"
+      "name": "issn",
+      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/issn[@pub-type=\"ppub\"]/text()"
     },
     {
-      "name": "nbKeywords",
-      "type": "Count",
-      "xpath": "count(/article/front/article-meta/kwd-group/kwd)"
+      "name": "issue",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/issue/text()"
     },
     {
       "name": "journalPublisherId",
@@ -55,14 +45,24 @@
       "xpath": "/article/front/journal-meta/journal-id[@journal-id-type=\"publisher-id\"]/text()"
     },
     {
+      "name": "journalTitle",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/journal-title/text()"
+    },
+    {
+      "name": "nbKeywords",
+      "type": "Count",
+      "xpath": "count(/article/front/article-meta/kwd-group/kwd)"
+    },
+    {
+      "name": "nbRefBibs",
+      "type": "Count",
+      "xpath": "count(/article/back/ref-list/ref)"
+    },
+    {
       "name": "volume",
       "type": "Number",
       "xpath": "/article/front/article-meta/volume/text()"
-    },
-    {
-      "name": "issue",
-      "type": "Number",
-      "xpath": "/article/front/article-meta/issue/text()"
     }
   ]
 }
