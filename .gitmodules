@@ -7,3 +7,6 @@
 [submodule "worker/sisyphe-xpath"]
 	path = worker/sisyphe-xpath
 	url = https://github.com/istex/sisyphe-xpath.git
+[submodule "worker/sisyphe-filetype"]
+	path = worker/sisyphe-filetype
+	url = https://github.com/istex/sisyphe-filetype.git
