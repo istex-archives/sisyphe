@@ -4,7 +4,7 @@
   "description": "Get the XML informations",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "",
   "license": "MIT",
@@ -13,5 +13,9 @@
     "get-doctype": "^1.0.0",
     "xmldom": "git+https://github.com/rmeja/xmldom.git",
     "xpath": "0.0.23"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2"
   }
 }
