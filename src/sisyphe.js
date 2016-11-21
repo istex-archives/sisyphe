@@ -31,11 +31,17 @@ class Sisyphe {
     };
     this.starter = starter || defaultStarter;
     const defaultWorkers = [{
-      name: "Alpha",
-      module: "alpha-worker"
+      name: "SisypheFileType",
+      module: "sisyphe-filetype"
     }, {
-      name: "Beta",
-      module: "beta-worker"
+      name: "SisypheXML",
+      module: "sisyphe-xml"
+    }, {
+      name : "SisyphePDF",
+      module: "sisyphe-pdf"
+    }, {
+      name : "SisypheXPATH",
+      module : "sisyphe-xpath"
     }];
     this.workers = workers || defaultWorkers;
   }
