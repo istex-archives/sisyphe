@@ -22,7 +22,7 @@ const sisypheXpath = {},
 const fullXpaths = new Set();
 
 sisypheXpath.doTheJob = function (data, next) {
-  if (data.mimetype !== 'application/xml') {
+  if (data.mimetype !== 'application/xml' || !data.isWellFormed) {
     return next(null, data);
   }
   // console.log('Not Ignored: ', data.name);
