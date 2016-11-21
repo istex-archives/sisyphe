@@ -18,7 +18,7 @@ sisypheXml.doTheJob = function (data, next) {
     return next(null, data)
   }
 
-  // Permet d'identifier les fichiers .nxml (BMJ) et .Meta (Springer) comme mimetype XML
+  // .nxml (BMJ) & .Meta (Springer)
   mime.define({
     'application/xml': ["nxml", "meta", "xlink_v03", "prime_v03", "plusxml_v02", "plusprime_v02", "info_V03", "citation_v03", "aux_v03"]
   });
@@ -28,14 +28,11 @@ sisypheXml.doTheJob = function (data, next) {
 
   firstline(datapath).then((line1) => {
     if (isXml(line1)) {
-      //console.log(data.name, 'firstline', 'application/xml')
       return 'application/xml'
     }
-    //console.log(data.name, 'firstline', 'application/octet-stream');
     return 'application/octet-stream'
   }).catch(() => {
     // Err loading first line 
-    //console.log(data.name, 'CatchFirstline', 'application/octet-stream');
     return 'application/octet-stream'
   })
   // This is in test building ...
@@ -56,7 +53,6 @@ sisypheXml.doTheJob = function (data, next) {
                   // add corrupt message here to data
                   return mimeResult;
                 }
-                //console.log(stdout.replace(/\n|\r/g, ''));
                 return stdout.replace(/\n|\r/g, '');
               }).catch(() => {
                 return mimeResult
@@ -75,10 +71,8 @@ sisypheXml.doTheJob = function (data, next) {
           if (seemsXml || nbOfXmlBalises > 10) {
             return 'application/xml'
           }
-          //console.log(data.name, 'fulldata', mimeResult);
           return mimeResult
         }).catch(err => {
-          console.log(data.name, 'CatchFulldata', mimeResult, err);
           // Err loading full data
           return mimeResult;
         })
