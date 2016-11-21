@@ -72,7 +72,6 @@ sisypheXml.doTheJob = function (data, next) {
 
           if (!value) {
             // Will not check if value is empty
-            console.log('xpath :', metadata.xpath);
             return;
           }
 
