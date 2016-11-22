@@ -48,23 +48,24 @@ sisypheXml.doTheJob = function (data, next) {
       return xmlDom;
     });
   }).then((xmlDom) => {
-    if (data.isWellFormed) {
-      this.getConf(data.corpusname).then((conf) => {
-        return this.getMetadataInfos(conf, xmlDom);
-      }).then((metadatas) => {
-        metadatas.map((metadata) => {
-          data[metadata.name + 'IsValid'] = metadata.isValueValid;
-          if (metadata.isValueValid) {
-            data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-          } else {
-            data[metadata.name + 'Error'] = metadata.value;
-          }
-        });
-        next(null, data);
-      }).catch(() => {
-        next(null, data);
-      });
+    if (!data.isWellFormed) {
+      return next(null, data);
     }
+    this.getConf(data.corpusname).then((conf) => {
+      return this.getMetadataInfos(conf, xmlDom);
+    }).then((metadatas) => {
+      metadatas.map((metadata) => {
+        data[metadata.name + 'IsValid'] = metadata.isValueValid;
+        if (metadata.isValueValid) {
+          data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+        } else {
+          data[metadata.name + 'Error'] = metadata.value;
+        }
+      });
+      next(null, data);
+    }).catch(() => {
+      next(null, data);
+    });
   });
 };
 
@@ -112,7 +113,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
   }).map((metadata) => {
     if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {
       const regex = new RegExp(metadata.regex);
-     metadata.isValueValid = regex.test(metadata.value);
+      metadata.isValueValid = regex.test(metadata.value);
     }
     return metadata;
   });
