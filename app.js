@@ -28,6 +28,18 @@ fs.statAsync(pathInput).catch((error) => {
       path: pathInput,
       corpusname: program.corpusname
     }
+  }, {
+    name: "Sisyphe FileType",
+    module: "sisyphe-filetype"
+  }, {
+    name: "Sisyphe XML",
+    module: "sisyphe-xml"
+  }, {
+    name: "Sisyphe PDF",
+    module: "sisyphe-pdf"
+  }, {
+    name: "Sisyphe xpath",
+    module: "sisyphe-xpath"
   });
 }).then((sisyphe) => {
   sisyphe.start();
