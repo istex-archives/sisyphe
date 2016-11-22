@@ -61,6 +61,8 @@ sisypheXml.doTheJob = function (data, next) {
           }
         });
         next(null, data);
+      }).catch(() => {
+        next(null, data);
       });
     }
   });
