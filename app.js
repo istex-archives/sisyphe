@@ -28,7 +28,7 @@ fs.statAsync(pathInput).catch((error) => {
       path: pathInput,
       corpusname: program.corpusname
     }
-  }, {
+  },[{
     name: "Sisyphe FileType",
     module: "sisyphe-filetype"
   }, {
@@ -40,7 +40,7 @@ fs.statAsync(pathInput).catch((error) => {
   }, {
     name: "Sisyphe xpath",
     module: "sisyphe-xpath"
-  });
+  }]);
 }).then((sisyphe) => {
   sisyphe.start();
 });
