@@ -53,9 +53,9 @@ class Sisyphe {
   heartbeat() {
     const callFinishers = () => {
       return bluebird.filter(this.workflow.listWorker, (worker) => {
-        return worker.finalFunction !== undefined
+        return worker.features.finalJob !== undefined
       }).map((worker) => {
-        return bluebird.promisify(worker.finalFunction)();
+        return bluebird.promisify(worker.features.finalJob)();
       })
     };
 
@@ -116,13 +116,12 @@ class Sisyphe {
         const packageWorkerModule = require(pathToWorkerModule + '/package.json');
         return {
           name: packageWorkerModule.name,
-          doTheJob: workerModule.doTheJob,
-          finalJob: workerModule.finalJob
+          obj: workerModule
         };
       })
     }).then((arrayWorkerModule) => {
       arrayWorkerModule.map((workerModule) => {
-        this.workflow.addWorker(workerModule.name, workerModule.doTheJob, workerModule.finalJob);
+        this.workflow.addWorker(workerModule.name, workerModule.obj);
       });
       this.workflow.createQueueForWorkers();
       return this;

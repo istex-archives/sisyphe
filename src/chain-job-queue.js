@@ -27,13 +27,12 @@ class ChainJobQueue {
     this.redisHost = redisHost || '127.0.0.1';
   }
 
-  addWorker(name, jobQueueFunction, finalFunction) {
+  addWorker(name, worker) {
     const newWorker = {
       name: name,
       totalPerformedTask: 0,
       totalFailedTask: 0,
-      jobQueueFunction: jobQueueFunction,
-      finalFunction: finalFunction
+      features: worker
     };
     this.listWorker.push(newWorker);
     return this;
@@ -55,7 +54,7 @@ class ChainJobQueue {
   addJobProcessToWorkers() {
     this.listWorker.map((worker) => {
       worker.queue.process((job, done) => {
-        worker.jobQueueFunction(job.data, done);
+        worker.features.doTheJob(job.data, done);
       });
       return worker;
     }).map((worker, index, listWorker) => {
