@@ -1,20 +1,16 @@
 'use strict';
 
-const DOMParser = require('xmldom').DOMParser,
+const assert = require('assert'),
+  DOMParser = require('xmldom').DOMParser,
   xpath = require('xpath'),
   Promise = require('bluebird'),
   fs = Promise.promisifyAll(require('fs')),
   getDoctype = Promise.promisifyAll(require("get-doctype"));
 
 const sisypheXml = {};
-sisypheXml.doTheJob = function (data, next) {
-
-  if (data.mimetype !== 'application/xml') {
-    return next(null, data);
-  }
-
-  const wellFormedError = {};
-  const errorHandle = function (wellFormedErrorObj) {
+sisypheXml.init = function () {
+  this.wellFormedError = {};
+  this.errorHandle = function (wellFormedErrorObj) {
     return function (level, msg, locator) {
       wellFormedErrorObj[level] = {
         message: msg,
@@ -23,88 +19,100 @@ sisypheXml.doTheJob = function (data, next) {
     }
   };
 
-  const parser = new DOMParser({
+  this.parser = new DOMParser({
     locator: {},
     errorHandler: {
-      warning: errorHandle(wellFormedError),
-      error: errorHandle(wellFormedError),
-      fatalError: errorHandle(wellFormedError)
+      warning: this.errorHandle(this.wellFormedError),
+      error: this.errorHandle(this.wellFormedError),
+      fatalError: this.errorHandle(this.wellFormedError)
     }
   });
+};
 
-  const getConf = (corpusname) => {
-    const pathToConf = __dirname + '/conf/' + corpusname + '.json';
-    return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
-      return fs.readFileAsync(pathToConf)
-    }).then((dataConf) => {
-      return JSON.parse(dataConf);
-    });
-  };
+sisypheXml.doTheJobNew = function (data, next) {
+  if (data.mimetype !== 'application/xml') {
+    return next(null, data);
+  }
 
+  this.init();
   fs.readFileAsync(data.path, 'utf8').then((xmlContent) => {
-    const xmlDom = parser.parseFromString(xmlContent, 'application/xml');
-    data.isWellFormed = Object.keys(wellFormedError).length === 0;
+    const xmlDom = this.parser.parseFromString(xmlContent, 'application/xml');
+    data.isWellFormed = Object.keys(this.wellFormedError).length === 0;
+    if (!data.isWellFormed) data.wellFormedError = this.wellFormedError;
+    return getDoctype.parseFileAsync(data.path).then((doctype) => {
+      data.doctype = doctype;
+      return xmlDom;
+    }).catch((error) => {
+      data.wellFormedError = error;
+      data.isWellFormed = false;
+      return xmlDom;
+    });
+  }).then((xmlDom) => {
     if (data.isWellFormed) {
-      getDoctype.parseFileAsync(data.path).then((doctype) => {
-        data.doctype = doctype;
-        return getConf(data.corpusname);
-      }).then((conf) => {
-        if (!conf.metadata) {
-          // config file empty, add error here
-          next(null, data);
-          return;
-        }
-        conf.metadata.map((metadata) => {
-          // Select the first XPATH possibility
-          let value = null;
-          if (Array.isArray(metadata.xpath)) {
-            for (let i = 0; i < metadata.length; i++) {
-              let currValue = xpath.select(metadata[i].xpath, xmlDom);
-              if (currValue.length) {
-                value = currValue;
-                break;
-              }
-            }
+      this.getConf(data.corpusname).then((conf) => {
+        return this.getMetadataInfos(conf, xmlDom);
+      }).then((metadatas) => {
+        metadatas.map((metadata) => {
+          data[metadata.name + 'IsValid'] = metadata.isValueValid;
+          if (metadata.isValueValid) {
+            data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
           } else {
-            value = xpath.select(metadata.xpath, xmlDom);
+            data[metadata.name + 'Error'] = metadata.value;
           }
-          value = (metadata.type === 'String' || metadata.type === 'Number') ? value.toString() : value;
-
-          if (!value) {
-            // Will not check if value is empty
-            return;
-          }
-
-          if (!metadata.hasOwnProperty('regex')) {
-            value = (metadata.type === 'Number') ? parseInt(value, 10) : value;
-            data[metadata.name] = value;
-            return;
-          }
-
-          const regex = new RegExp(metadata.regex),
-            isValueValid = regex.test(value);
-
-          if (!isValueValid) {
-            data[metadata.name + 'IsValid'] = isValueValid;
-            data[metadata.name + 'Error'] = value;
-            return;
-          }
-          data[metadata.name + 'IsValid'] = isValueValid;
-          value = (metadata.type === 'Number') ? parseInt(value, 10) : value;
-          data[metadata.name] = value;
         });
         next(null, data);
-      }).catch(error => {
-        data.wellFormedError = error;
-        data.isWellFormed = false;
-        return next(null, data)
-      })
-    } else {
-      data.wellFormedError = wellFormedError;
-      next(null, data);
+      });
     }
-  }).catch((err) => {
-    next(err, data);
+  });
+};
+
+sisypheXml.getConf = function (corpusname) {
+  const pathToConf = __dirname + '/conf/' + corpusname + '.json';
+  return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
+    return fs.readFileAsync(pathToConf)
+  }).then((dataConf) => {
+    return JSON.parse(dataConf);
+  });
+};
+
+sisypheXml.checkConf = function (confObj) {
+  return new Promise((resolve) => {
+    assert(confObj.hasOwnProperty('metadata'));
+    assert(Array.isArray(confObj.metadata));
+    confObj.metadata.map((metadata) => {
+      assert(metadata.hasOwnProperty('name'));
+      assert(metadata.hasOwnProperty('type'));
+      assert(metadata.hasOwnProperty('xpath'));
+    });
+    resolve(true);
+  })
+};
+
+sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
+  return confObj.metadata.map((metadata) => {
+    // Select the first XPATH possibility
+    let value = null;
+    if (Array.isArray(metadata.xpath)) {
+      for (let i = 0; i < metadata.length; i++) {
+        let currValue = xpath.select(metadata[i].xpath, xmlDom);
+        if (currValue.length) {
+          value = currValue;
+          break;
+        }
+      }
+    } else {
+      value = xpath.select(metadata.xpath, xmlDom);
+    }
+
+    value = (metadata.type === 'String' || metadata.type === 'Number') ? value.toString() : value;
+    if (value) metadata.value = value;
+    return metadata;
+  }).map((metadata) => {
+    if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {
+      const regex = new RegExp(metadata.regex);
+     metadata.isValueValid = regex.test(metadata.value);
+    }
+    return metadata;
   });
 };
 

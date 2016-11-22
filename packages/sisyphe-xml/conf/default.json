@@ -4,7 +4,7 @@
       "name": "someInfos",
       "regex": "^([a-z]{8})$",
       "type": "String",
-      "xpath": "/xpath/to/my/infos"
+      "xpath": "/xpath/to/my/infos/text()"
     }
   ]
 }
