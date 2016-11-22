@@ -1,40 +1,8 @@
-<!DOCTYPE article PUBLIC "-//NLM//DTD Journal Archiving and Interchange DTD v2.2 20060430//EN" "archivearticle.dtd">
-<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article">
-    <front>
-        <journal-meta>
-            <journal-id journal-id-type="nlm-ta">Caesed</journal-id>
-            <journal-title>Califa and Wern Medine</journal-title>
-            <issn pub-type="ppub">0001-0001</issn>
-        </journal-meta>
-        <article-meta>
-            <article-id pub-id-type="pmid">8888888</article-id>
-            <article-categories>
-                <subj-group subj-group-type="heading">
-                    <subject>Articles</subject>
-                </subj-group>
-            </article-categories>
-            <title-group>
-                <article-title>PROPHYIS AD TRMENT OF WO INIONS BY MERN MEDS</article-title>
-            </title-group>
-            <contrib-group>
-                <contrib contrib-type="author">
-                    <name>
-                        <surname>Mer</surname>
-                        <given-names>K</given-names>
-                    </name>
-                </contrib>
-            </contrib-group>
-            <pub-date pub-type="ppub">
-                <month>01</month>
-                <year>1930</year>
-            </pub-date>
-            <volume>20</volume>
-            <issue>2</issue>
-            <fpage>123</fpage>
-            <lpage>321</lpage>
-        </article-meta>
-    </front>
-    <body>
-        <p>nothing</p>
-    </body>
-</article>
+<!DOCTYPE article PUBLIC "my doctype of doom" "mydoctype.dtd">
+<xpath>
+    <to>
+        <my>
+            <infos>trezaq</infos>
+        </my>
+    </to>
+</xpath>
