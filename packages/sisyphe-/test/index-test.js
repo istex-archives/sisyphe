@@ -15,9 +15,9 @@ const dataInput = {
   size: 123
 };
 
-describe('doTheJobNew', function () {
+describe('doTheJob', function () {
   it('should add some info about the XML whithout config', function (done) {
-    sisypheXml.doTheJobNew(dataInput, (error, dataOutput) => {
+    sisypheXml.doTheJob(dataInput, (error, dataOutput) => {
       if (error) return done(error);
       expect(dataOutput).to.have.property('isWellFormed');
       expect(dataOutput.isWellFormed).to.be.a('boolean');

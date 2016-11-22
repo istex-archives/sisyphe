@@ -29,7 +29,7 @@ sisypheXml.init = function () {
   });
 };
 
-sisypheXml.doTheJobNew = function (data, next) {
+sisypheXml.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml') {
     return next(null, data);
   }
