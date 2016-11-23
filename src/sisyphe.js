@@ -47,6 +47,7 @@ class Sisyphe {
   }
 
   startToGenerateTask() {
+    console.time('executionTime');
     this.starterModule.start();
   }
 
@@ -74,6 +75,7 @@ class Sisyphe {
             clientRedis.del('sisyphe');
             console.log('');
             console.log('This is the end !');
+            console.timeEnd('executionTime');
           }).catch((error) => {
             // TODO : rajouter une gestion des erreur pour les logs
             logger.info(error);
