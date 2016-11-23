@@ -43,6 +43,7 @@ describe('DoTheJob', () => {
   it('Should not doing work if mimetype is not xml', (done) => {
     let objTest = {
       extension: '.xml',
+      isWellFormed: true,
       path: 'test/test.xxx',
       mimetype: 'application/xxx',
       size: 500
@@ -60,6 +61,7 @@ describe('DoTheJob', () => {
   it('Should not doing job if file does not exist', (done) => {
     let objTest = {
       extension: '.xml',
+      isWellFormed: true,
       path: 'test/test-nofile.xml',
       mimetype: 'application/xml',
       size: 500
@@ -83,6 +85,7 @@ describe('DoTheJob', () => {
   it('Should generate xpath obj', (done) => {
     let objTest = {
       extension: '.xml',
+      isWellFormed: true,
       path: 'test/test.xml',
       mimetype: 'application/xml',
       size: 500
