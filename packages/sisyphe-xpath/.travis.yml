@@ -1,6 +1,7 @@
 language: node_js
 node_js:
   - "6"
-
+services:
+  - redis-server
 notifications:
   slack: 'inist-dpi:53Jp5iUZeRidSGZn0TukMSKo#activity'
