@@ -6,6 +6,7 @@ const chai = require('chai'),
 
 const dataInput = {
   corpusname: 'default',
+  debugmod: true,
   mimetype: 'application/pdf',
   startAt: 1479731952814,
   extension: '.pdf',
