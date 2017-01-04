@@ -10,3 +10,6 @@
 [submodule "worker/sisyphe-filetype"]
 	path = worker/sisyphe-filetype
 	url = https://github.com/istex/sisyphe-filetype.git
+[submodule "worker/sisyphe-out"]
+	path = worker/sisyphe-out
+	url = https://github.com/istex/sisyphe-out

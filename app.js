@@ -40,6 +40,9 @@ fs.statAsync(pathInput).catch((error) => {
   }, {
     name: "Sisyphe xpath",
     module: "sisyphe-xpath"
+  },{
+    name: "Sisyphe Output",
+    module: "sisyphe-out"
   }]);
 }).then((sisyphe) => {
   sisyphe.start();
