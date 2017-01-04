@@ -8,17 +8,16 @@ global.DOMParser = require('xmldom').DOMParser;
 const sisyphePdf = {};
 sisyphePdf.doTheJob = function (data, next) {
   if (data.mimetype === 'application/pdf') {
-    if (!data.debugmod) {
+    if (!data.debugmod && !process.env.SISYPHEDEBUG) {
         console.log = function(){};
     }
-    //console.log = function(){};
     bluebird.join(this.getPdfMetaData(data), this.getPdfWordCount(data), (pdfMetadata, pdfWordCount) => {
       data.pdfWordCount = pdfWordCount;
       data.pdfWordByPage = Math.floor(data.pdfWordCount / data.pdfPageTotal);
       data.pdfMetadata = pdfMetadata.info;
       next(null, data);
     }).catch((error) => {
-      data.pdfError = error;
+      data.pdfError = JSON.stringify(error);
       next(null,data);
     })
   } else {

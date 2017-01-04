@@ -3,3 +3,6 @@
 
 # sisyphe-pdf
 module of generating of PDF's information
+
+## Dev
+Don't forget to add env SISYPHEDEBUG (to any value) in your bashrc (or whatever ..) or you won't see log.
