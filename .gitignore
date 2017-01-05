@@ -1,7 +1,9 @@
-# Logs
+# Logs & temps
 logs
 *.log
 npm-debug.log*
+job/
+temp/
 
 # Runtime data
 pids
