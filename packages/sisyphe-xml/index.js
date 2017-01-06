@@ -55,11 +55,16 @@ sisypheXml.doTheJob = function (data, next) {
       return this.getMetadataInfos(conf, xmlDom);
     }).then((metadatas) => {
       metadatas.map((metadata) => {
-        data[metadata.name + 'IsValid'] = metadata.isValueValid;
-        if (metadata.isValueValid) {
+        if (metadata.hasOwnProperty('isValueValid')) {
+          data[metadata.name + 'IsValid'] = metadata.isValueValid;
+          if(metadata.isValueValid){
+            data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+          }
+          else {
+            data[metadata.name + 'Error'] = metadata.value;
+          }
+        } else{
           data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-        } else {
-          data[metadata.name + 'Error'] = metadata.value;
         }
       });
       next(null, data);
