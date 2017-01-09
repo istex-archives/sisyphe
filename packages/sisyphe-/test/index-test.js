@@ -25,6 +25,7 @@ const badDataInput = {
   size: 123
 };
 
+// TODO : Finish writing this test when you see this, ok ?
 
 // describe('doTheJob', function () {
 //   it('should add some info about the XML whithout config', function (done) {
