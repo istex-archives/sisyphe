@@ -36,7 +36,6 @@ describe('doTheJob', function () {
   it('should add some info about a wellformed XML and valid DTD', function (done) {
     sisypheXml.doTheJob(doc, (error, docOutput) => {
       if (error) return done(error);
-      console.log(docOutput);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
       expect(docOutput).to.have.property('doctype');
