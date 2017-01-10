@@ -23,6 +23,8 @@ sisypheXml.doTheJob = function (docObject, next) {
   ).then((xmlDom) => {
     docObject.isWellFormed = true;
     this.getConf(docObject.corpusname).then((conf) => {
+      return this.checkConf(conf);
+    }).then((conf) => {
       return this.getMetadataInfos(conf, xmlDom);
     }).then((metadatas) => {
       metadatas.map((metadata) => {
@@ -114,7 +116,7 @@ sisypheXml.checkConf = function (confObj) {
       assert(metadata.hasOwnProperty('type'));
       assert(metadata.hasOwnProperty('xpath'));
     });
-    resolve(true);
+    resolve(confObj);
   })
 };
 
