@@ -6,5 +6,6 @@
       "type": "String",
       "xpath": "/xpath/to/my/infos/text()"
     }
-  ]
+  ],
+  "dtd": ["mydoctype.dtd"]
 }
