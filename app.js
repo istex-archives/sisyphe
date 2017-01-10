@@ -44,7 +44,7 @@ var workers = [{
 }];
 
 // This is an Update
-if(!pathInput){
+if(!pathInput && program.corpusname){
   starter ={
     module: "walker-elastic",
     options: {
