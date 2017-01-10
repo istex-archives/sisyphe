@@ -13,8 +13,6 @@ sisypheXml.doTheJob = function (docObject, next) {
     return next(null, docObject);
   }
 
-  // TODO : Finish writing this code when you see this, ok ?
-
   Promise.join(
     this.getXmlDom(docObject.path),
     this.getDoctype(docObject.path),
