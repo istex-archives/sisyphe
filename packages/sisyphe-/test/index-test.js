@@ -66,7 +66,7 @@ describe('getXmlDom', function () {
     })
   });
 
-  it('should catch error from a not wellformed xml file', function () {
+  it('should catch an error from a not wellformed xml file', function () {
     return sisypheXml.getXmlDom(docWithNotWellFormedXml.path).catch((error) => {
       expect(error).to.be.an.instanceof(Error);
       expect(error).to.have.property('type');
@@ -118,10 +118,26 @@ describe('checkConf', function () {
         }
       ]
     };
-    return sisypheXml.checkConf(confObjInput).then((confIsValid) => {
-      expect(confIsValid).to.be.true;
+    return sisypheXml.checkConf(confObjInput).then((confObjOuput) => {
+      expect(confObjInput).to.be.equal(confObjOuput);
+    });
+  });
+
+  it('should catch an error with wrong config file', function () {
+    const confObjInput = {
+      "metadata": [
+        {
+          "singing": "in the rain",
+          "wtf": "dude",
+        }
+      ]
+    };
+    return sisypheXml.checkConf(confObjInput).catch((error) => {
+      expect(error).to.be.an('object');
+      expect(error.name).to.be.equal('AssertionError');
     });
   })
+
 });
 
 describe('getMetadataInfos', function () {
