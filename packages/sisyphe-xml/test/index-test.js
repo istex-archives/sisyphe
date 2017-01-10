@@ -187,3 +187,21 @@ describe('getMetadataInfos', function () {
     })
   })
 });
+
+describe('validateAgainstDTD', function () {
+  it('should validate the Xml file from a docObject and a dtd list who contains a good DTD', function () {
+    const arrayPathDTD = ['test/dtd/myBADdoctype.dtd', 'test/dtd/mydoctype.dtd'];
+    return sisypheXml.validateAgainstDTD(doc, arrayPathDTD).then((result) => {
+      expect(result).to.be.an('object');
+      expect(result).to.have.property('dtd');
+      expect(result).to.have.property('stdout');
+    })
+  });
+
+  it('should catch an error when tries to validate a xml file from a docObject and a dtd list who contains only a bad DTD', function () {
+    const arrayPathDTD = ['test/dtd/myBADdoctype.dtd'];
+    return sisypheXml.validateAgainstDTD(doc, arrayPathDTD).catch((error) => {
+      expect(error).to.be.an.instanceof(Error);
+    })
+  })
+});
