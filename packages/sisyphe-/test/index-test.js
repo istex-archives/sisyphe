@@ -18,6 +18,8 @@ const baseDoc = {
 const doc = Object.assign({path: __dirname + '/data/test-default.xml'}, baseDoc);
 const docWithBadDoctypeInXml = Object.assign({path: __dirname + '/data/test-bad-doctype.xml'}, baseDoc);
 const docWithNotWellFormedXml = Object.assign({path: __dirname + '/data/test-not-wellformed.xml'}, baseDoc);
+const docWithUnknownDoctype = Object.assign({path: __dirname + '/data/test-unknown-doctype.xml'}, baseDoc);
+const docWithNotValidXml = Object.assign({path: __dirname + '/data/test-not-valid-dtd.xml'}, baseDoc);
 
 describe('Dependancies', () => {
   it('should have acces to xmlstarlet', (done) => {
@@ -31,9 +33,10 @@ describe('Dependancies', () => {
 });
 
 describe('doTheJob', function () {
-  it('should add some info about a wellformed XML whithout config', function (done) {
+  it('should add some info about a wellformed XML and valid DTD', function (done) {
     sisypheXml.doTheJob(doc, (error, docOutput) => {
       if (error) return done(error);
+      console.log(docOutput);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
       expect(docOutput).to.have.property('doctype');
@@ -42,11 +45,15 @@ describe('doTheJob', function () {
       expect(docOutput.doctype.sysid).to.be.a('string');
       expect(docOutput).to.have.property('someInfosIsValid');
       expect(docOutput).to.have.property('someInfosError');
+      expect(docOutput).to.have.property('validationDTDInfos');
+      expect(docOutput.validationDTDInfos).to.be.an('object');
+      expect(docOutput.validationDTDInfos).to.have.property('dtd');
+      expect(docOutput.validationDTDInfos).to.have.property('stdout');
       done();
     });
   });
 
-  it('should add some info, after all, about a not wellformed XML whithout config', function (done) {
+  it('should add some info about a not wellformed XML', function (done) {
     sisypheXml.doTheJob(docWithNotWellFormedXml, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
@@ -58,7 +65,7 @@ describe('doTheJob', function () {
     });
   });
 
-  it('should add some info, after all, about a XML whit bad doctype and whithout config', function (done) {
+  it('should add some info about a XML whith bad doctype', function (done) {
     sisypheXml.doTheJob(docWithBadDoctypeInXml, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
@@ -68,7 +75,33 @@ describe('doTheJob', function () {
       expect(docOutput.error.type).to.be.equal('doctype');
       done();
     });
+  });
+
+  it('should add some info about a XML whith an unknown doctype but valid after all', function (done) {
+    sisypheXml.doTheJob(docWithUnknownDoctype, (error, docOutput) => {
+      if (error) return done(error);
+      expect(docOutput).to.have.property('isWellFormed');
+      expect(docOutput.isWellFormed).to.be.a('boolean');
+      expect(docOutput).to.have.property('validationDTDInfos');
+      expect(docOutput.validationDTDInfos).to.be.an('object');
+      expect(docOutput.validationDTDInfos).to.have.property('dtd');
+      expect(docOutput.validationDTDInfos).to.have.property('stdout');
+      done();
+    });
+  });
+
+  it('should add some info about a not valid XML', function (done) {
+    sisypheXml.doTheJob(docWithNotValidXml, (error, docOutput) => {
+      if (error) return done(error);
+      expect(docOutput).to.have.property('isWellFormed');
+      expect(docOutput.isWellFormed).to.be.a('boolean');
+      expect(docOutput).to.have.property('error');
+      expect(docOutput.error).to.be.an.instanceof(Error);
+      expect(docOutput.error.type).to.be.equal('validation-dtd');
+      done();
+    });
   })
+
 });
 
 describe('getXmlDom', function () {
@@ -202,6 +235,10 @@ describe('getMetadataInfos', function () {
 
 describe('validateAgainstDTD', function () {
   it('should validate the Xml file from a docObject and a dtd list who contains a good DTD', function () {
+    doc.doctype = { type: 'PUBLIC',
+      name: 'article',
+      pubid: 'my doctype of doom',
+      sysid: 'mydoctype.dtd' };
     const arrayPathDTD = ['test/dtd/myBADdoctype.dtd', 'test/dtd/mydoctype.dtd'];
     return sisypheXml.validateAgainstDTD(doc, arrayPathDTD).then((result) => {
       expect(result).to.be.an('object');
@@ -212,6 +249,10 @@ describe('validateAgainstDTD', function () {
 
   it('should catch an error when tries to validate a xml file from a docObject and a dtd list who contains only a bad DTD', function () {
     const arrayPathDTD = ['test/dtd/myBADdoctype.dtd'];
+    doc.doctype = { type: 'PUBLIC',
+      name: 'article',
+      pubid: 'my doctype of doom',
+      sysid: 'mydoctype.dtd' };
     return sisypheXml.validateAgainstDTD(doc, arrayPathDTD).catch((error) => {
       expect(error).to.be.an.instanceof(Error);
     })

@@ -27,23 +27,33 @@ sisypheXml.doTheJob = function (docObject, next) {
     this.getConf(docObject.corpusname).then((conf) => {
       return this.checkConf(conf);
     }).then((conf) => {
-      return this.getMetadataInfos(conf, xmlDom);
-    }).then((metadatas) => {
-      metadatas.map((metadata) => {
-        if (metadata.hasOwnProperty('isValueValid')) {
-          docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
-          if (metadata.isValueValid) {
+      const dtdsPath = conf.dtd.map((dtd) => __dirname + '/conf/' + docObject.corpusname + '/dtd/' + dtd);
+      this.validateAgainstDTD(docObject, dtdsPath).then((validationDTDresult) => {
+        docObject.isValidAgainstDTD = true;
+        docObject.validationDTDInfos = validationDTDresult;
+        return this.getMetadataInfos(conf, xmlDom);
+      }).then((metadatas) => {
+        metadatas.map((metadata) => {
+          if (metadata.hasOwnProperty('isValueValid')) {
+            docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
+            if (metadata.isValueValid) {
+              docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+            }
+            else {
+              docObject[metadata.name + 'Error'] = metadata.value;
+            }
+          } else {
             docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
           }
-          else {
-            docObject[metadata.name + 'Error'] = metadata.value;
-          }
-        } else {
-          docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-        }
+          next(null, docObject);
+        });
+      }).catch((error) => {
+        docObject.isValidAgainstDTD = false;
+        docObject.error = error;
+        next(null, docObject);
       });
-      next(null, docObject);
-    }).catch(() => {
+    }).catch((error) => {
+      docObject.error = error;
       next(null, docObject);
     });
   }).catch((error) => {
@@ -150,7 +160,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
   });
 };
 
-sisypheXml.validateAgainstDTD = function(docObj, arrayPathDTD) {
+sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
   const DTDs = arrayPathDTD;
   const dtdToValidateFirst = docObj.doctype.sysid;
   Array.prototype.move = function (old_index, new_index) {
@@ -165,14 +175,15 @@ sisypheXml.validateAgainstDTD = function(docObj, arrayPathDTD) {
     (function loop(arrayDTD) {
       if (arrayDTD.length) {
         const dtd = arrayDTD.shift();
-        exec('xmlstarlet val -e -d '+ dtd + ' ' + docObj.path).then((stdout, stderr) => {
-          if (stderr) console.log('stderr :', stderr);
+        exec('xmlstarlet val -e -d ' + dtd + ' ' + docObj.path).then((stdout) => {
           resolve({dtd, stdout})
         }).catch(() => {
           loop(arrayDTD)
         })
       } else {
-        reject(new Error('No DTD validate the xml file'))
+        const error = new Error('No DTD validate the xml file');
+        error.type = "validation-dtd";
+        reject(error)
       }
     })(DTDs)
   })
