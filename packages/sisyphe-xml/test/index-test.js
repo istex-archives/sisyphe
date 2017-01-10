@@ -5,54 +5,69 @@ const chai = require('chai'),
   expect = chai.expect,
   sisypheXml = require('../index.js');
 
-const dataInput = {
+const baseDoc = {
   corpusname: 'default',
   mimetype: 'application/xml',
   startAt: 1479731952814,
   extension: '.xml',
-  path: __dirname + '/data/test-default.xml',
   name: 'test-default.xml',
   size: 123
 };
 
-const badDataInput = {
-  corpusname: 'default',
-  mimetype: 'application/xml',
-  startAt: 1479731952814,
-  extension: '.xml',
-  path: __dirname + '/data/test-bad-default.xml',
-  name: 'test-default.xml',
-  size: 123
-};
+const doc = Object.assign({path: __dirname + '/data/test-default.xml'}, baseDoc);
+const docWithBadDoctypeInXml = Object.assign({path: __dirname + '/data/test-bad-doctype.xml'}, baseDoc);
+const docWithNotWellFormedXml = Object.assign({path: __dirname + '/data/test-not-wellformed.xml'}, baseDoc);
 
-// TODO : Finish writing this test when you see this, ok ?
+describe('doTheJob', function () {
+  it('should add some info about a wellformed XML whithout config', function (done) {
+    sisypheXml.doTheJob(doc, (error, docOutput) => {
+      if (error) return done(error);
+      expect(docOutput).to.have.property('isWellFormed');
+      expect(docOutput.isWellFormed).to.be.a('boolean');
+      expect(docOutput).to.have.property('doctype');
+      expect(docOutput.doctype).to.be.a('object');
+      expect(docOutput.doctype).to.have.property('sysid');
+      expect(docOutput.doctype.sysid).to.be.a('string');
+      expect(docOutput).to.have.property('someInfosIsValid');
+      expect(docOutput).to.have.property('someInfosError');
+      done();
+    });
+  });
 
-// describe('doTheJob', function () {
-//   it('should add some info about the XML whithout config', function (done) {
-//     sisypheXml.doTheJob(dataInput, (error, dataOutput) => {
-//       if (error) return done(error);
-//       expect(dataOutput).to.have.property('isWellFormed');
-//       expect(dataOutput.isWellFormed).to.be.a('boolean');
-//       expect(dataOutput).to.have.property('doctype');
-//       expect(dataOutput.doctype).to.be.a('object');
-//       expect(dataOutput.doctype).to.have.property('sysid');
-//       expect(dataOutput.doctype.sysid).to.be.a('string');
-//       expect(dataOutput).to.have.property('someInfosIsValid');
-//       expect(dataOutput).to.have.property('someInfosError');
-//       done();
-//     });
-//   })
-// });
+  it('should add some info, after all, about a not wellformed XML whithout config', function (done) {
+    sisypheXml.doTheJob(docWithNotWellFormedXml, (error, docOutput) => {
+      if (error) return done(error);
+      expect(docOutput).to.have.property('isWellFormed');
+      expect(docOutput.isWellFormed).to.be.a('boolean');
+      expect(docOutput).to.have.property('error');
+      expect(docOutput.error).to.be.an.instanceof(Error);
+      expect(docOutput.error.type).to.be.equal('wellFormed');
+      done();
+    });
+  });
+
+  it('should add some info, after all, about a XML whit bad doctype and whithout config', function (done) {
+    sisypheXml.doTheJob(docWithBadDoctypeInXml, (error, docOutput) => {
+      if (error) return done(error);
+      expect(docOutput).to.have.property('isWellFormed');
+      expect(docOutput.isWellFormed).to.be.a('boolean');
+      expect(docOutput).to.have.property('error');
+      expect(docOutput.error).to.be.an.instanceof(Error);
+      expect(docOutput.error.type).to.be.equal('doctype');
+      done();
+    });
+  })
+});
 
 describe('getXmlDom', function () {
   it('should get xml DOM from a wellformed xml file', function () {
-    return sisypheXml.getXmlDom(dataInput.path).then((xmlDom) => {
+    return sisypheXml.getXmlDom(doc.path).then((xmlDom) => {
       expect(xmlDom).to.be.an('object');
     })
   });
 
   it('should catch error from a not wellformed xml file', function () {
-    return sisypheXml.getXmlDom(badDataInput.path).catch((error) => {
+    return sisypheXml.getXmlDom(docWithNotWellFormedXml.path).catch((error) => {
       expect(error).to.be.an.instanceof(Error);
       expect(error).to.have.property('type');
       expect(error.type).to.equal('wellFormed');
@@ -64,7 +79,7 @@ describe('getXmlDom', function () {
 
 describe('getDoctype', function () {
   it('should get a doctype from a xml file with a good structured doctype', function () {
-    return sisypheXml.getDoctype(dataInput.path).then((doctype) => {
+    return sisypheXml.getDoctype(doc.path).then((doctype) => {
       expect(doctype).to.be.an('object');
       expect(doctype).to.have.property('type');
       expect(doctype).to.have.property('name');
@@ -74,7 +89,7 @@ describe('getDoctype', function () {
   });
 
   it('should get a doctype from a xml file with a bad structured doctype', function () {
-    return sisypheXml.getDoctype(badDataInput.path).catch((error) => {
+    return sisypheXml.getDoctype(docWithBadDoctypeInXml.path).catch((error) => {
       expect(error).to.be.an.instanceof(Error);
       expect(error).to.have.property('type');
       expect(error.type).to.equal('doctype');

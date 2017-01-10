@@ -18,53 +18,37 @@ sisypheXml.doTheJob = function (docObject, next) {
   Promise.join(
     this.getXmlDom(docObject.path),
     this.getDoctype(docObject.path),
-    function (xmlContent, doctype) {
+    function (xmlDom, doctype) {
       docObject.doctype = doctype;
-      return xmlContent;
+      return xmlDom;
     }
-  ).then((xmlContent) => {
+  ).then((xmlDom) => {
     docObject.isWellFormed = true;
-
+    this.getConf(docObject.corpusname).then((conf) => {
+      return this.getMetadataInfos(conf, xmlDom);
+    }).then((metadatas) => {
+      metadatas.map((metadata) => {
+        if (metadata.hasOwnProperty('isValueValid')) {
+          docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
+          if (metadata.isValueValid) {
+            docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+          }
+          else {
+            docObject[metadata.name + 'Error'] = metadata.value;
+          }
+        } else {
+          docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+        }
+      });
+      next(null, docObject);
+    }).catch(() => {
+      next(null, docObject);
+    });
+  }).catch((error) => {
+    docObject.isWellFormed = false;
+    docObject.error = error;
+    next(null, docObject);
   });
-
-
-  // fs.readFileAsync(docObject.path, 'utf8').then((xmlContent) => {
-  //   const xmlDom = this.parser.parseFromString(xmlContent, 'application/xml');
-  //   docObject.isWellFormed = Object.keys(this.wellFormedError).length === 0;
-  //   if (!docObject.isWellFormed) docObject.wellFormedError = this.wellFormedError;
-  //   return getDoctype.parseFileAsync(docObject.path).then((doctype) => {
-  //     docObject.doctype = doctype;
-  //     return xmlDom;
-  //   }).catch((error) => {
-  //     docObject.wellFormedError = error;
-  //     docObject.isWellFormed = false;
-  //     return xmlDom;
-  //   });
-  // }).then((xmlDom) => {
-  //   if (!docObject.isWellFormed) {
-  //     return next(null, docObject);
-  //   }
-  //   this.getConf(docObject.corpusname).then((conf) => {
-  //     return this.getMetadataInfos(conf, xmlDom);
-  //   }).then((metadatas) => {
-  //     metadatas.map((metadata) => {
-  //       if (metadata.hasOwnProperty('isValueValid')) {
-  //         docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
-  //         if (metadata.isValueValid) {
-  //           docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-  //         }
-  //         else {
-  //           docObject[metadata.name + 'Error'] = metadata.value;
-  //         }
-  //       } else {
-  //         docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-  //       }
-  //     });
-  //     next(null, docObject);
-  //   }).catch(() => {
-  //     next(null, docObject);
-  //   });
-  // });
 };
 
 sisypheXml.getXmlDom = function (xmlFilePath) {
@@ -101,7 +85,7 @@ sisypheXml.getXmlDom = function (xmlFilePath) {
   })
 };
 
-sisypheXml.getDoctype = function(xmlFilePath) {
+sisypheXml.getDoctype = function (xmlFilePath) {
   return new Promise((resolve, reject) => {
     getDoctype.parseFile(xmlFilePath, (error, doctype) => {
       if (error) {
