@@ -1,6 +1,7 @@
 'use strict';
 
 const chai = require('chai'),
+  exec = require('child_process').exec,
   DOMParser = require('xmldom').DOMParser,
   expect = chai.expect,
   sisypheXml = require('../index.js');
@@ -17,6 +18,17 @@ const baseDoc = {
 const doc = Object.assign({path: __dirname + '/data/test-default.xml'}, baseDoc);
 const docWithBadDoctypeInXml = Object.assign({path: __dirname + '/data/test-bad-doctype.xml'}, baseDoc);
 const docWithNotWellFormedXml = Object.assign({path: __dirname + '/data/test-not-wellformed.xml'}, baseDoc);
+
+describe('Dependancies', () => {
+  it('should have acces to xmlstarlet', (done) => {
+    exec('which xmlstarlet', (err, stdout, stderr) => {
+      void expect(err).to.be.null;
+      void expect(stderr).to.be.empty;
+      void expect(stdout).to.be.not.null;
+      done();
+    });
+  });
+});
 
 describe('doTheJob', function () {
   it('should add some info about a wellformed XML whithout config', function (done) {
