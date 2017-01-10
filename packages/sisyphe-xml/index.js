@@ -1,10 +1,12 @@
 'use strict';
 
 const assert = require('assert'),
+  path = require('path'),
   DOMParser = require('xmldom').DOMParser,
   xpath = require('xpath'),
   Promise = require('bluebird'),
   fs = Promise.promisifyAll(require('fs')),
+  exec = Promise.promisify(require('child_process').exec),
   getDoctype = require("get-doctype");
 
 const sisypheXml = {};
@@ -99,7 +101,7 @@ sisypheXml.getDoctype = function (xmlFilePath) {
 };
 
 sisypheXml.getConf = function (corpusname) {
-  const pathToConf = __dirname + '/conf/' + corpusname + '.json';
+  const pathToConf = __dirname + '/conf/' + corpusname + '/' + corpusname + '.json';
   return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
     return fs.readFileAsync(pathToConf)
   }).then((dataConf) => {
@@ -146,6 +148,34 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
     }
     return metadata;
   });
+};
+
+sisypheXml.validateAgainstDTD = function(docObj, arrayPathDTD) {
+  const DTDs = arrayPathDTD;
+  const dtdToValidateFirst = docObj.doctype.sysid;
+  Array.prototype.move = function (old_index, new_index) {
+    this.splice(new_index, 0, this.splice(old_index, 1)[0]);
+    return this;
+  };
+
+  return new Promise((resolve, reject) => {
+    const indexDtdToValidateFirst = DTDs.map((pathDtd) => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
+    if (indexDtdToValidateFirst !== -1) DTDs.move(indexDtdToValidateFirst, 0);
+
+    (function loop(arrayDTD) {
+      if (arrayDTD.length) {
+        const dtd = arrayDTD.shift();
+        exec('xmlstarlet val -e -d '+ dtd + ' ' + docObj.path).then((stdout, stderr) => {
+          if (stderr) console.log('stderr :', stderr);
+          resolve({dtd, stdout})
+        }).catch(() => {
+          loop(arrayDTD)
+        })
+      } else {
+        reject(new Error('No DTD validate the xml file'))
+      }
+    })(DTDs)
+  })
 };
 
 module.exports = sisypheXml;
