@@ -137,7 +137,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
     }
 
     value = (metadata.type === 'String' || metadata.type === 'Number') ? value.toString() : value;
-    if (value) metadata.value = value;
+    metadata.value = value;
     return metadata;
   }).map((metadata) => {
     if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {
