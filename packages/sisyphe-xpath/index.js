@@ -25,9 +25,8 @@ sisypheXpath.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml' || !data.isWellFormed) {
     return next(null, data);
   }
-  // console.log('Not Ignored: ', data.name);
   xml.generate(data.path, true).then(result => {
-    //data.xpath = result;
+    data.xpath = result;
     let keys = Object.keys(result);
     for (let i = 0; i < keys.length; i++) {
       redisClient.incrby(keys[i], result[keys[i]].count);
