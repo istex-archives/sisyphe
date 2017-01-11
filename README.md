@@ -25,7 +25,7 @@ Just start Sisyphe on a folder with any files in it.
 Sisyphe is now working in background with all your computer thread.
 Just take a coffee and wait , it will prevent you when it's done :)
 
-[Sisyphe-pic](https://raw.githubusercontent.com/istex/sisyphe/update/sisyphe.png)
+![Sisyphe-pic](https://raw.githubusercontent.com/istex/sisyphe/update/sisyphe.png)
 
 
 You should now have a file full of logs in `/yourcustomfolder/sisyphe/logs/sisyphe.log` (errors,info,duration..)
