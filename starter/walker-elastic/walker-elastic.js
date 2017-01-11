@@ -54,10 +54,12 @@ class WalkerElastic {
         if (error) reject(error);
         if (response.hasOwnProperty('hits') && response.hits.hasOwnProperty('hits')) {
           response.hits.hits.forEach((hit) => {
-            var objToSend = Object.assign({}, hit._source);
-            objToSend._index = hit._index;
-            objToSend._type = hit._type;
-            objToSend._id = hit._id;
+            // Be sure hit._source exists.
+            var objToSend = Object.assign({}, hit._source.fields);
+            objToSend.updateEs = {};
+            objToSend.updateEs._index = hit._index;
+            objToSend.updateEs._type = hit._type;
+            objToSend.updateEs._id = hit._id;
             results.push(objToSend);
           });
         }
