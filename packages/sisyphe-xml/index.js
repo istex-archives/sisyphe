@@ -113,7 +113,7 @@ sisypheXml.getDoctype = function (xmlFilePath) {
 sisypheXml.getConf = function (corpusname) {
   const pathToConf = __dirname + '/conf/' + corpusname + '/' + corpusname + '.json';
   return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
-    return fs.readFileAsync(pathToConf)
+    return fs.readFileAsync(pathToConf, 'utf8')
   }).then((dataConf) => {
     return JSON.parse(dataConf);
   });
