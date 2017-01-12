@@ -62,8 +62,12 @@ class Sisyphe {
 
     setInterval(function () {
       clientRedis.hgetallAsync('sisyphe').then((values) => {
+        values.isAllValuesOK = true;
+        for (const prop in values) {
+          if (values.hasOwnProperty(prop) && values[prop] === undefined) values.isAllValuesOK = false;
+        }
         const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
-        if (+values.totalGeneratedTask && totalJobs >= +values.totalGeneratedTask) {
+        if (values.isAllValuesOK && totalJobs >= +values.totalGeneratedTask) {
           clearInterval(this);
           logger.info("Total jobs created = " + +[values.totalGeneratedTask]);
           logger.info("Total jobs completed = " + +[values.totalPerformedTask]);
