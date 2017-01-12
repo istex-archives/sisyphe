@@ -58,18 +58,22 @@ describe(pkg.name + '/src/chain-job-queue.js', function () {
   describe('addTask', function () {
     it('Should add a task and start to work on it', function (done) {
       const chain = new ChainJobQueue();
-      chain.addWorker('First Worker', (data, next) => {
-        setTimeout(() => {
-          data.count++;
-          expect(data.count).to.equal(1);
-          next(null, data);
-        }, data.time);
-      }).addWorker('Second Worker', (data, next) => {
-        setTimeout(() => {
-          data.count++;
-          expect(data.count).to.equal(2);
-          next(null, data);
-        }, data.time);
+      chain.addWorker('first-worker', {
+        doTheJob: function(data, next) {
+          setTimeout(() => {
+            data.count++;
+            expect(data.count).to.equal(1);
+            next(null, data);
+          }, data.time);
+        }
+      }).addWorker('second-worker', {
+        doTheJob: function(data, next) {
+          setTimeout(() => {
+            data.count++;
+            expect(data.count).to.equal(2);
+            next(null, data);
+          }, data.time);
+        }
       }).initialize()
         .addTask({
           message: 'Première tache',
