@@ -1,6 +1,6 @@
 'use strict';
 
-const elasticUrl= process.env.ELASTIC_URL || 'localhost:9200';
+const elasticUrl = process.env.ELASTIC_URL || 'localhost:9200';
 const elasticsearch = require('elasticsearch'),
   Promise = require('bluebird');
 
@@ -17,9 +17,11 @@ class WalkerElastic {
 
   start() {
     return this.getResultsFromES(this.elasticIndex, this.elasticReq)
-    .map(doc => {
-      this.functionEventOnData(doc)
-    })
+      .map(doc => {
+        this.functionEventOnData(doc)
+      }).then(() => {
+        this.functionEventOnEnd();
+      });
   }
 
   setFunctionEventOnFile(functionEventOnFile) {
@@ -44,7 +46,7 @@ class WalkerElastic {
   getResultsFromES(elasticIndex, elasticReq) {
     const results = [];
     const self = this;
- 
+
     return new Promise((resolve, reject) => {
       this._client.search({
         scroll: '30s',
@@ -63,7 +65,7 @@ class WalkerElastic {
             results.push(objToSend);
           });
         }
- 
+
         if (results.length < response.hits.total) {
           self._client.scroll({
             scrollId: response._scroll_id,
