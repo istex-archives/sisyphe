@@ -8,7 +8,7 @@ const ChainJobQueue = require('./chain-job-queue'),
   redis = require('redis'),
   clientRedis = redis.createClient(),
   cluster = require('cluster'),
-  numberFork = require('os').cpus().length // / 2;
+  numberFork = require('os').cpus().length / 2;
 
 const logger = new (winston.Logger)({
   transports: [
@@ -86,7 +86,7 @@ class Sisyphe {
           });
         }
       });
-    }, 1000);
+    }, 2000);
   }
 
   start() {
@@ -98,6 +98,7 @@ class Sisyphe {
             logger.info('fork created');
           });
           fork.on('exit', () => {
+            cluster.fork();
             logger.info('fork exit');
           });
         }
