@@ -71,13 +71,20 @@ class ChainJobQueue {
         const isTheLastWorker = listWorker.length === (index + 1);
         if (isTheLastWorker) {
           worker.totalPerformedTask++;
-          clientRedis.hincrby('sisyphe',  job.queue.name + ':totalPerformedTask', 1);
           clientRedis.hincrby('sisyphe', 'totalPerformedTask', 1);
           worker.totalPerformedTask = 0;
         } else {
           const workerAfter = listWorker[index + 1];
           workerAfter.queue.add(result, {removeOnComplete: true});
         }
+      });
+
+      worker.queue.on('stalled', function (job) {
+        logger.error(job);
+      });
+
+      worker.queue.on('error', function (error) {
+        logger.error(error);
       });
 
       return worker;
