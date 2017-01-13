@@ -11,7 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.4.1",
-    "bull": "^1.0.0",
+    "bull": "^2.0.0",
     "commander": "^2.9.0",
     "debug": "^2.2.0",
     "elasticsearch": "^12.1.3",
