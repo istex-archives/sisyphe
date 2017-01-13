@@ -5,6 +5,7 @@
 const program = require('commander'),
   Sisyphe = require('./src/sisyphe'),
   bluebird = require('bluebird'),
+  path = require('path'),
   fs = bluebird.promisifyAll(require('fs'));
 
 program
@@ -43,6 +44,9 @@ let workers = [{
   name: "Sisyphe Output",
   module: "sisyphe-out"
 }];
+
+//Temp write config file
+fs.writeFileSync(path.resolve(__dirname , 'temp/config.json'), JSON.stringify({corpusname: program.corpusname}),{encoding: 'utf-8'})
 
 // This is an Update
 if (!pathInput && program.corpusname) {

@@ -8,7 +8,7 @@ const ChainJobQueue = require('./chain-job-queue'),
   redis = require('redis'),
   clientRedis = redis.createClient(),
   cluster = require('cluster'),
-  numberFork = require('os').cpus().length / 2;
+  numberFork = require('os').cpus().length;
 
 const logger = new (winston.Logger)({
   transports: [
@@ -48,6 +48,7 @@ class Sisyphe {
 
   startToGenerateTask() {
     console.time('executionTime');
+    clientRedis.flushall();
     this.starterModule.start();
   }
 

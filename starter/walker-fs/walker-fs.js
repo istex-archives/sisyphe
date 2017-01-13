@@ -10,7 +10,6 @@ class WalkerFS {
     this._path = options.path;
     this.corpusname = options.corpusname;
     // Use an init function should be better
-    fs.writeFileSync(path.resolve(__dirname , '../../temp/config.json'), JSON.stringify({corpusname: this.corpusname}),{encoding: 'utf-8'})
     this.totalFile = 0;
     this.now = Date.now();
     this.functionEventOnFile = (root, stats) => {

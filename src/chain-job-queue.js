@@ -14,6 +14,16 @@ const logger = new (winston.Logger)({
     new (winston.transports.File)({
       filename: 'logs/sisyphe.log',
       level: 'info'
+    }),
+    new (winston.transports.File)({
+      'name' : 'sisyphe-error',
+      filename: 'logs/sisyphe-error.json',
+      level: 'error'
+    }),
+    new (winston.transports.File)({
+      'name' : 'sisyphe-warn',
+      filename: 'logs/sisyphe-warning.json',
+      level: 'warn'
     })
   ]
 });
@@ -59,7 +69,7 @@ class ChainJobQueue {
       return worker;
     }).map((worker, index, listWorker) => {
       worker.queue.on('failed', (job, error) => {
-        logger.error(error);
+        logger.error({errorFailed: error, data: job});
         process.stdout.write(kuler('|', 'red'));
         worker.totalFailedTask++;
         clientRedis.hincrby('sisyphe', job.queue.name + ':totalFailedTask', 1);
@@ -75,16 +85,16 @@ class ChainJobQueue {
           worker.totalPerformedTask = 0;
         } else {
           const workerAfter = listWorker[index + 1];
-          workerAfter.queue.add(result, {removeOnComplete: true});
+          workerAfter.queue.add(result, {removeOnComplete: true, timeout: 60000});
         }
       });
 
       worker.queue.on('stalled', function (job) {
-        logger.error(job);
+        logger.error({errorStalled: true, data: job});
       });
 
       worker.queue.on('error', function (error) {
-        logger.error(error);
+        logger.error({errorSisyphe: error});
       });
 
       return worker;
@@ -93,7 +103,7 @@ class ChainJobQueue {
   }
 
   addTask(task) {
-    this.listWorker[0].queue.add(task, {removeOnComplete: true});
+    this.listWorker[0].queue.add(task, {removeOnComplete: true, timeout: 60000});
     return this;
   }
 }
