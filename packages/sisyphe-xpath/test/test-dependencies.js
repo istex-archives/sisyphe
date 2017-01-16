@@ -14,7 +14,8 @@ const redisHost = process.env.REDIS_HOST || 'localhost',
   redisPort = process.env.REDIS_PORT || '6379',
   config = {
     "redisDB" : 1,
-    "xpathsOutput" : "job/"
+    "xpathsOutput" : "job/",
+    "debug" : true
   }; // Override configuration file for tests
 
 describe('Redis', () => {
@@ -88,7 +89,8 @@ describe('DoTheJob', () => {
       isWellFormed: true,
       path: 'test/test.xml',
       mimetype: 'application/xml',
-      size: 500
+      size: 500,
+      debug : true
     };
 
     doTheJob(objTest, (err, data) => {
