@@ -57,7 +57,8 @@ if (!pathInput && program.corpusname) {
       corpusname: program.corpusname
     }
   };
-  workers = [{name: "Sisyphe XML", module: "sisyphe-xml"}, {name: "Sisyphe Output", module: "sisyphe-out"}];
+  workers = [{name: "Sisyphe XML", module: "sisyphe-xml"}, 
+  {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname}}];
   let sisyphe = new Sisyphe(starter, workers);
   sisyphe.start();
   return;
