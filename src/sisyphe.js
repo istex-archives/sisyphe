@@ -11,10 +11,18 @@ const ChainJobQueue = require('./chain-job-queue'),
   numberFork = require('os').cpus().length;
 
 const logger = new (winston.Logger)({
+  exitOnError: false,
   transports: [
     new (winston.transports.File)({
+      name: 'sisyphe-info',
       filename: 'logs/sisyphe.log',
       level: 'info'
+    }),
+    new (winston.transports.File)({
+      name: 'sisyphe-error',
+      handleExceptions: true,
+      filename: 'logs/sisyphe-error.log',
+      level: 'error'
     })
   ]
 });
@@ -83,7 +91,7 @@ class Sisyphe {
             console.timeEnd('executionTime');
           }).catch((error) => {
             // TODO : rajouter une gestion des erreur pour les logs
-            logger.info(error);
+            logger.error(error);
           });
         }
       });

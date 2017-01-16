@@ -10,20 +10,18 @@ const Queue = require('bull'),
   clientRedis = redis.createClient();
 
 const logger = new (winston.Logger)({
+  exitOnError: false,
   transports: [
     new (winston.transports.File)({
-      filename: 'logs/sisyphe.log',
+      name: 'info-file',
+      filename: 'logs/sisyphe-info.log',
       level: 'info'
     }),
     new (winston.transports.File)({
-      'name' : 'sisyphe-error',
-      filename: 'logs/sisyphe-error.json',
+      name : 'sisyphe-error',
+      handleExceptions: true,
+      filename: 'logs/sisyphe-error.log',
       level: 'error'
-    }),
-    new (winston.transports.File)({
-      'name' : 'sisyphe-warn',
-      filename: 'logs/sisyphe-warning.json',
-      level: 'warn'
     })
   ]
 });
