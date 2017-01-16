@@ -47,13 +47,6 @@ class ChainJobQueue {
     return this;
   }
 
-  initialize() {
-    this.createQueueForWorkers()
-      .initializeFeaturesWorkers()
-      .addJobProcessToWorkers();
-    return this;
-  }
-
   initializeFeaturesWorkers() {
     this.listWorker.filter((worker) => {
       return worker.features.init !== undefined
