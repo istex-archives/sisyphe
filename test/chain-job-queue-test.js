@@ -33,27 +33,30 @@ describe(pkg.name + '/src/chain-job-queue.js', function () {
     })
   });
 
-  describe('initialize', function () {
-    it('Should instances and initialize workers', function (done) {
-      const chain = new ChainJobQueue();
-      chain.addWorker('First Worker', (data, done) => {
-        setTimeout(() => {
-          console.log('First Worker', data);
-          done();
-        }, data.time);
-      }).addWorker('Second Worker', (data, done) => {
-        setTimeout(() => {
-          console.log('Second Worker', data);
-          done();
-        }, data.time);
-      }).initialize();
-      chain.listWorker.forEach((worker) => {
-        expect(worker.queue).to.be.an.instanceof(Queue);
-        worker.queue.close();
-      });
-      done();
-    });
-  });
+
+  // TODO : redécouper ce test avec les fonctions associés
+
+  // describe('initialize', function () {
+  //   it('Should instances and initialize workers', function (done) {
+  //     const chain = new ChainJobQueue();
+  //     chain.addWorker('First Worker', (data, done) => {
+  //       setTimeout(() => {
+  //         console.log('First Worker', data);
+  //         done();
+  //       }, data.time);
+  //     }).addWorker('Second Worker', (data, done) => {
+  //       setTimeout(() => {
+  //         console.log('Second Worker', data);
+  //         done();
+  //       }, data.time);
+  //     }).initialize();
+  //     chain.listWorker.forEach((worker) => {
+  //       expect(worker.queue).to.be.an.instanceof(Queue);
+  //       worker.queue.close();
+  //     });
+  //     done();
+  //   });
+  // });
 
   describe('addTask', function () {
     it('Should add a task and start to work on it', function (done) {

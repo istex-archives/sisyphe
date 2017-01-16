@@ -124,12 +124,13 @@ class Sisyphe {
         const packageWorkerModule = require(pathToWorkerModule + '/package.json');
         return {
           name: packageWorkerModule.name,
-          obj: workerModule
+          obj: workerModule,
+          options: worker.options
         };
       })
     }).then((arrayWorkerModule) => {
       arrayWorkerModule.map((workerModule) => {
-        this.workflow.addWorker(workerModule.name, workerModule.obj);
+        this.workflow.addWorker(workerModule.name, workerModule.obj, workerModule.options);
       });
       this.workflow.createQueueForWorkers();
       return this;
@@ -137,7 +138,7 @@ class Sisyphe {
   }
 
   activateWorker() {
-    this.workflow.addJobProcessToWorkers();
+    this.workflow.initializeFeaturesWorkers().addJobProcessToWorkers();
     return this;
   }
 

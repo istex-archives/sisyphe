@@ -42,11 +42,11 @@ let workers = [{
   module: "sisyphe-xpath"
 }, {
   name: "Sisyphe Output",
-  module: "sisyphe-out"
+  module: "sisyphe-out",
+  options: {
+    corpusname: program.corpusname
+  }
 }];
-
-//Temp write config file
-fs.writeFileSync(path.resolve(__dirname , 'temp/config.json'), JSON.stringify({corpusname: program.corpusname}),{encoding: 'utf-8'})
 
 // This is an Update
 if (!pathInput && program.corpusname) {

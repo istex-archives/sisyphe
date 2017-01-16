@@ -37,19 +37,31 @@ class ChainJobQueue {
     this.redisHost = redisHost || '127.0.0.1';
   }
 
-  addWorker(name, worker) {
+  addWorker(name, worker, options) {
     const newWorker = {
       name: name,
       totalPerformedTask: 0,
       totalFailedTask: 0,
-      features: worker
+      features: worker,
+      options
     };
     this.listWorker.push(newWorker);
     return this;
   }
 
   initialize() {
-    this.createQueueForWorkers().addJobProcessToWorkers();
+    this.createQueueForWorkers()
+      .initializeFeaturesWorkers()
+      .addJobProcessToWorkers();
+    return this;
+  }
+
+  initializeFeaturesWorkers() {
+    this.listWorker.filter((worker) => {
+      return worker.features.init !== undefined
+    }).map((worker) => {
+      worker.features.init(worker.options)
+    });
     return this;
   }
 
