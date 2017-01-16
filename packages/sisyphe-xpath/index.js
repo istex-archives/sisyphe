@@ -12,7 +12,8 @@ const config = require('./config.json'),
   mkdirp = Promise.promisifyAll(require('mkdirp'));
 
 config.xpathsOutput = config.xpathsOutput || '/applis/istex/job/';
-config.redisDB = config.redisDB || config.redisDB;
+config.debug = (config.hasOwnProperty('debug')) ? config.debug : false; 
+config.redisDB = config.redisDB || 1;
 
 const redisClient = redis.createClient(`//${redisHost}:${redisPort}`, {db: config.redisDB});
 
@@ -26,7 +27,7 @@ sisypheXpath.doTheJob = function (data, next) {
     return next(null, data);
   }
   xml.generate(data.path, true).then(result => {
-    //data.xpath = result;
+    if(data.debug === true) data.xpath = result;
     let keys = Object.keys(result);
     for (let i = 0; i < keys.length; i++) {
       redisClient.incrby(keys[i], result[keys[i]].count);
