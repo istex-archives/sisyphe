@@ -57,7 +57,7 @@ class Sisyphe {
   startToGenerateTask() {
     console.time('executionTime');
     clientRedis.flushall();
-    this.starterModule.start();
+    return this.starterModule.start();
   }
 
   heartbeat() {
@@ -94,6 +94,8 @@ class Sisyphe {
             logger.error(error);
           });
         }
+      }).catch((error) => {
+        logger.error(error)
       });
     }, 2000);
   }
@@ -101,7 +103,7 @@ class Sisyphe {
   start() {
     this.initializeWorker().then(() => {
       if (cluster.isMaster) {
-        for (var i = 0; i < numberFork; i++) {
+        for (let i = 0; i < numberFork; i++) {
           const fork = cluster.fork();
           fork.on('online', () => {
             logger.info('fork created');
@@ -111,8 +113,10 @@ class Sisyphe {
             logger.info('fork exit');
           });
         }
-        this.heartbeat();
-        this.initializeStarter().then(() => this.startToGenerateTask());
+        // this.heartbeat();
+        this.initializeStarter()
+          .then(() => this.startToGenerateTask())
+          .then(() => this.heartbeat());
       } else {
         this.activateWorker();
       }
