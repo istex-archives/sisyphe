@@ -113,7 +113,6 @@ class Sisyphe {
             logger.info('fork exit');
           });
         }
-        // this.heartbeat();
         this.initializeStarter()
           .then(() => this.startToGenerateTask())
           .then(() => this.heartbeat());
