@@ -3,9 +3,15 @@
   "version": "0.0.18",
   "description": "",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/istex/sisyphe.git"
+  },
   "scripts": {
     "test": "mocha",
-    "test-worker": "git submodule foreach 'npm test'"
+    "preinstall": "npm i -g lerna",
+    "postinstall": "lerna bootstrap && npm test && lerna run --ignore *-worker test",
+    "test-worker": "lerna run --ignore *-worker test"
   },
   "author": "",
   "license": "MIT",
