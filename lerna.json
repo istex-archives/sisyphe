@@ -3,5 +3,5 @@
   "packages": [
     "worker/*"
   ],
-  "version": "1.0.0"
+  "version": "independent"
 }
