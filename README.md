@@ -5,7 +5,7 @@
 
 ## Sisyphe
 
-Sisyphe is a generic NodeJS folder analyser.
+Sisyphe is a generic NodeJS folder analyser & a ([lerna](https://github.com/lerna/lerna)) git [monorepo](https://github.com/babel/babel/blob/master/doc/design/monorepo.md).
 
 It's in construction so you should come back a little latter for an easy-to-use & easy-to install process ;)
 
@@ -17,9 +17,8 @@ Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1
 ### Install it
 
 1. Download the lastest Sisyphe version 
-2. Init it's modules `git submodule init`
-3. Update it's modules `git submodule update -remote`
-4. Install their depedencies `git submodule foreach "npm install"`
+2. Just do : `npm install`
+3. ... that's it.
 
 
 ### How it works ?
@@ -38,7 +37,7 @@ You should now have a file full of logs in `/yourcustomfolder/sisyphe/logs/sisyp
 ### Modules
 There is a list of default modules (focused on xml & pdf).
 
-
+Those URL NEED to be updated when merge branch will be ok.
 - [Sisyphe-FILETYPE](https://github.com/istex/sisyphe-filetype) Will detect mimetype,extension, corrupted files..
 - [Sisyphe-PDF](https://github.com/istex/sisyphe-pdf) Will get info from PDF (version, author, meta...)
 - [Sisyphe-XML](https://github.com/istex/sisyphe-xml) Will check if it's wellformed, valid-dtd's, get element from balises ...
@@ -47,3 +46,11 @@ There is a list of default modules (focused on xml & pdf).
 
 You can create your own module & add it to sisyphe :
 => This part is not written yet
+
+
+### Developpement on worker
+
+When you work on worker, just: 
+1. Commit your changes as easy
+2. Do a `lerna updated` (to check what worker has changed)
+3. Do a `lerna publish` (it will ask you to change version of module worker & publish it to npm & github)
