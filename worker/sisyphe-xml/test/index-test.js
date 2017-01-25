@@ -57,9 +57,6 @@ describe('doTheJob', function () {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
-      expect(docOutput).to.have.property('error');
-      expect(docOutput.error).to.be.an.instanceof(Error);
-      expect(docOutput.error.type).to.be.equal('wellFormed');
       done();
     });
   });
@@ -69,9 +66,6 @@ describe('doTheJob', function () {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
-      expect(docOutput).to.have.property('error');
-      expect(docOutput.error).to.be.an.instanceof(Error);
-      expect(docOutput.error.type).to.be.equal('doctype');
       done();
     });
   });
@@ -94,13 +88,9 @@ describe('doTheJob', function () {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
-      expect(docOutput).to.have.property('error');
-      expect(docOutput.error).to.be.an.instanceof(Error);
-      expect(docOutput.error.type).to.be.equal('validation-dtd');
       done();
     });
   })
-
 });
 
 describe('getXmlDom', function () {
@@ -116,7 +106,7 @@ describe('getXmlDom', function () {
       expect(error).to.have.property('type');
       expect(error.type).to.equal('wellFormed');
       expect(error).to.have.property('list');
-      expect(error.list).to.be.an('Array');
+      expect(error.list).to.be.an('Object');
     })
   })
 });
@@ -147,6 +137,12 @@ describe('getConf', function () {
     return sisypheXml.getConf('default').then((defaultConfObj) => {
       expect(defaultConfObj).to.be.an('object');
     })
+  });
+
+  it('should catch an error when getting an unknown config file', function () {
+    return sisypheXml.getConf('unknown').catch({code: 'ENOENT'}, (error) => {
+      expect(error).to.be.an.instanceof(Error);
+    })
   })
 });
 
@@ -158,7 +154,7 @@ describe('checkConf', function () {
           "name": "someInfos",
           "regex": "^([a-z]{8})$",
           "type": "String",
-          "xpath": "/xpath/to/my/infos/text()"
+          "xpath": "/xpath/to/my/infos"
         }
       ]
     };
@@ -192,40 +188,94 @@ describe('getMetadataInfos', function () {
           "name": "someInfos",
           "regex": "^([a-z]{8})$",
           "type": "String",
-          "xpath": "/xpath/to/my/infos/text()"
+          "xpath": "/xpath/to/my/infos"
+        },
+        {
+          "name": "noInfos",
+          "regex": "^([a-z]{8})$",
+          "type": "String",
+          "xpath": "/xpath/to/no/infos"
+        }, {
+          "name": "noInfosWithArray",
+          "regex": "^([a-z]{8})$",
+          "type": "String",
+          "xpath": ["/xpath/to/no/infos", "/XPATH/TO/NO/INFOS"]
         }, {
           "name": "myNumber",
           "regex": "^([1-9]{4})$",
           "type": "Number",
-          "xpath": "/xpath/to/my/number/text()"
+          "xpath": "/xpath/to/my/number"
+        },
+        {
+          "name": "hasInfos",
+          "type": "Boolean",
+          "xpath": "/xpath/to/my/infos"
         }, {
-          "name": "noInfo",
-          "regex": "^([a-z]{8})$",
-          "type": "String",
-          "xpath": "/xpath/to/nowhere/text()"
+          "name": "hasNoInfos",
+          "type": "Boolean",
+          "xpath": "/xpath/to/no/infos"
+        }, {
+          "name": "hasInfosWithArray",
+          "type": "Boolean",
+          "xpath": ["XPATH/TO/MY/INFOS", "/xpath/to/my/infos"]
+        }, {
+          "name": "hasNoInfosWithArray",
+          "type": "Boolean",
+          "xpath": ["XPATH/TO/NO/INFOS", "/xpath/to/no/infos"]
+        }, {
+          "name": "nbParagraph",
+          "type": "Count",
+          "xpath": "/xpath/to/my/p"
+        }, {
+          "name": "nbNoParagraph",
+          "type": "Count",
+          "xpath": "/xpath/to/no/p"
+        }, {
+          "name": "nbParagraphWithArray",
+          "type": "Count",
+          "xpath": ["/XPATH/TO/MY/P", "/xpath/to/my/p"]
+        }, {
+          "name": "nbNoParagraphWithArray",
+          "type": "Count",
+          "xpath": ["/XPATH/TO/NO/P", "/xpath/to/no/p"]
+        }, {
+          "name": "infoWithDefaultXmlNamespace",
+          "type": "Attribute",
+          "xpath": "/xpath/@xml:lang"
         }
       ]
     };
     const xmlData = `
     <?xml version="1.0" encoding="UTF-8"?>
-    <xpath>
+    <xpath xml:lang="FR">
     <to>
         <my>
-            <infos>trezaq</infos>
+            <infos>trezaqwx</infos>
             <number>1234</number>
+            <p>lorem ipsum dolor sit amet</p>
+            <p>lorem ipsum dolor sit amet</p>
         </my>
     </to>
     </xpath>
     `;
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlData);
-    sisypheXml.getMetadataInfos(confObjInput, xmlDoc).map((metadata) => {
+    return sisypheXml.getMetadataInfos(confObjInput, xmlDoc).map((metadata) => {
       expect(metadata).to.have.property('name');
       expect(metadata).to.have.property('type');
       if (metadata.hasOwnProperty('regex')) {
         expect(metadata.regex).to.be.a('string');
       }
-      if (metadata.hasOwnProperty('value')) {
+      if (metadata.hasOwnProperty('value') && metadata.type === 'String') {
+        expect(metadata.value).to.be.a('string');
+      }
+      if (metadata.type === 'Count') {
+        expect(metadata.value).to.be.a('number');
+      }
+      if (metadata.type === 'Boolean') {
+        expect(metadata.value).to.be.a('boolean');
+      }
+      if (metadata.hasOwnProperty('value') && metadata.type === 'Attribute') {
         expect(metadata.value).to.be.a('string');
       }
     })
@@ -234,10 +284,12 @@ describe('getMetadataInfos', function () {
 
 describe('validateAgainstDTD', function () {
   it('should validate the Xml file from a docObject and a dtd list who contains a good DTD', function () {
-    doc.doctype = { type: 'PUBLIC',
+    doc.doctype = {
+      type: 'PUBLIC',
       name: 'article',
       pubid: 'my doctype of doom',
-      sysid: 'mydoctype.dtd' };
+      sysid: 'mydoctype.dtd'
+    };
     const arrayPathDTD = ['test/dtd/myBADdoctype.dtd', 'test/dtd/mydoctype.dtd'];
     return sisypheXml.validateAgainstDTD(doc, arrayPathDTD).then((result) => {
       expect(result).to.be.an('object');
@@ -248,10 +300,12 @@ describe('validateAgainstDTD', function () {
 
   it('should catch an error when tries to validate a xml file from a docObject and a dtd list who contains only a bad DTD', function () {
     const arrayPathDTD = ['test/dtd/myBADdoctype.dtd'];
-    doc.doctype = { type: 'PUBLIC',
+    doc.doctype = {
+      type: 'PUBLIC',
       name: 'article',
       pubid: 'my doctype of doom',
-      sysid: 'mydoctype.dtd' };
+      sysid: 'mydoctype.dtd'
+    };
     return sisypheXml.validateAgainstDTD(doc, arrayPathDTD).catch((error) => {
       expect(error).to.be.an.instanceof(Error);
     })

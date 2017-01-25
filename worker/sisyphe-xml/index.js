@@ -9,12 +9,14 @@ const assert = require('assert'),
   exec = Promise.promisify(require('child_process').exec),
   getDoctype = require("get-doctype");
 
+const xpathSelect = xpath.useNamespaces({"xml": "http://www.w3.org/XML/1998/namespace"});
+
 const sisypheXml = {};
 sisypheXml.doTheJob = function (docObject, next) {
   if (docObject.mimetype !== 'application/xml') {
     return next(null, docObject);
   }
-
+  // TODO : refactore this Promise Hell (like Callback Hell)
   Promise.join(
     this.getXmlDom(docObject.path),
     this.getDoctype(docObject.path),
@@ -31,9 +33,8 @@ sisypheXml.doTheJob = function (docObject, next) {
       this.validateAgainstDTD(docObject, dtdsPath).then((validationDTDresult) => {
         docObject.isValidAgainstDTD = true;
         docObject.validationDTDInfos = validationDTDresult;
-        return this.getMetadataInfos(conf, xmlDom);
-      }).then((metadatas) => {
-        metadatas.map((metadata) => {
+      }).then(() => {
+        this.getMetadataInfos(conf, xmlDom).map((metadata) => {
           if (metadata.hasOwnProperty('isValueValid')) {
             docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
             if (metadata.isValueValid) {
@@ -45,6 +46,11 @@ sisypheXml.doTheJob = function (docObject, next) {
           } else {
             docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
           }
+        }).then(() => {
+          next(null, docObject);
+        }).catch((error) => {
+          console.log(error)
+          docObject.metadataErrors = error.toString();
           next(null, docObject);
         });
       }).catch((error) => {
@@ -52,6 +58,8 @@ sisypheXml.doTheJob = function (docObject, next) {
         docObject.error = error;
         next(null, docObject);
       });
+    }).catch({code: 'ENOENT'}, () => {
+      next(null, docObject);
     }).catch((error) => {
       docObject.error = error;
       next(null, docObject);
@@ -66,7 +74,7 @@ sisypheXml.doTheJob = function (docObject, next) {
 sisypheXml.getXmlDom = function (xmlFilePath) {
   const error = new Error();
   error.type = 'wellFormed';
-  error.list = [];
+  error.list = {};
   const errorHandle = function (wellFormedErrorObj) {
     return function (level, msg, locator) {
       wellFormedErrorObj[level] = {
@@ -133,23 +141,41 @@ sisypheXml.checkConf = function (confObj) {
 };
 
 sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
-  return confObj.metadata.map((metadata) => {
+  return Promise.map(confObj.metadata, (metadata) => {
     // Select the first XPATH possibility
-    let value = null;
     if (Array.isArray(metadata.xpath)) {
-      for (let i = 0; i < metadata.length; i++) {
-        let currValue = xpath.select(metadata[i].xpath, xmlDom);
-        if (currValue.length) {
-          value = currValue;
+      for (let i = 0; i < metadata.xpath.length; i++) {
+        const itemElement = xpathSelect(metadata.xpath[i], xmlDom);
+        if (itemElement.length) {
+          metadata.element = itemElement;
           break;
         }
       }
+      if (!metadata.element) metadata.element = []
     } else {
-      value = xpath.select(metadata.xpath, xmlDom);
+      metadata.element = xpathSelect(metadata.xpath, xmlDom);
     }
 
-    value = (metadata.type === 'String' || metadata.type === 'Number') ? value.toString() : value;
-    metadata.value = value;
+    if (metadata.hasOwnProperty('element')) {
+      switch (metadata.type) {
+        case "String":
+          if (metadata.element.length) metadata.value = metadata.element[0].firstChild.data;
+          break;
+        case "Number":
+          if (metadata.element.length) metadata.value = metadata.element[0].firstChild.data;
+          break;
+        case "Boolean":
+          metadata.value = !!metadata.element.length;
+          break;
+        case "Count":
+          metadata.value = metadata.element.length;
+          break;
+        case "Attribute":
+          if (metadata.element.length) metadata.value = metadata.element[0].value;
+          if (metadata.element.length) metadata.value = metadata.element[0].value;
+          break;
+      }
+    }
     return metadata;
   }).map((metadata) => {
     if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {
@@ -181,7 +207,8 @@ sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
           loop(arrayDTD)
         })
       } else {
-        const error = new Error('No DTD validate the xml file');
+        const error = new Error();
+        error.message = 'No DTD validate the xml file';
         error.type = "validation-dtd";
         reject(error)
       }

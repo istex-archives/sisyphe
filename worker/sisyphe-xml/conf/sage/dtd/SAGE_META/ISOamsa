@@ -1,0 +1,82 @@
+<!-- 
+
+     File isoamsa.ent produced by the dsssl script ent.dsl
+     from input data in unicode.xml.
+
+     Please report any errors to 
+     David Carlisle <davidc@nag.co.uk>.
+
+     The numeric character values assigned to each entity
+     (should) match either official Unicode assignments
+     or assignments in the STIX proposal for characters
+     for Mathematics.
+
+     The STIX assignments are temporary and will change if
+     the proposal or some variant of it is adopted by the
+     Unicode Consortium.
+
+     Entity names in this file are derived from files carrying the
+     following notice:
+
+     (C) International Organization for Standardization 1986
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+
+<!ENTITY cularr     "&#8630;"  ><!--U21B6 /curvearrowleft A: left curved arrow  -->
+<!ENTITY curarr     "&#8631;"  ><!--U21B7 /curvearrowright A: rt curved arrow  -->
+<!ENTITY darr2      "&#8650;"  ><!--U21CA /downdownarrows A: two down arrows  -->
+<!ENTITY dArr       "&#8659;"  ><!--U21D3 /Downarrow A: down dbl arrow  -->
+<!ENTITY dharl      "&#8643;"  ><!--U21C3 /downleftharpoon A: dn harpoon-left  -->
+<!ENTITY dharr      "&#8642;"  ><!--U21C2 /downrightharpoon A: down harpoon-rt  -->
+<!ENTITY dlarr      "&#8601;"  ><!--U2199 /swarrow A: downward l arrow  -->
+<!ENTITY drarr      "&#8600;"  ><!--U2198 /searrow A: downward rt arrow  -->
+<!ENTITY harr       "&#8596;"  ><!--U2194 /leftrightarrow A: l&r arrow  -->
+<!ENTITY harrw      "&#8621;"  ><!--U21AD /leftrightsquigarrow A: l&r arr-wavy  -->
+<!ENTITY hArr       "&#8660;"  ><!--U21D4 /Leftrightarrow A: l&r dbl arrow  -->
+<!ENTITY larrhk     "&#8617;"  ><!--U21A9 /hookleftarrow A: left arrow-hooked  -->
+<!ENTITY larrlp     "&#8619;"  ><!--U21AB /looparrowleft A: left arrow-looped  -->
+<!ENTITY larrtl     "&#8610;"  ><!--U21A2 /leftarrowtail A: left arrow-tailed  -->
+<!ENTITY larr2      "&#8647;"  ><!--U21C7 /leftleftarrows A: two left arrows  -->
+<!ENTITY lAarr      "&#8666;"  ><!--U21DA /Lleftarrow A: left triple arrow  -->
+<!ENTITY lhard      "&#8637;"  ><!--U21BD /leftharpoondown A: l harpoon-down  -->
+<!ENTITY lharu      "&#8636;"  ><!--U21BC /leftharpoonup A: left harpoon-up  -->
+<!ENTITY lrarr2     "&#8646;"  ><!--U21C6 /leftrightarrows A: l arr over r arr  -->
+<!ENTITY lrhar2     "&#8651;"  ><!--U21CB /leftrightharpoons A: l harp over r  -->
+<!ENTITY lsh        "&#8624;"  ><!--U21B0 /Lsh A: -->
+<!ENTITY Larr       "&#8606;"  ><!--U219E /twoheadleftarrow A: -->
+<!ENTITY map        "&#8614;"  ><!--U21A6 /mapsto A: -->
+<!ENTITY mumap      "&#8888;"  ><!--U22B8 /multimap A: -->
+<!ENTITY nearr      "&#8599;"  ><!--U2197 /nearrow A: NE pointing arrow  -->
+<!ENTITY nharr      "&#8622;"  ><!--U21AE /nleftrightarrow A: not l&r arrow  -->
+<!ENTITY nhArr      "&#8654;"  ><!--U21CE /nLeftrightarrow A: not l&r dbl arr  -->
+<!ENTITY nlarr      "&#8602;"  ><!--U219A /nleftarrow A: not left arrow  -->
+<!ENTITY nlArr      "&#8653;"  ><!--U21CD /nLeftarrow A: not implied by  -->
+<!ENTITY nrarr      "&#8603;"  ><!--U219B /nrightarrow A: not right arrow  -->
+<!ENTITY nrArr      "&#8655;"  ><!--U21CF /nRightarrow A: not implies  -->
+<!ENTITY nwarr      "&#8598;"  ><!--U2196 /nwarrow A: NW pointing arrow  -->
+<!ENTITY olarr      "&#8634;"  ><!--U21BA /circlearrowleft A: l arr in circle  -->
+<!ENTITY orarr      "&#8635;"  ><!--U21BB /circlearrowright A: r arr in circle  -->
+<!ENTITY rarrhk     "&#8618;"  ><!--U21AA /hookrightarrow A: rt arrow-hooked  -->
+<!ENTITY rarrlp     "&#8620;"  ><!--U21AC /looparrowright A: rt arrow-looped  -->
+<!ENTITY rarrtl     "&#8611;"  ><!--U21A3 /rightarrowtail A: rt arrow-tailed  -->
+<!ENTITY rarrw      "&#8669;"  ><!--U21DD /squigarrowright A: rt arrow-wavy  -->
+<!ENTITY rarr2      "&#8649;"  ><!--U21C9 /rightrightarrows A: two rt arrows  -->
+<!ENTITY rAarr      "&#8667;"  ><!--U21DB /Rrightarrow A: right triple arrow  -->
+<!ENTITY rhard      "&#8641;"  ><!--U21C1 /rightharpoondown A: rt harpoon-down  -->
+<!ENTITY rharu      "&#8640;"  ><!--U21C0 /rightharpoonup A: rt harpoon-up  -->
+<!ENTITY rlarr2     "&#8644;"  ><!--U21C4 /rightleftarrows A: r arr over l arr  -->
+<!ENTITY rlhar2     "&#8652;"  ><!--U21CC /rightleftharpoons A: r harp over l  -->
+<!ENTITY rsh        "&#8625;"  ><!--U21B1 /Rsh A: -->
+<!ENTITY Rarr       "&#8608;"  ><!--U21A0 /twoheadrightarrow A: -->
+<!ENTITY uarr2      "&#8648;"  ><!--U21C8 /upuparrows A: two up arrows  -->
+<!ENTITY uArr       "&#8657;"  ><!--U21D1 /Uparrow A: up dbl arrow  -->
+<!ENTITY uharl      "&#8639;"  ><!--U21BF /upleftharpoon A: up harpoon-left  -->
+<!ENTITY uharr      "&#8638;"  ><!--U21BE /uprightharpoon A: up harp-r -->
+<!ENTITY varr       "&#8597;"  ><!--U2195 /updownarrow A: up&down arrow  -->
+<!ENTITY vArr       "&#8661;"  ><!--U21D5 /Updownarrow A: up&down dbl arrow  -->
+<!ENTITY xharr      "&#57859;" ><!--UE203 /longleftrightarrow A: long l&r arr  -->
+<!ENTITY xhArr      "&#57858;" ><!--UE202 /Longleftrightarrow A: long l&r dbl arr -->
+<!ENTITY xlArr      "&#57856;" ><!--UE200 /Longleftarrow A: long l dbl arrow  -->
+<!ENTITY xrArr      "&#57860;" ><!--UE204 /Longrightarrow A: long rt dbl arr  -->
