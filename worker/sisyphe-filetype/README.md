@@ -5,6 +5,7 @@ Sisyphe-filetype
 =========
 A [sisyphe](https://github.com/istex/sisyphe) module which detect filetype
 
+
 ### What does it do ?
 This module will get the path of the file in data & extract : its mimetype, mimeDetails (a mimetype with more informations) 
 
