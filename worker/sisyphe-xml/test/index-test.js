@@ -189,8 +189,16 @@ describe('getMetadataInfos', function () {
           "regex": "^([a-z]{8})$",
           "type": "String",
           "xpath": "/xpath/to/my/infos"
-        },
-        {
+        }, {
+          "name": "someInfosWithAutoClosedElement",
+          "type": "String",
+          "xpath": "/xpath/to/my/title"
+        }, {
+          "name": "someInfosWithArray",
+          "regex": "^([a-z]{8})$",
+          "type": "String",
+          "xpath": ["/XPATH/TO/MY/INFOS", "/xpath/to/my/infos"]
+        }, {
           "name": "noInfos",
           "regex": "^([a-z]{8})$",
           "type": "String",
@@ -199,7 +207,7 @@ describe('getMetadataInfos', function () {
           "name": "noInfosWithArray",
           "regex": "^([a-z]{8})$",
           "type": "String",
-          "xpath": ["/xpath/to/no/infos", "/XPATH/TO/NO/INFOS"]
+          "xpath": ["/XPATH/TO/NO/INFOS", "/xpath/to/no/infos"]
         }, {
           "name": "myNumber",
           "regex": "^([1-9]{4})$",
@@ -252,6 +260,7 @@ describe('getMetadataInfos', function () {
         <my>
             <infos>trezaqwx</infos>
             <number>1234</number>
+            <title/>
             <p>lorem ipsum dolor sit amet</p>
             <p>lorem ipsum dolor sit amet</p>
         </my>

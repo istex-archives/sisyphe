@@ -49,7 +49,6 @@ sisypheXml.doTheJob = function (docObject, next) {
         }).then(() => {
           next(null, docObject);
         }).catch((error) => {
-          console.log(error)
           docObject.metadataErrors = error.toString();
           next(null, docObject);
         });
@@ -157,12 +156,24 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
     }
 
     if (metadata.hasOwnProperty('element')) {
+      metadata.element.isEmpty = metadata.element.length;
+      if (metadata.element.isEmpty) {
+        metadata.element.hasFirstChild = metadata.element[0].hasOwnProperty('firstChild');
+      }
+      if (metadata.element.isEmpty && metadata.element.hasFirstChild) {
+        metadata.element.hasDataInFirstChild = metadata.element[0].firstChild.hasOwnProperty('data');
+      }
+
       switch (metadata.type) {
         case "String":
-          if (metadata.element.length) metadata.value = metadata.element[0].firstChild.data;
+          if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
+            metadata.value = metadata.element[0].firstChild.data;
+          }
           break;
         case "Number":
-          if (metadata.element.length) metadata.value = metadata.element[0].firstChild.data;
+          if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
+            metadata.value = metadata.element[0].firstChild.data;
+          }
           break;
         case "Boolean":
           metadata.value = !!metadata.element.length;
