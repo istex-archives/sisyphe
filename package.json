@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "preinstall": "npm i -g lerna",
+    "preinstall": "npm i -g lerna@2.0.0-beta.32",
     "postinstall": "lerna bootstrap && npm test && lerna run --ignore *-worker test",
     "test-worker": "lerna run --ignore *-worker test"
   },
