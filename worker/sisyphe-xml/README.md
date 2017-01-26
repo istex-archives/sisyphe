@@ -6,7 +6,7 @@ Sisyphe-xml
 Module which generate XML's information for Sisyphe
 
 ## Requirements:
-Tested with Redis@3.2.6 & Node 6.9 & XmlStarlet@1.6.1(libxml2@2.9.4)
+Tested with Redis@3.2.6 & Node 6.9
 
 
 ## How it works ?
