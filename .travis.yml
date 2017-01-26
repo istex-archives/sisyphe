@@ -3,6 +3,8 @@ language: node_js
 node_js:
   - "6"
 
+before_install: npm install -g lerna@2.0.0-beta.33
+
 services:
   - redis-server
 

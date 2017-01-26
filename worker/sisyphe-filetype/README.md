@@ -19,7 +19,6 @@ It does not really care about extensions.
 ### Corrupt files
 This module is able to detect a lot of broken files (Ok not all ...almost), corrupt files will get a mimetype "application/octet-stream".
 
-
 ### Info 
 Hidden files mimetype can be set to "application/octet-stream" whereas they are not actually broken.
 
