@@ -8,6 +8,7 @@ Output module for sisyphe analyser
 Will export data to file & ElasticSearch
 
 
+
 ## Output formats
 By default, this module will export the transferred data to 
 - JSON file
