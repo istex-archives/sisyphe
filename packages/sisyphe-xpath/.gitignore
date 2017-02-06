@@ -3,7 +3,7 @@ logs
 *.log
 npm-debug.log*
 job
-xpaths
+xpaths/*
 
 # Runtime data
 pids
