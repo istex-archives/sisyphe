@@ -30,7 +30,16 @@ sisypheXpath.doTheJob = function (data, next) {
     if(data.debug === true) data.xpath = result;
     let keys = Object.keys(result);
     for (let i = 0; i < keys.length; i++) {
-      redisClient.incrby(keys[i], result[keys[i]].count);
+      redisClient.hincrby(keys[i], 'count' ,result[keys[i]].count);
+      // Set attributes in hash key
+      let attributesRedis = [];
+      for(var attr in result[keys[i]].attributes){
+        attributesRedis.push(attr);
+        attributesRedis.push(result[keys[i]].attributes[attr].toString());
+      }
+      if(attributesRedis.length) {
+        redisClient.hmset(keys[i], attributesRedis);
+      }
     }
     return next(null, data);
   }).catch(err => {
@@ -41,7 +50,7 @@ sisypheXpath.doTheJob = function (data, next) {
 sisypheXpath.finalJob = function (done) {
   // When no more data in queue, sisyphe will execute it
   let outputPath = path.resolve(config.xpathsOutput, Date.now().toString()),
-    outputFile = path.resolve(outputPath, 'xpaths-list.txt');
+    outputFile = path.resolve(outputPath, 'xpaths-list.csv');
 
   mkdirp.mkdirpAsync(outputPath).then(() => {
     let xpathsStream = fs.createWriteStream(outputFile);
@@ -49,8 +58,8 @@ sisypheXpath.finalJob = function (done) {
       return done(err);
     });
     xpathsStream.on('open', () => {
-      scanAsync('0', '*').map((result) => {
-        return xpathsStream.writeAsync(`${result.key} ${result.val}\n`);
+      scanAsync(0, '*').map((result) => {
+        return xpathsStream.writeAsync(`${result.key};${result.count};${result.attributes.toString()}\n`);
       }).then(() => {
         xpathsStream.close();
         done();
@@ -74,8 +83,11 @@ function scanAsync(cursor, pattern) {
     }
     if (cursor !== 0) return scanAsync(cursor, '*');
     return Promise.map(fullXpaths, (key) => {
-      return redisClient.getAsync(key).then(value => {
-        return {key: key, val: value}
+      return redisClient.hgetallAsync(key).then(value => {
+        let count  = value.count;
+        delete value.count;
+        let attributes = Object.keys(value);
+        return {key: key, count: count, attributes: attributes}
       });
     })
   });
