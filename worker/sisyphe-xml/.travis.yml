@@ -7,6 +7,3 @@ addons:
   apt:
     packages:
     - xmlstarlet
-
-notifications:
-  slack: 'inist-dpi:53Jp5iUZeRidSGZn0TukMSKo#activity'
