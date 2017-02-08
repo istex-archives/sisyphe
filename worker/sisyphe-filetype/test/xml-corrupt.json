@@ -1,0 +1,5 @@
+[
+  {"path": "test/samples/xml/corrupt/corrupt with spaces.nxml"},
+  {"path": "test/samples/xml/corrupt/corrupt.nxml"},
+  {"path": "test/samples/xml/corrupt/corrupt.nxmlv2"}
+]
