@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-filetype",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Sisyphe module to detect file type",
   "main": "index.js",
   "scripts": {
