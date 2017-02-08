@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-xpath",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Module for sisyphe to geenrate list of xpath on the fly",
   "main": "index.js",
   "scripts": {
