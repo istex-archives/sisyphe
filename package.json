@@ -1,13 +1,13 @@
 {
   "name": "sisyphe",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "",
   "main": "index.js",
   "scripts": {
     "postinstall": "lerna bootstrap",
     "test": "mocha && ./node_modules/lerna/bin/lerna.js run --ignore *-worker test",
-    "updated" : "./node_modules/lerna/bin/lerna.js updated",
-    "publish" : "./node_modules/lerna/bin/lerna.js publish --skip-npm && git push --follow-tags"
+    "updated": "./node_modules/lerna/bin/lerna.js updated",
+    "publish": "./node_modules/lerna/bin/lerna.js publish --skip-npm && git push --follow-tags"
   },
   "author": "",
   "license": "MIT",
