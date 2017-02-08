@@ -1,0 +1,1426 @@
+<!-- CUPJNLHD DTD v1.2 12/3/97
+
+
+
+CUPSSSH v0.1
+
+This DTD is based on the SSSH v2 DTD from Pira International and
+
+adds CUP elements under the marked sections %cup
+
+
+
+CUPSSSH v1.0
+
+PII added from SSSH v2.1 proposal
+
+CUP futher additions added
+
+
+
+CUPSSSH v1.1
+
+RE RV RL Article types added
+
+
+
+CUPJNLHD v1.0
+
+name changed from CUPSSSH
+
+
+
+CUPJNLHD v1.1
+
+emphasis codes extended to 99
+
+parameter entity data added to allow footnotes and text formatting
+
+in most elements and subelements
+
+cd year and month made required
+
+
+
+CUPJNLHD v1.2
+
+correction to omittag feature on artty end tag
+
+formula added to paragraph structure -->
+
+
+
+<!-- The following comment is from the SSSH DTD itself -->
+
+
+
+<!-- Simplified SGML for Serial Headers (SSSH)
+
+Based upon the MAJOUR header.dtd;  Date: January 14, 1991
+
+Basis for a document type definition for journal article headers.
+
+Developed by the European Workgroup on SGML (EWS) (Elsevier Science
+
+Publishers, Kluwer, Springer, Thieme, Fachinformationszentrum Karlsruhe,
+
+Stuertz, MID/Information Logistics Group, Satzrechenzentrum Berlin).
+
+Based on the AAP concept. -->
+
+
+
+<!-- SSSH modifications made by Pira International
+
+     for Book Industry Communications, January, 1996
+
+
+
+     Parameter Entity MAJOUR disables these modifications
+
+     by causing marked sections containing the "original"
+
+     declarations to be INCLUDEd and marked sections
+
+     containing the "oasis" declarations to be IGNOREd.
+
+
+
+     To invoke the original MAJOUR structures the replacement text
+
+     for MAJOUR should be changed from IGNORE to INCLUDE.
+
+     Users of the "nsgmls" parser can do this without modifying
+
+     the DTD, by including the option "-iMAJOUR" in the command line.
+
+
+
+     Parameter Entity AFFMOD disables the model for element "aff" in
+
+     its modified form, and enables a user-defined model in an external
+
+     entity with system identifier "affmodel.ent". When using MAJOUR
+
+     in its original form, AFFMOD has no effect.
+
+
+
+     To invoke the user-defined model for "aff" the replacement text
+
+     for AFFMODEL should be changed from IGNORE to INCLUDE.
+
+     Users of the "nsgmls" parser can do this without modifying
+
+     the DTD, by including the option "-iAFFMOD" in the command line.
+
+
+
+     {Repeated declarations of the same entity are ignored) -->
+
+
+
+<!ENTITY % MAJOUR "IGNORE">
+
+<!ENTITY % AFFMOD "IGNORE">
+
+
+
+<![%MAJOUR[
+
+<!ENTITY % oasis "IGNORE">
+
+<!ENTITY % originl "INCLUDE">
+
+<!ENTITY % cup "IGNORE">
+
+
+
+]]>
+
+
+
+<![%AFFMOD[
+
+<!ENTITY % affmodl SYSTEM "affmodel.ent">
+
+]]>
+
+
+
+<!ENTITY % oasis "IGNORE">
+
+<!ENTITY % originl "IGNORE">
+
+<!ENTITY % cup "INCLUDE">
+
+
+
+<![%cup[<!-- Version 2 Revision -->
+
+<!-- Alternative article identifier notations -->
+
+
+
+<!NOTATION pii PUBLIC "-//Elsevier Science//NOTATION Publisher Item
+Identifier (PII)//EN" >
+
+<!ENTITY % altids "pii?" >
+
+<!ELEMENT (pii)        - - (#PCDATA) >
+
+<!ATTLIST pii coding NOTATION (pii) #FIXED pii>]]>
+
+
+
+<!-- Inclusion of ENTITY lists for special characters and symbols. -->
+
+<!-- The following list is commented out for the CUP System -->
+
+
+
+<!-- <!ENTITY % ISOlat1 PUBLIC "ISO 8879:1986//ENTITIES Added Latin 1//EN">
+
+%ISOlat1;
+
+
+
+<!ENTITY % ISOlat2 PUBLIC "ISO 8879:1986//ENTITIES Added Latin 2//EN">
+
+%ISOlat2;
+
+
+
+<!ENTITY % ISOpub PUBLIC "ISO 8879:1986//ENTITIES Publishing//EN">
+
+%ISOpub;
+
+
+
+<!ENTITY % ISOtech PUBLIC "ISO 8879:1986//ENTITIES General Technical//EN">
+
+%ISOtech;
+
+
+
+<![%oasis[<!ENTITY % ISOnum PUBLIC "ISO 8879:1986//ENTITIES Numeric and
+Special Graphic//EN">
+
+%ISOnum;]]>
+
+
+
+<![%oasis[<!ENTITY % ISOamso PUBLIC "ISO 8879:1986//ENTITIES Added Math
+Symbols: Ordinary//EN">
+
+%ISOamso;]]>
+
+
+
+<![%oasis[<!ENTITY % ISOdia PUBLIC "ISO 8879:1986//ENTITIES Diacritical
+Marks//EN">
+
+%ISOdia;]]>
+
+
+
+<!ENTITY % ISOgrk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN">
+
+%ISOgrk1;
+
+
+
+<![%oasis[<!ENTITY % ISOgrk3 PUBLIC "ISO 8879:1986//ENTITIES Greek
+Symbols//EN">
+
+%ISOgrk3;]]> -->
+
+
+
+<!-- CUP System Entity references for Entities -->
+
+
+
+<![%cup[<!ENTITY % ISOlat1 SYSTEM "isolat1.ent">
+
+%ISOlat1;
+
+
+
+<!ENTITY % ISOlat2 SYSTEM "isolat2.ent">
+
+%ISOlat2;
+
+
+
+<!ENTITY % ISOnum SYSTEM "isonum.ent">
+
+%ISOnum;
+
+
+
+<!ENTITY % ISOpub SYSTEM "isopub.ent">
+
+%ISOpub;
+
+
+
+<!ENTITY % ISOtech SYSTEM "isotech.ent">
+
+%ISOtech;
+
+
+
+<!ENTITY % ISOgrk1 SYSTEM "isogrk1.ent">
+
+%ISOgrk1;
+
+
+
+<!ENTITY % ISOgrk2 SYSTEM "isogrk2.ent">
+
+%ISOgrk2;
+
+
+
+<!ENTITY % ISOgrk3 SYSTEM "isogrk3.ent">
+
+%ISOgrk3;
+
+
+
+<!ENTITY % ISOamsr SYSTEM "isoamsr.ent">
+
+%ISOamsr;
+
+
+
+<!ENTITY % ISOcyr1 SYSTEM "isocyr1.ent">
+
+%ISOcyr1;
+
+
+
+<!ENTITY % ISOcyr2 SYSTEM "isocyr2.ent">
+
+%ISOcyr2;
+
+
+
+<!ENTITY % ISOamsa SYSTEM "isoamsa.ent">
+
+%ISOamsa;
+
+
+
+<!ENTITY % ISOamsb SYSTEM "isoamsb.ent">
+
+%ISOamsb;
+
+
+
+<!ENTITY % ISOamsc SYSTEM "isoamsc.ent">
+
+%ISOamsc;
+
+
+
+<!ENTITY % ISOamsn SYSTEM "isoamsn.ent">
+
+%ISOamsn;
+
+
+
+<!ENTITY % ISOamso SYSTEM "isoamso.ent">
+
+%ISOamso;
+
+
+
+<!ENTITY % ISObox SYSTEM "isobox.ent">
+
+%ISObox;
+
+
+
+<!ENTITY % ISOdia SYSTEM "isodia.ent">
+
+%ISOdia;
+
+
+
+<!ENTITY % ISOmfrk SYSTEM "isomfrk.ent">
+
+%ISOmfrk;
+
+
+
+<!ENTITY % ISOmscr SYSTEM "isomscr.ent">
+
+%ISOmscr;
+
+
+
+<!ENTITY % ISOmopf SYSTEM "isomopf.ent">
+
+%ISOmopf;]]>
+
+
+
+
+
+<!ELEMENT formula           - -  CDATA  -- provisional solution -->
+
+<!ATTLIST formula  form     (inline|display)  inline
+
+                   disc     (math|chem)       math>
+
+
+
+<!-- basic text elements -->
+
+<![%originl[<!ENTITY % p.em.ph "(e1|e2|e3|e4|e5|e6|e7|e8|e9)">]]>
+
+<![%oasis[<!ENTITY % p.em.ph "(e1|e2|e3|e4|e5|e6|e7|e8|e9)">]]>
+
+
+
+<![%cup[<!-- emphasis elements EXTENDED FOR CUPHEADER DTD -->
+
+<!ENTITY % p.em.ph "(e1|e2|e3|e4|e5|e6|e7|e8|e9|e10|
+
+			e11|e12|e13|e14|e15|e16|e17|
+
+			e18|e19|e20|e21|e22|e23|e24|
+
+			e25|e26|e27|e28|e29|e30|e31|
+
+			e32|e33|e34|e35|e36|e37|e38|
+
+			e39|e40|e41|e42|e43|e44|e45|
+
+			e46|e47|e48|e49|e50|e51|e52|
+
+			e53|e54|e55|e56|e57|e58|e59|
+
+			e60|e61|e62|e63|e64|e65|e66|
+
+			e67|e68|e69|e70|e71|e72|e73|
+
+			e74|e75|e76|e77|e78|e79|e80|
+
+			e81|e82|e83|e84|e85|e86|e87|
+
+			e88|e89|e90|e91|e92|e93|e94|
+
+			e95|e96|e97|e98|e99)">]]>
+
+
+
+<!-- text elements NEW FOR CUPHEADER DTD-->
+
+<![%cup[<!ENTITY % data "(#PCDATA | %p.em.ph; | sup | inf | fn | fnr)*">]]>
+
+
+
+<![%originl[<!ELEMENT p    - o  (#PCDATA | %p.em.ph; | sup | inf | fn | fnr)*
+
+                                                                +(formula)>]]>
+
+<![%oasis[<!ELEMENT p    o o  (#PCDATA | %p.em.ph; | sup | inf | fn | fnr)*
+
+                                                                +(formula)>
+
+<!-- SSSH modification: start tag made optional -->]]>
+
+
+
+
+
+<![%cup[<!ELEMENT p    - -  (%data; | ead)*
+
+						+(formula)>
+
+<!-- CUP as SSSH modification: start tag made optional
+
+     New CUP modification: e-mail element added -->]]>
+
+
+
+
+
+<!ELEMENT fn                - -  (p+)                    -(fn)>
+
+<!ATTLIST fn       id       ID                #IMPLIED>
+
+<!ELEMENT fnr               - o  EMPTY>
+
+<!ATTLIST fnr      rid      IDREF             #IMPLIED>
+
+
+
+<!ELEMENT %p.em.ph;     - -  (#PCDATA)>
+
+
+
+<![%originl[<!ELEMENT (sup | inf)   - -  (#PCDATA | sup | inf)*>]]>
+
+<![%oasis[<!ELEMENT (sup | inf)     - -  (#PCDATA | sup | inf)*>]]>
+
+<![%cup[<!ELEMENT (sup | inf)       - -  (#PCDATA | %p.em.ph; | sup | inf
+| fn | fnr)*>]]>
+
+
+
+<!-- AFF.ENT, affiliation elements
+
+     Date: December 3, 1990 -->
+
+
+
+<![%originl[<!ELEMENT aff    - o  (onm | odv | oad)+              +(oid)>
+
+<!ATTLIST aff        type   (priv | org)                         org>
+
+<!ELEMENT oad               - o  (#PCDATA | str | pb | pc | cty | sbd | cny |
+
+                                 phone | fax | ead)*>
+
+<!ELEMENT (str | pb | pc |
+
+          cty | sbd | cny
+
+          | phone | fax |
+
+          ead)              - o  (#PCDATA)>
+
+<!ATTLIST cny       cnycode NAME                                 #REQUIRED>
+
+
+
+<!ELEMENT (onm | odv)       - o  (#PCDATA)>]]>
+
+<![%oasis[<!ENTITY % affmodl "<!ELEMENT aff - o (#PCDATA) +(oid) >">
+
+%affmodl;]]>
+
+<!-- SSSH modification: support for publishers' own aff models -->
+
+
+
+<![%cup[<!ELEMENT aff    - -  (%data; | onm | cny | ead)+              +(oid)>
+
+<!ATTLIST aff        type   (priv | org)                         org>
+
+
+
+<!ELEMENT (onm | cny)              - -  (%data;)>
+
+<!ELEMENT (ead)                          - -  (#PCDATA)>
+
+<!ATTLIST cny       cnycode NAME                                 #IMPLIED>
+
+<!-- CUP Modification for affiliation structure, end tag required -->]]>
+
+
+
+
+
+<!ELEMENT oid               - o  EMPTY>
+
+<!ATTLIST oid        id     ID                                   #REQUIRED>
+
+
+
+<!-- ISSUE.ENT, issue elements
+
+     Date: January 14, 1991 -->
+
+
+
+
+
+<![%originl[<!ELEMENT issue         o o  (pinfo, jsinfo?, jinfo, pubinfo)>]]>
+
+<![%oasis[<!ELEMENT issue           o o  (pinfo, jsinfo?, jinfo, pubinfo)>]]>
+
+<![%cup[<!ELEMENT issue             - -  (pinfo, jsinfo?, jinfo, pubinfo)>]]>
+
+
+
+<!-- Publisher Information -->
+
+
+
+<![%originl[<!ELEMENT pinfo  - o  (pnm, loc*)+>
+
+<!ELEMENT pnm                - o  (#PCDATA)>
+
+<!ELEMENT loc                - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT pinfo   - o  (pnm, loc*)+>
+
+<!ELEMENT pnm               - o  (#PCDATA)>
+
+<!ELEMENT loc               - o  (#PCDATA)>]]>
+
+
+
+<![%cup[<!ELEMENT pinfo     - -  (pnm, loc*)+>
+
+<!ELEMENT pnm               - -  (#PCDATA)>
+
+<!ELEMENT loc               - -  (#PCDATA)>]]>
+
+
+
+
+
+<!-- Journal series information -->
+
+
+
+<![%originl[<!ELEMENT jsinfo            - o  (jsid, jtl, jsbt?, jalt?, jabt?)>
+
+<!ELEMENT jsid              - o  (#PCDATA)>
+
+<!ELEMENT jtl               - o  (#PCDATA)>
+
+<!ELEMENT jsbt              - o  (#PCDATA)>
+
+<!ELEMENT jalt              - o  (#PCDATA)>
+
+<!ELEMENT jabt              - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT jsinfo            - o  (jsid, jtl, jsbt?, jalt?, jabt?)>
+
+<!ELEMENT jsid              - o  (#PCDATA)>
+
+<!ELEMENT jtl               - o  (#PCDATA)>
+
+<!ELEMENT jsbt              - o  (#PCDATA)>
+
+<!ELEMENT jalt              - o  (#PCDATA)>
+
+<!ELEMENT jabt              - o  (#PCDATA)>]]>
+
+
+
+<![%cup[<!ELEMENT jsinfo            - -  (jsid, jtl, jsbt?, jalt?, jabt?)>
+
+<!ELEMENT jsid              - -  (#PCDATA)>
+
+<!ELEMENT jtl               - -  (#PCDATA)>
+
+<!ELEMENT jsbt              - -  (#PCDATA)>
+
+<!ELEMENT jalt              - -  (#PCDATA)>
+
+<!ELEMENT jabt              - -  (#PCDATA)>]]>
+
+
+
+<!-- Journal information -->
+
+
+
+<![%originl[<!ELEMENT jinfo  - o  (jid, jtl, jsbt?, jalt?, jabt?,
+
+                                 issn, cdn?)>]]>
+
+<![%oasis[<!ELEMENT jinfo    - o  (jid?, jtl, jsbt?, jalt?, jabt?,
+
+                                 issn, cdn?)>
+
+<!-- SSSH modification: element "jid" made optional -->]]>
+
+
+
+<![%cup[<!ELEMENT jinfo  - -  (jid, jtl, jsbt?, jalt?, jabt?,
+
+                                 issn, cdn?)>
+
+<!-- CUP as SSSH modification: element "jid" made optional -->]]>
+
+
+
+
+
+<!-- Publication information -->
+
+
+
+<![%originl[<!ELEMENT pubinfo         - o  (vid, iid?, cd)>]]>
+
+<![%oasis[<!ELEMENT pubinfo           - o  (vid, iid?, cd?)>
+
+
+
+<!-- SSSH modification: element "cd" made optional -->]]>
+
+
+
+<![%cup[<!ELEMENT pubinfo           - -  (vid, iid?, cd)>
+
+<!-- CUP as SSSH modification: element "cd" required
+
+     year and month required for CUPHEADER-->]]>
+
+
+
+<!ELEMENT cd                - o  (#PCDATA)>
+
+<![%originl[<!ATTLIST cd         year   NUMBER                   #IMPLIED
+
+                                 month  NUMBER                   #IMPLIED
+
+                                 day    NUMBER                   #IMPLIED>]]>
+
+
+
+<![%oasis[<!ATTLIST cd           year   NUMBER                   #IMPLIED
+
+                                 month  NUMBER                   #IMPLIED
+
+                                 day    NUMBER                   #IMPLIED>]]>
+
+
+
+<![%cup[<!ATTLIST cd		year	NUMBER			#REQUIRED
+
+				month	NUMBER			#REQUIRED
+
+				day	NUMBER			#IMPLIED>]]>
+
+
+
+<!-- Refinfo information -->
+
+<![%originl[<!ELEMENT jid   - o  (#PCDATA)>
+
+<!ELEMENT issn              - o  (#PCDATA)>
+
+<!ELEMENT cdn               - o  (#PCDATA)>
+
+<!ELEMENT vid               - o  (#PCDATA)>
+
+<!ELEMENT iid               - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT jid     - o  (#PCDATA)>
+
+<!ELEMENT issn              - o  (#PCDATA)>
+
+<!ELEMENT cdn               - o  (#PCDATA)>
+
+<!ELEMENT vid               - o  (#PCDATA)>
+
+<!ELEMENT iid               - o  (#PCDATA)>]]>
+
+
+
+<![%cup[<!ELEMENT jid       - -  (#PCDATA)>
+
+<!ELEMENT issn              - -  (#PCDATA)>
+
+<!ELEMENT cdn               - -  (#PCDATA)>
+
+<!ELEMENT vid               - -  (#PCDATA)>
+
+<!ELEMENT iid               - -  (#PCDATA)>]]>
+
+
+
+
+
+<!--ARTCON.ENT, article content elements
+
+    Date: January 14, 1991 -->
+
+
+
+<!-- ARTINFO.ENT, article information elements
+
+     Date: January 14, 1991 -->
+
+
+
+<![%originl[<!ELEMENT artinfo - o  (aid, artty,
+
+                                 categ?, figct?, tabct?, refct?, ppct?,
+
+                                 wrdct?, ppf?, ppl?, crn?, hst?)>]]>
+
+<![%oasis[<!ELEMENT artinfo - o  (aid?, sici?, altid?, artty,
+
+                                 categ?, figct?, tabct?, refct?, ppct?,
+
+                                 wrdct?, ppf?, ppl?, crn?, hst?)>
+
+<!NOTATION sici PUBLIC "ANSI/NISO Z39.56-1995//NOTATION SICI//EN" >
+
+<!ELEMENT sici              - o  (#PCDATA) >
+
+<!ATTLIST sici coding NOTATION (sici) #FIXED sici >
+
+<!ELEMENT altid             - o  (%altids;) >
+
+<!-- SSSH modification: 1) element "aid" made optional
+
+                        2) optional element "sici" added
+
+                        3) optional element "altid" added (Version 2
+revision) -->]]>
+
+
+
+<![%cup[<!ELEMENT artinfo - -  (aid?, sici?, altid?, artty, categ?, figct?,
+
+                               tabct?, refct?, ppct?, wrdct?, ppf?, ppl?,
+
+                               crn?, hst?)>
+
+<!NOTATION sici PUBLIC "ANSI/NISO Z39.56-1995//NOTATION SICI//EN" >
+
+<!ELEMENT sici              - -  (#PCDATA) >
+
+<!ATTLIST sici coding NOTATION (sici) #FIXED sici >
+
+<!ELEMENT altid             - -  (%altids;) >
+
+<!-- CUP modification (as SSSH): 1) element "aid" made optional
+
+                                 2) optional element "sici" added
+
+                                 3) optional element "altid" added
+(Version 2 revision) -->]]>
+
+
+
+
+
+<![%originl[<!ELEMENT aid   - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT aid     - o  (#PCDATA)>]]>
+
+
+
+<![%cup[<!ELEMENT aid       - -  (#PCDATA)>]]>
+
+
+
+<!ELEMENT artty             - o  EMPTY>
+
+
+
+
+
+<![%originl[<!ATTLIST artty artty
+
+                            (RA|RP|LP|SC|ER|PI|AB|AD|BR|JP|XX)   #REQUIRED>]]>
+
+<![%oasis[<!ATTLIST artty artty
+
+                            (RA|RV|RL|RP|LP|SC|ER|PI|AB|AD|BR|JP|XX)
+#REQUIRED>
+
+<!-- SSSH modification: additional attribute values RV and RL
+
+
+
+Relationships between SSSH and MAJOUR article types:
+
+
+
+SSSH      relation  MAJOUR
+
+RA        equiv     RA
+
+RV        subset    RP + PI
+
+RL        equiv     LP
+
+SC        equiv     SC
+
+ER        equiv     ER
+
+          no equiv  AD
+
+AB        equiv     AB
+
+BR        equiv     BR
+
+          no equiv  JP
+
+XX        equiv     XX
+
+-->]]>
+
+
+
+<![%cup[<!ATTLIST artty artty
+
+
+(RA|RV|RL|LP|SC|ER|PI|AB|AD|BR|JP|ED|EA|ME|RE|XX)   #REQUIRED>
+
+<!-- CUP article Types as SSSH plus:
+
+ED Editorial
+
+EA Editorial Article(different content to regular editorial)
+
+ME In Memoriam(or Obituary)
+
+RE Review added 17/1/97
+
+RV Review Article added 17/1/97
+
+RL Research Letter added 17/1/97-->]]>
+
+
+
+<![%originl[<!ELEMENT categ         - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT categ           - o  (#PCDATA)>]]>
+
+
+
+<![%cup[<!ELEMENT categ             - -  (#PCDATA)>]]>
+
+
+
+<!ELEMENT figct             - o  EMPTY>
+
+<!ATTLIST figct      count  NUMBER                               #REQUIRED>
+
+<!ELEMENT tabct             - o  EMPTY>
+
+<!ATTLIST tabct      count  NUMBER                               #REQUIRED>
+
+<!ELEMENT refct             - o  EMPTY>
+
+<!ATTLIST refct      count  NUMBER                               #REQUIRED>
+
+<!ELEMENT ppct              - o  EMPTY>
+
+<!ATTLIST ppct       count  NUMBER                               #REQUIRED>
+
+<!ELEMENT wrdct             - o  EMPTY>
+
+<!ATTLIST wrdct      count  NUMBER                               #REQUIRED>
+
+
+
+<![%originl[<!ELEMENT ppf   - o  (#PCDATA)>
+
+<!ELEMENT ppl               - o  (#PCDATA)>
+
+<!ELEMENT crn               - o  (#PCDATA)>
+
+<!ELEMENT hst               - o  (re |  acc | rv | misc)*>]]>
+
+
+
+<![%oasis[<!ELEMENT ppf     - o  (#PCDATA)>
+
+<!ELEMENT ppl               - o  (#PCDATA)>
+
+<!ELEMENT crn               - o  (#PCDATA)>
+
+<!ELEMENT hst               - o  (re |  acc | rv | misc)*>]]>
+
+
+
+<![%cup[<!ELEMENT ppf       - -  (#PCDATA)>
+
+<!ELEMENT ppl               - -  (#PCDATA)>
+
+<!ELEMENT crn               - -  (#PCDATA)>
+
+<!ELEMENT hst               - -  (re |  acc | rv | misc)*>]]>
+
+
+
+<!ELEMENT re                - o  EMPTY>
+
+<!ATTLIST re         year   NUMBER                               #REQUIRED
+
+                     month  NUMBER                               #REQUIRED
+
+                     day    NUMBER                               #IMPLIED>
+
+<!ELEMENT acc               - o  EMPTY>
+
+<!ATTLIST acc        year   NUMBER                               #REQUIRED
+
+                     month  NUMBER                               #REQUIRED
+
+                     day    NUMBER                               #IMPLIED>
+
+<!ELEMENT rv                - o  EMPTY>
+
+<!ATTLIST rv         year   NUMBER                               #REQUIRED
+
+                     month  NUMBER                               #REQUIRED
+
+                     day    NUMBER                               #IMPLIED>
+
+
+
+<![%originl[<!ELEMENT misc          - o       (#PCDATA)>]]>
+
+<![%oasis[<!ELEMENT misc            - o       (#PCDATA)>]]>
+
+<![%cup[<!ELEMENT misc              - -       (%data;)>]]>
+
+
+
+<!ATTLIST misc       year   NUMBER                               #REQUIRED
+
+                     month  NUMBER                               #REQUIRED
+
+                     day    NUMBER                               #IMPLIED>
+
+
+
+<!-- ABS.ENT, abstract elements
+
+     Date: December 3, 1990 -->
+
+
+
+<![%originl[<!ELEMENT abs           - o  (p+)>]]>
+
+<![%oasis[<!ELEMENT abs             - o  (p+)>]]>
+
+<![%cup[<!ELEMENT abs               - -  (p+)>]]>
+
+
+
+<!ATTLIST abs      language NAME                                 #IMPLIED>
+
+<!-- KWDG.ENT, keyword group elements
+
+     Date: December 3, 1990 -->
+
+
+
+<![%originl[<!ELEMENT kwdg          - o  (kwd+)>]]>
+
+<![%oasis[<!ELEMENT kwdg            - o  (kwd+)>]]>
+
+<![%cup[<!ELEMENT kwdg              - -  (kwd+)>]]>
+
+
+
+<!ATTLIST kwdg     class    CDATA                                #IMPLIED
+
+                   language NAME                                 #IMPLIED>
+
+<![%originl[<!ELEMENT kwd           - o  (#PCDATA)
++(formula)>]]>
+
+<![%oasis[<!ELEMENT kwd             - o  (#PCDATA)
++(formula)>]]>
+
+<![%cup[<!ELEMENT kwd               - -  (%data;)
++(formula)>]]>
+
+
+
+<!-- NAMING.ENT, naming elements
+
+     Date: January 14, 1991 -->
+
+
+
+<![%originl[<!ENTITY % namephr
+"(#PCDATA|degs|fnms|inits|snm|roles|fn|fnr)+">]]>
+
+<![%oasis[<!ENTITY % namephr "(#PCDATA|degs|fnms|inits|snm|roles|fn|fnr)+">]]>
+
+<![%cup[<!ENTITY % namephr "(%data;|degs|fnms|inits|snm|roles|ead)+">]]>
+
+<!-- CUP modification e-mail address 'ead' added -->
+
+
+
+<!-- Name elements -->
+
+
+
+<![%originl[<!ELEMENT (degs | fnms |
+
+          inits | snm |
+
+          roles)            - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT (degs | fnms |
+
+          inits | snm |
+
+          roles)            - o  (#PCDATA)>]]>
+
+
+
+<![%cup[<!ELEMENT (degs | fnms |
+
+          inits | snm |
+
+          roles)            - -  (#PCDATA)>]]>
+
+<!-- CUP modification: end tag required -->
+
+
+
+<!-- GENHDR.ENT, contribution information for general headers
+
+     Date: December 3, 1990 -->
+
+
+
+<!-- TIG.ENT, title group elements for general headers
+
+     Date: December 3, 1990 -->
+
+
+
+<![%originl[<!ELEMENT tig    - o  (atl+)>
+
+<!ELEMENT atl                - o  (#PCDATA, sbt?)
+
+                                                            +(formula)>
+
+<!ATTLIST atl    language   NAME                                   #IMPLIED
+
+                 purpose    (normal|run)                           normal>
+
+<!ELEMENT sbt               - o  (#PCDATA)>
+
+
+
+
+
+<!-- DEDG.ENT, dedication group elements
+
+     Date: December 3, 1990 -->]]>
+
+
+
+<![%originl[<!ELEMENT dedg            - o  (ded?, prs?)>
+
+<!ELEMENT ded                         - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT dedg              - o  (ded?, prs?)>
+
+<!ELEMENT ded                         - o  (#PCDATA)>]]>
+
+
+
+<![%cup[<!ELEMENT dedg                - -  (ded?, prs?)>
+
+<!ELEMENT ded                         - -  (%data;)>
+
+<!-- CUPHEADER modification: CHANGED TO %data; -->]]>
+
+
+
+
+
+<![%originl[<!ELEMENT prs             - o  (#PCDATA)>]]>
+
+<![%oasis[<!ELEMENT prs               - o  (#PCDATA)>]]>
+
+<!-- AUG.ENT, author group elements
+
+     Date: December 3, 1990 -->
+
+
+
+<![%cup[<!ELEMENT prs               - -  (%data;)>
+
+<!-- CUPHEADER modification: CHANGED TO %data; -->]]>
+
+
+
+
+
+<![%oasis[<!ELEMENT tig    o o  (atl+)>
+
+<!-- SSSH modification: start tag made optional -->
+
+<!ELEMENT atl               - o  ((#PCDATA | %p.em.ph; | sup | inf)+, sbt?)
+
+                                                            +(formula)>
+
+<!ATTLIST atl    language   NAME                                   #IMPLIED
+
+                 purpose    (normal|run)                           normal>
+
+<!ELEMENT sbt               - o  (#PCDATA | %p.em.ph; | sup | inf)+>]]>
+
+
+
+
+
+<![%cup[<!ELEMENT tig    - -  (atl+)>
+
+<!-- CUP as SSSH modification: start tag made optional -->
+
+
+
+<!ELEMENT atl                - -  (%data;, sbt?)
+
+                                                            +(formula)>
+
+<!ATTLIST atl    language   NAME                                   #IMPLIED
+
+                 purpose    (normal|run|aurun)
+normal>
+
+<!ELEMENT sbt                - -  (%data;)>
+
+<!-- CUP modification: aurun added to purpose attribute -->]]>
+
+
+
+<![%originl[<!ELEMENT aug    - o  ((collab | au)+, aff*)>]]>
+
+<![%oasis[<!ELEMENT aug      o o  ((collab | au)+, aff*)>
+
+<!-- SSSH modification: start tag made optional -->]]>
+
+
+
+<![%cup[<!ELEMENT aug        - -  (((collab | au), cor?)+, aff*)>
+
+<!ELEMENT cor                - -	(%data; | onm | cny | ead)+>
+
+<!-- CUP modification: start and end tag required
+
+     New CUP modification: corresspondence address added -->]]>
+
+
+
+<![%originl[<!ELEMENT collab            - o  (#PCDATA)>]]>
+
+<![%oasis[<!ELEMENT collab              - o  (#PCDATA)>]]>
+
+<![%cup[<!ELEMENT collab                - -  (%data;)>]]>
+
+
+
+<![%originl[<!ELEMENT au                - o  (%namephr;)
++(orf)>]]>
+
+<![%oasis[<!ELEMENT au                  - o  (%namephr;)
++(orf)>]]>
+
+<![%cup[<!ELEMENT au                    - -  (%namephr;)
++(orf)>]]>
+
+
+
+<!ELEMENT orf               - o  EMPTY>
+
+<!ATTLIST orf        rid    IDREF                                #REQUIRED>
+
+
+
+
+
+<!-- CNG.ENT, Conference group elements
+
+     Date: December 3, 1990 -->
+
+
+
+<![%originl[<!ELEMENT cng    - o  (cndf | cndl | cnm | cnn | cnp | cns)*>]]>
+
+<![%oasis[<!ELEMENT cng      - o  (cndf | cndl | cnm | cnn | cnp | cns)*>]]>
+
+<![%cup[<!ELEMENT cng        - -  (cndf | cndl | cnm | cnn | cnp | cns)*>]]>
+
+
+
+<!ELEMENT cndf              - o  EMPTY>
+
+<!ATTLIST cndf       year   NUMBER                               #REQUIRED
+
+                     month  NUMBER                               #REQUIRED
+
+                     day    NUMBER                               #IMPLIED>
+
+<!ELEMENT cndl              - o  EMPTY>
+
+<!ATTLIST cndl       year   NUMBER                               #REQUIRED
+
+                     month  NUMBER                               #REQUIRED
+
+                     day    NUMBER                               #IMPLIED>
+
+<![%originl[<!ELEMENT cnm   - o  (#PCDATA)>
+
+<!ELEMENT cnn               - o  (#PCDATA)>
+
+<!ELEMENT cnp               - o  (#PCDATA)>
+
+<!ELEMENT cns               - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT cnm     - o  (#PCDATA)>
+
+<!ELEMENT cnn               - o  (#PCDATA)>
+
+<!ELEMENT cnp               - o  (#PCDATA)>
+
+<!ELEMENT cns               - o  (#PCDATA)>]]>
+
+
+
+<!-- CUPHEADER modification: CHANGED TO parameter entity data -->
+
+<![%cup[<!ELEMENT cnm       - -  (%data;)>
+
+<!ELEMENT cnn               - -  (%data;)>
+
+<!ELEMENT cnp               - -  (%data;)>
+
+<!ELEMENT cns               - -  (%data;)>]]>
+
+
+
+
+
+<!-- CGRANT.ENT, contract grant elements
+
+     Date: December 3, 1990 -->
+
+
+
+<![%originl[<!ELEMENT cgn   - o  (#PCDATA)>
+
+<!ELEMENT cgs               - o  (#PCDATA)>]]>
+
+
+
+<![%oasis[<!ELEMENT cgn     - o  (#PCDATA)>
+
+<!ELEMENT cgs               - o  (#PCDATA)>]]>
+
+
+
+<!-- CUPHEADER modification: CHANGED TO parameter entity data -->
+
+<![%cup[<!ELEMENT cgn       - -  (%data;)>
+
+<!ELEMENT cgs               - -  (%data;)>]]>
+
+
+
+<!ELEMENT genhdr            - -  (artinfo, tig, dedg?, aug+, abs*, kwdg*,
+
+                                 cng*, (cgn | cgs)*)>
+
+<![%originl[<!ATTLIST genhdr   language NAME                    #REQUIRED >]]>
+
+<![%oasis[<!ATTLIST genhdr   language NAME
+#IMPLIED >
+
+<!-- SSSH modification: language attribute IMPLIED -->]]>
+
+<![%cup[<!ATTLIST genhdr   language NAME                           #IMPLIED >
+
+<!-- CUP as SSSH modification: language attribute IMPLIED -->]]>
+
+
+
+<!ELEMENT artcon       o o  (genhdr | jurhdr)>
+
+
+
+
+
+<!-- JURHDR.ENT, contribution information for jurisprudence headers
+
+     Date: January 14, 1991 -->
+
+
+
+<!-- SENTENCE.ENT, special title elements in jurhdr
+
+     Date: January 14, 1991 -->
+
+
+
+<!ELEMENT sentence        - o  (court | date | case | magis | atl | annot)*>
+
+<!ELEMENT court           - o  (#PCDATA)>
+
+<!ELEMENT date            - o  (#PCDATA)>
+
+<!ATTLIST date       year   NUMBER                               #IMPLIED
+
+                     month  NUMBER                               #IMPLIED
+
+                     day    NUMBER                               #IMPLIED>
+
+
+
+<!ELEMENT case            - o  (#PCDATA)>
+
+<!ELEMENT magis           - o  (judge | prosec | #PCDATA)*>
+
+<!ELEMENT judge           - o  (%namephr;)>
+
+<!ELEMENT prosec          - o  (%namephr;)>
+
+<!ELEMENT annot           - o  (#PCDATA)>
+
+<!-- PARTIES.ENT, special elements in jurhdr
+
+     Date: December 3, 1990 -->
+
+
+
+<!ELEMENT parties           - o  (purs+ & def+)>
+
+<!ELEMENT purs              - o  (%namephr;|onm)>
+
+<!ELEMENT def               - o  (%namephr;|onm)>
+
+<![%oasis[<!ELEMENT onm       - o  (#PCDATA)>
+
+<!-- SSSH modification: onm defined here due to omission of MAJOUR aff
+sub-elements -->]]>
+
+
+
+<!ELEMENT jurhdr            - o  (artinfo, sentence, abs*,
+
+                                 kwdg*, parties?)>
+
+<!ATTLIST jurhdr   language NAME                                 #REQUIRED>
+
+
+
+<!-- Maximum content of a header -->
+
+
+
+<!ELEMENT header    - -  (issue, artcon)>
+

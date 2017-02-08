@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <include href="JATS-journalpubcustom-classes0.ent.rng"/>
+  <include href="JATS-default-classes0.ent.rng"/>
+  <include href="JATS-journalpubcustom-mixes0.ent.rng"/>
+  <include href="JATS-default-mixes0.ent.rng"/>
+  <include href="JATS-journalpubcustom-models0.ent.rng"/>
+  <include href="JATS-common0.ent.rng"/>
+  <include href="JATS-articlemeta0.ent.rng"/>
+  <include href="JATS-backmatter0.ent.rng"/>
+  <include href="JATS-display0.ent.rng"/>
+  <include href="JATS-format0.ent.rng"/>
+  <include href="JATS-funding0.ent.rng"/>
+  <include href="JATS-journalmeta0.ent.rng"/>
+  <include href="JATS-link0.ent.rng"/>
+  <include href="JATS-list0.ent.rng"/>
+  <include href="JATS-math0.ent.rng"/>
+  <include href="JATS-nlmcitation0.ent.rng"/>
+  <include href="JATS-para0.ent.rng"/>
+  <include href="JATS-phrase0.ent.rng"/>
+  <include href="JATS-references0.ent.rng"/>
+  <include href="JATS-related-object0.ent.rng"/>
+  <include href="JATS-section0.ent.rng"/>
+  <include href="JATS-mathmlsetup0.ent.rng"/>
+  <include href="JATS-XHTMLtablesetup0.ent.rng"/>
+  <include href="JATS-chars0.ent.rng"/>
+  <define name="dtd-version">
+    <optional>
+      <attribute name="dtd-version" a:defaultValue="0.4">
+        <value type="string" datatypeLibrary="">0.4</value>
+      </attribute>
+    </optional>
+  </define>
+  <define name="article-atts">
+    <optional>
+      <attribute name="article-type"/>
+    </optional>
+    <ref name="dtd-version"/>
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+    <optional>
+      <attribute name="xml:lang" a:defaultValue="en">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <ref name="XLINK.xmlns.attrib"/>
+    <ref name="MATHML.xmlns.attrib"/>
+    <ref name="Schema.xmlns.attrib"/>
+  </define>
+  <define name="body-atts">
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+  </define>
+  <define name="sub-article-atts">
+    <optional>
+      <attribute name="article-type"/>
+    </optional>
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+    <optional>
+      <attribute name="xml:lang">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="response-atts">
+    <optional>
+      <attribute name="response-type"/>
+    </optional>
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+    <optional>
+      <attribute name="xml:lang">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="article-short-model">
+    <choice>
+      <ref name="front"/>
+      <ref name="front-stub"/>
+    </choice>
+    <optional>
+      <ref name="body"/>
+    </optional>
+    <optional>
+      <ref name="back"/>
+    </optional>
+    <optional>
+      <ref name="floats-group"/>
+    </optional>
+  </define>
+  <define name="article-full-model">
+    <ref name="front"/>
+    <optional>
+      <ref name="body"/>
+    </optional>
+    <optional>
+      <ref name="back"/>
+    </optional>
+    <optional>
+      <ref name="floats-group"/>
+    </optional>
+    <choice>
+      <zeroOrMore>
+        <ref name="sub-article"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="response"/>
+      </zeroOrMore>
+    </choice>
+  </define>
+  <define name="article">
+    <element name="article">
+      <ref name="article-attlist"/>
+      <ref name="article-full-model"/>
+    </element>
+  </define>
+  <define name="article-attlist" combine="interleave">
+    <ref name="article-atts"/>
+  </define>
+  <define name="front-model">
+    <ref name="journal-meta"/>
+    <ref name="article-meta"/>
+    <optional>
+      <ref name="front-back.class"/>
+    </optional>
+  </define>
+  <define name="front">
+    <element name="front">
+      <ref name="front-attlist"/>
+      <ref name="front-model"/>
+    </element>
+  </define>
+  <define name="front-attlist" combine="interleave">
+    <empty/>
+  </define>
+  <define name="body-model">
+    <zeroOrMore>
+      <ref name="para-level"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="sec-level"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="sig-block"/>
+    </optional>
+  </define>
+  <define name="body">
+    <element name="body">
+      <ref name="body-attlist"/>
+      <ref name="body-model"/>
+    </element>
+  </define>
+  <define name="body-attlist" combine="interleave">
+    <ref name="body-atts"/>
+  </define>
+  <define name="back-model">
+    <optional>
+      <ref name="label"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="title"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="doc-back-matter-mix"/>
+    </zeroOrMore>
+  </define>
+  <define name="back">
+    <element name="back">
+      <ref name="back-attlist"/>
+      <ref name="back-model"/>
+    </element>
+  </define>
+  <define name="back-attlist" combine="interleave">
+    <empty/>
+  </define>
+  <define name="sub-article-model">
+    <choice>
+      <ref name="front"/>
+      <ref name="front-stub"/>
+    </choice>
+    <optional>
+      <ref name="body"/>
+    </optional>
+    <optional>
+      <ref name="back"/>
+    </optional>
+    <optional>
+      <ref name="floats-group"/>
+    </optional>
+    <choice>
+      <zeroOrMore>
+        <ref name="sub-article"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="response"/>
+      </zeroOrMore>
+    </choice>
+  </define>
+  <define name="sub-article">
+    <element name="sub-article">
+      <ref name="sub-article-attlist"/>
+      <ref name="sub-article-model"/>
+    </element>
+  </define>
+  <define name="sub-article-attlist" combine="interleave">
+    <ref name="sub-article-atts"/>
+  </define>
+  <define name="front-stub-model">
+    <zeroOrMore>
+      <ref name="article-id"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="article-categories"/>
+    </optional>
+    <optional>
+      <ref name="title-group"/>
+    </optional>
+    <zeroOrMore>
+      <choice>
+        <ref name="contrib-group.class"/>
+        <ref name="aff-alternatives.class"/>
+      </choice>
+    </zeroOrMore>
+    <optional>
+      <ref name="author-notes"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="pub-date"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="volume"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="volume-id"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="volume-series"/>
+    </optional>
+    <optional>
+      <ref name="issue"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="issue-id"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="issue-title"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="issue-sponsor"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="issue-part"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="isbn"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="supplement"/>
+    </optional>
+    <optional>
+      <choice>
+        <group>
+          <ref name="fpage"/>
+          <optional>
+            <ref name="lpage"/>
+          </optional>
+          <optional>
+            <ref name="page-range"/>
+          </optional>
+        </group>
+        <ref name="elocation-id"/>
+      </choice>
+    </optional>
+    <zeroOrMore>
+      <choice>
+        <ref name="address-link.class"/>
+        <ref name="product"/>
+        <ref name="supplementary-material"/>
+      </choice>
+    </zeroOrMore>
+    <optional>
+      <ref name="history"/>
+    </optional>
+    <optional>
+      <ref name="permissions"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="self-uri"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="related-article"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="abstract"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="trans-abstract"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="kwd-group"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="funding-group"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="conference"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="counts"/>
+    </optional>
+    <optional>
+      <ref name="custom-meta-group"/>
+    </optional>
+  </define>
+  <define name="front-stub">
+    <element name="front-stub">
+      <ref name="front-stub-attlist"/>
+      <ref name="front-stub-model"/>
+    </element>
+  </define>
+  <define name="front-stub-attlist" combine="interleave">
+    <empty/>
+  </define>
+  <define name="response">
+    <element name="response">
+      <ref name="response-attlist"/>
+      <ref name="article-short-model"/>
+    </element>
+  </define>
+  <define name="response-attlist" combine="interleave">
+    <ref name="response-atts"/>
+  </define>
+  <start>
+    <choice>
+      <ref name="article"/>
+      <ref name="overline-start"/>
+      <ref name="unstructured-kwd-group"/>
+      <ref name="underline-end"/>
+      <ref name="string-date"/>
+      <ref name="underline-start"/>
+      <ref name="x"/>
+      <ref name="overline-end"/>
+    </choice>
+  </start>
+</grammar>

@@ -5,11 +5,18 @@ node_js:
 
 services:
   - redis-server
+  - elasticsearch
+
+env:
+  - CXX=g++-4.8
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
-    - xmlstarlet
+      - xmlstarlet
+      - g++-4.8
 
 notifications:
-  slack: 'inist-dpi:53Jp5iUZeRidSGZn0TukMSKo#activity'
+  email: false

@@ -1,11 +1,15 @@
 {
   "name": "sisyphe",
-  "version": "0.0.18",
+  "version": "0.0.23",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
-    "test-worker": "git submodule foreach 'npm test'"
+    "postinstall": "lerna bootstrap",
+    "test": "mocha && ./node_modules/lerna/bin/lerna.js run --ignore *-worker test",
+    "test-all": "mocha && ./node_modules/lerna/bin/lerna.js run --ignore *-worker test",
+    "test-worker": "./node_modules/lerna/bin/lerna.js run --ignore *-worker test",
+    "updated": "./node_modules/lerna/bin/lerna.js updated",
+    "publish": "./node_modules/lerna/bin/lerna.js publish --skip-npm && git push --follow-tags"
   },
   "author": "",
   "license": "MIT",
@@ -24,6 +28,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "lerna": "2.0.0-beta.36",
     "mocha": "^3.1.2"
   }
 }

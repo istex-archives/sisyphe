@@ -1,5 +1,5 @@
 # Logs & temps
-logs
+logs/*
 *.log
 npm-debug.log*
 job/
@@ -139,10 +139,6 @@ fabric.properties
 
 
 ### Node ###
-# Logs
-logs
-*.log
-npm-debug.log*
 
 # Runtime data
 pids
@@ -236,7 +232,6 @@ GitHub.sublime-settings
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -244,3 +239,5 @@ GitHub.sublime-settings
 hs_err_pid*
 
 # End of https://www.gitignore.io/api/macos,linux,webstorm,node,java,osx,sublimetext
+
+!.gitkeep

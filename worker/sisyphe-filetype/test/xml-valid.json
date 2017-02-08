@@ -1,0 +1,9 @@
+[
+  {"path": "test/samples/xml/valid/valid with spaces.nxml"},
+  {"path": "test/samples/xml/valid/valid.nxml"},
+  {"path": "test/samples/xml/valid/valid.nxmlv2"},
+  {"path": "test/samples/xml/valid/valid.xml.nxmlv2"},
+  {"path": "test/samples/xml/valid/xmlfile.txt"},
+  {"path": "test/samples/xml/valid/validwith{special[cara(ter)]}.nxmlv2"},
+  {"path": "test/samples/xml/valid/녔녔녔녔녔.nxmlv2"}
+]
