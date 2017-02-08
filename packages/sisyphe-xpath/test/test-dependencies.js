@@ -4,6 +4,7 @@ const chai = require('chai'),
   kuler = require('kuler'),
   doTheJob = require('../index.js').doTheJob,
   finalJob = require('../index.js').finalJob,
+  initJob = require('../index.js').initJob,
   expect = chai.expect,
   path = require('path'),
   rimraf = require('rimraf'),
@@ -14,7 +15,7 @@ const redisHost = process.env.REDIS_HOST || 'localhost',
   redisPort = process.env.REDIS_PORT || '6379',
   config = {
     "redisDB" : 1,
-    "xpathsOutput" : "job/",
+    "xpathsOutput" : "xpaths/",
     "debug" : true
   }; // Override configuration file for tests
 
@@ -44,6 +45,7 @@ describe('DoTheJob', () => {
   it('Should not doing work if mimetype is not xml', (done) => {
     let objTest = {
       extension: '.xml',
+      corpusname : 'test',
       isWellFormed: true,
       path: 'test/test.xxx',
       mimetype: 'application/xxx',
@@ -63,6 +65,7 @@ describe('DoTheJob', () => {
     let objTest = {
       extension: '.xml',
       isWellFormed: true,
+      corpusname : 'test',
       path: 'test/test-nofile.xml',
       mimetype: 'application/xml',
       size: 500
@@ -87,11 +90,14 @@ describe('DoTheJob', () => {
     let objTest = {
       extension: '.xml',
       isWellFormed: true,
+      corpusname : 'test',
       path: 'test/test.xml',
       mimetype: 'application/xml',
       size: 500,
       debug : true
     };
+
+    initJob({corpusname : 'test'});
 
     doTheJob(objTest, (err, data) => {
       if (err) {
@@ -108,6 +114,7 @@ describe('DoTheJob', () => {
 
 describe('FinalJob', () => {
   it('Final Job should not failed during work', (done) => {
+    initJob({corpusname : 'test'});
     finalJob((err) => {
       if (err) {
         return done(err)
