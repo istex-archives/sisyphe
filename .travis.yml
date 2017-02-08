@@ -17,3 +17,6 @@ addons:
     packages:
       - xmlstarlet
       - g++-4.8
+
+notifications:
+  email: false

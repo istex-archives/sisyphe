@@ -11,7 +11,7 @@ It's in construction so you should come back a little latter for an easy-to-use 
 
 
 ### Requirements
-Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1
+Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxml2@2.9.4)
 
 
 ### Install it
