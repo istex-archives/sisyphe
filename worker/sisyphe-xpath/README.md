@@ -3,7 +3,7 @@
 
 Sisyphe-xpath
 ============
-Module of generating of xpaths
+Module of generating of xpaths (with their attributes) for XML files.
 
 ## Requirements:
 Tested with Redis@3.2.6 & Node 6.9
@@ -16,5 +16,7 @@ After all sisyphe-jobs terminated, it will epxort a txt file in `/yourcustomfold
 
 ## Info
 Xpath list are random sorted (due to redis export ...), you can order them in an .csv file but this will not represent the element as the appear in xml's files.
+
+
 
 

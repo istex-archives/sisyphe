@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/istex/sisyphe.svg?branch=master)](https://travis-ci.org/istex/sisyphe)
 [![bitHound Overall Score](https://www.bithound.io/github/istex/sisyphe/badges/score.svg)](https://www.bithound.io/github/istex/sisyphe)
 
-![sisyphe](https://raw.githubusercontent.com/istex/sisyphe/master/logo-sisyphe.jpg)
+![sisyphe](/logo-sisyphe.jpg)
 
 ## Sisyphe
 
@@ -33,7 +33,7 @@ Just start Sisyphe on a folder with any files in it.
 Sisyphe is now working in background with all your computer thread.
 Just take a coffee and wait , it will prevent you when it's done :)
 
-![Sisyphe-pic](https://raw.githubusercontent.com/istex/sisyphe/update/sisyphe.png)
+![Sisyphe-pic](/sisyphe.jpg)
 
 
 You should now have a file full of logs in `/yourcustomfolder/sisyphe/logs/sisyphe.log` (errors,info,duration..)
@@ -55,6 +55,6 @@ You can create your own module & add it to sisyphe :
 ### Developpement on worker
 
 When you work on worker, just: 
-1. Commit your changes as easy
-2. Do a `npm run updated` (to check what worker has changed)
-3. Do a `npm run publish` (it will ask you to change version of module worker & publish it to github)
+- Commit your changes as easy
+- Do a `npm run updated` (to check what worker has changed)
+- Do a `npm run publish` (it will ask you to change version of module worker & publish it to github)
