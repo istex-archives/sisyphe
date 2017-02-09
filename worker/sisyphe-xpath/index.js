@@ -20,7 +20,7 @@ var fullXpaths = new Set(),
   outputPath,
   redisClient;
 
-sisypheXpath.initJob = function(options){
+sisypheXpath.init = function(options){
 
   config.xpathsOutput = config.xpathsOutput || '/applis/istex/xpaths/';
   config.debug = (config.hasOwnProperty('debug')) ? config.debug : false; 
