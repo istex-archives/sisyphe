@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-out",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Sisyphe output",
   "main": "index.js",
   "scripts": {
