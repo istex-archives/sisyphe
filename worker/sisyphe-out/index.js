@@ -2,7 +2,8 @@
 
 const redisHost = process.env.REDIS_HOST || 'localhost',
   redisPort = process.env.REDIS_PORT || '6379',
-  redisDB = 2;
+  redisDB = 2,
+  elasticUrl = process.env.ELASTIC_URL || 'localhost:9200';
 
 const sisypheOut = {},
   fs = require('fs'),
@@ -18,7 +19,7 @@ const template = require('./config/elasticsearch-template.json');
 
 sisypheOut.init = function (options) {
   this.client = new elasticsearch.Client({
-    host: 'localhost:9200',
+    host: elasticUrl,
     log: {
       type: 'file',
       level: ['error', 'warning'],
