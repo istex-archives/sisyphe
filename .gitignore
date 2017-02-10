@@ -4,6 +4,7 @@ logs/*
 npm-debug.log*
 job/
 temp/
+xpaths
 
 # Runtime data
 pids
