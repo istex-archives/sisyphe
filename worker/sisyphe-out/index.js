@@ -50,7 +50,7 @@ sisypheOut.init = function (options) {
 sisypheOut.doTheJob = function (data, next) {
 
   this.redisClient.getAsync(data.path).then((res) => {
-    if (res) {
+    if (res !== null) {
       // Path already exist, will skip it.
       next(null, data);
       return;

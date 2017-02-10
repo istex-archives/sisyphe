@@ -59,6 +59,10 @@ sisypheXpath.doTheJob = function (data, next) {
 
 sisypheXpath.finalJob = function (done) {
   // When no more data in queue, sisyphe will execute it
+  //Until a better way
+  outputPath = outputPath || path.resolve(config.xpathsOutput, Date.now().toString());
+  outputFile = outputFile || path.resolve(outputPath, 'xpaths-list.csv');
+  redisClient = redisClient || redis.createClient(`//${redisHost}:${redisPort}`, {db: config.redisDB});
 
   mkdirp.mkdirpAsync(outputPath).then(() => {
     let xpathsStream = fs.createWriteStream(outputFile);
