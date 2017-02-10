@@ -39,7 +39,10 @@ let workers = [{
   module: "sisyphe-pdf"
 }, {
   name: "Sisyphe xpath",
-  module: "sisyphe-xpath"
+  module: "sisyphe-xpath",
+  options: {
+    corpusname: program.corpusname
+  }
 }, {
   name: "Sisyphe Output",
   module: "sisyphe-out",

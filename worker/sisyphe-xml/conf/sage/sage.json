@@ -1,0 +1,72 @@
+{
+  "metadata": [
+    {
+      "name": "articleCategory",
+      "type": "String",
+      "xpath": "/article/front/article-meta/article-categories/subj-group/subject"
+    },
+    {
+      "name": "articlePubYear",
+      "regex": "^([0-9]{4})$",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/pub-date/year"
+    },
+    {
+      "name": "doi",
+      "regex": "(10[.][0-9]{4,}[^\\s\"/<>]*/[^\\s\"<>]+)",
+      "type": "String",
+      "xpath": "/article/front/article-meta/article-id[@pub-id-type=\"doi\"]"
+    },
+    {
+      "name": "eissn",
+      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/issn[@pub-type=\"epub\"]"
+    },
+    {
+      "name": "hasAbstract",
+      "type": "Boolean",
+      "xpath": "/article/front/article-meta/abstract"
+    },
+    {
+      "name": "issn",
+      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/issn[@pub-type=\"ppub\"]"
+    },
+    {
+      "name": "issue",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/issue"
+    },
+    {
+      "name": "journalPublisherId",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/journal-id[@journal-id-type=\"publisher-id\"]"
+    },
+    {
+      "name": "journalTitle",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/journal-title"
+    },
+    {
+      "name": "nbKeywords",
+      "type": "Count",
+      "xpath": "/article/front/article-meta/kwd-group/kwd"
+    },
+    {
+      "name": "nbRefBibs",
+      "type": "Count",
+      "xpath": "/article/back/ref-list/ref"
+    },
+    {
+      "name": "volume",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/volume"
+    }
+  ],
+  "dtd": [
+    "journal-publishing-dtd-2.3/journalpublishing.dtd",
+    "SAGE_META/SAGE_meta.dtd"
+  ]
+}

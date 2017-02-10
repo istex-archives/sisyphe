@@ -1,0 +1,20 @@
+{
+  "name": "sisyphe-pdf",
+  "version": "0.0.2",
+  "description": "Get the PDF informations",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "pdfjs-dist": "^1.6.297",
+    "xmldom": "^0.1.22"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2"
+  }
+}
