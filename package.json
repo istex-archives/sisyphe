@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "lerna bootstrap",
-    "test": "mocha && ./node_modules/lerna/bin/lerna.js run --ignore *-worker test",
-    "test-all": "mocha && ./node_modules/lerna/bin/lerna.js run --ignore *-worker test",
-    "test-worker": "./node_modules/lerna/bin/lerna.js run --ignore *-worker test",
+    "test": "mocha && lerna run --ignore *-worker test",
+    "test-worker": "lerna run --ignore *-worker test",
     "updated": "./node_modules/lerna/bin/lerna.js updated",
     "publish": "./node_modules/lerna/bin/lerna.js publish --skip-npm && git push --follow-tags"
   },
