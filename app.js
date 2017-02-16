@@ -14,8 +14,9 @@ program
   .option('-c, --corpusname <name>', 'Choose a corpus\'s name', 'default')
   .parse(process.argv);
 
-if (!process.argv.slice(2).length) {
+if (!program.args.length) {
   program.outputHelp();
+  process.exit();
 }
 
 const pathInput = program.args[0];
