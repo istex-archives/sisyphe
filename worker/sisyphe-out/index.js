@@ -33,7 +33,7 @@ sisypheOut.init = function (options) {
     transports: [
       new (winston.transports.File)({
         filename: `logs/analyse-${options.corpusname}.json`,
-        level: 'info'
+        level: 'debug'
       }),
       new Elasticsearch({
         level: 'info',
@@ -59,6 +59,7 @@ sisypheOut.doTheJob = function (data, next) {
       // Could be better if winston could do it .. to check
       let body = Object.assign({}, data);
       delete body.updateEs;
+      this.logger.debug(body);
       this.client.update({
         index: data.updateEs._index,
         type: data.updateEs._type,
@@ -78,6 +79,7 @@ sisypheOut.doTheJob = function (data, next) {
     } else {
       this.redisClient.incr(data.path);
       this.logger.info(data);
+      this.logger.debug(data);
       next(null, data);
     }
   }).catch(err => {
