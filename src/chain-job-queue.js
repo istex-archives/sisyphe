@@ -13,14 +13,9 @@ const logger = new (winston.Logger)({
   exitOnError: false,
   transports: [
     new (winston.transports.File)({
-      name: 'info-file',
-      filename: 'logs/sisyphe-info.log',
-      level: 'info'
-    }),
-    new (winston.transports.File)({
       name : 'sisyphe-error',
       handleExceptions: true,
-      filename: 'logs/sisyphe-error.log',
+      filename: 'logs/sisyphe-data-error.json',
       level: 'error'
     })
   ]
@@ -72,7 +67,7 @@ class ChainJobQueue {
       return worker;
     }).map((worker, index, listWorker) => {
       worker.queue.on('failed', (job, error) => {
-        logger.error({errorFailed: error, data: job});
+        logger.error({errorFailed: error.toString(), data: job.data});
         process.stdout.write(kuler('|', 'red'));
         worker.totalFailedTask++;
         clientRedis.hincrby('sisyphe', job.queue.name + ':totalFailedTask', 1);
@@ -93,11 +88,11 @@ class ChainJobQueue {
       });
 
       worker.queue.on('stalled', function (job) {
-        logger.error({errorStalled: true, data: job});
+        logger.error({errorStalled: true, data: job.data});
       });
 
       worker.queue.on('error', function (error) {
-        logger.error({errorSisyphe: error});
+        logger.error({errorSisyphe: error.toString()});
       });
 
       return worker;

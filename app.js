@@ -11,7 +11,9 @@ const program = require('commander'),
 program
   .version('0.0.1')
   .usage('[options] <path>')
-  .option('-c, --corpusname <name>', 'Choose a corpus\'s name', 'default')
+  .option('-n, --corpusname <name>', 'Choose an identifier \'s Name', 'default')
+  .option('-c, --config <path>', 'Config json file path')
+  .option('-d, --dtd <path>', 'DTD folder path')
   .parse(process.argv);
 
 if (!program.args.length) {
@@ -34,7 +36,12 @@ let workers = [{
   module: "sisyphe-filetype"
 }, {
   name: "Sisyphe XML",
-  module: "sisyphe-xml"
+  module: "sisyphe-xml",
+  options: {
+    corpusname: program.corpusname,
+    config: program.config,
+    dtd: program.dtd
+  }
 }, {
   name: "Sisyphe PDF",
   module: "sisyphe-pdf"
