@@ -12,6 +12,15 @@ const assert = require('assert'),
 const xpathSelect = xpath.useNamespaces({"xml": "http://www.w3.org/XML/1998/namespace"});
 
 const sisypheXml = {};
+
+var dtdPath,
+    configPath;
+
+sisypheXml.init = function(options){
+  dtdPath = options.dtd || null;
+  configPath = options.config || null;
+};
+
 sisypheXml.doTheJob = function (docObject, next) {
   if (docObject.mimetype !== 'application/xml') {
     return next(null, docObject);
@@ -27,9 +36,12 @@ sisypheXml.doTheJob = function (docObject, next) {
   ).then((xmlDom) => {
     docObject.isWellFormed = true;
     this.getConf(docObject.corpusname).then((conf) => {
+
       return this.checkConf(conf);
     }).then((conf) => {
-      const dtdsPath = conf.dtd.map((dtd) => __dirname + '/conf/' + docObject.corpusname + '/dtd/' + dtd);
+      const dtdsPath = dtdPath 
+        ? conf.dtd.map((dtd) => path.resolve(dtdPath, 'dtd/', dtd))
+        : conf.dtd.map((dtd) => __dirname + '/conf/' + docObject.corpusname + '/dtd/' + dtd);
       this.validateAgainstDTD(docObject, dtdsPath).then((validationDTDresult) => {
         docObject.isValidAgainstDTD = true;
         docObject.validationDTDInfos = validationDTDresult;
@@ -117,8 +129,8 @@ sisypheXml.getDoctype = function (xmlFilePath) {
   })
 };
 
-sisypheXml.getConf = function (corpusname) {
-  const pathToConf = __dirname + '/conf/' + corpusname + '/' + corpusname + '.json';
+sisypheXml.getConf = function (corpusname) {                      
+  const pathToConf = configPath || __dirname + '/conf/' + corpusname + '/' + corpusname + '.json';
   return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
     return fs.readFileAsync(pathToConf, 'utf8')
   }).then((dataConf) => {
