@@ -16,9 +16,9 @@ program
   .option('-d, --dtd <path>', 'DTD folder path')
   .parse(process.argv);
 
-if (!program.args.length) {
+if (!program.args.length && !program.config) {
   program.outputHelp();
-  process.exit();
+  process.exit(0);
 }
 
 const pathInput = program.args[0];
@@ -68,7 +68,11 @@ if (!pathInput && program.corpusname) {
       corpusname: program.corpusname
     }
   };
-  workers = [{name: "Sisyphe XML", module: "sisyphe-xml"}, 
+  workers = [{
+    name: "Sisyphe XML", 
+    module: "sisyphe-xml", 
+    options: { corpusname: program.corpusname, config: program.config, dtd: program.dtd}
+  }, 
   {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname}}];
   let sisyphe = new Sisyphe(starter, workers);
   sisyphe.start();
