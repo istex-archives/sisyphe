@@ -10,7 +10,7 @@ const ChainJobQueue = require('./chain-job-queue'),
   clientRedis = redis.createClient(),
   cluster = require('cluster'),
   ms = require('pretty-ms'),
-  numberFork = require('os').cpus().length;
+  numberFork = require('os').cpus().length / 2;
 
 const loggerInfo = new (winston.Logger)({
   exitOnError: false,
