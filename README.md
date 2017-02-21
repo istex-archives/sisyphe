@@ -7,8 +7,6 @@
 
 Sisyphe is a generic NodeJS folder analyser & a ([lerna](https://github.com/lerna/lerna)) git [monorepo](https://github.com/babel/babel/blob/master/doc/design/monorepo.md).
 
-It's in construction so you should come back a little latter for an easy-to-use & easy-to install process ;)
-
 
 ### Requirements
 Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxml2@2.9.4)
@@ -22,7 +20,7 @@ Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxm
 
 ### Test
 
-`npm run test` will test sisyphe & its workers
+`npm run test` will test sisyphe-core & its workers
 
 ### Help
 
