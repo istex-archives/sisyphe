@@ -1,0 +1,944 @@
+[
+  {
+    "_id": "analyse-generique",
+    "_type": "dashboard",
+    "_source": {
+      "title": "analyse-generique",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"col\":1,\"id\":\"TITRE-PDF\",\"panelIndex\":1,\"row\":13,\"size_x\":8,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-XML\",\"panelIndex\":2,\"row\":24,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-générale\",\"panelIndex\":3,\"row\":1,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-fichiers\",\"panelIndex\":4,\"row\":3,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-corpus\",\"panelIndex\":6,\"row\":5,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-fichiers-corrompus\",\"panelIndex\":7,\"row\":7,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-Fichier-corrompus\",\"panelIndex\":8,\"row\":9,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Extensions-fichiers-corrompus\",\"panelIndex\":9,\"row\":9,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-Fichiers-Corrompus\",\"panelIndex\":10,\"row\":11,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Répartition-de-tous-les-fichiers-slash-Extension\",\"panelIndex\":11,\"row\":3,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-de-PDF\",\"panelIndex\":12,\"row\":15,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-d'XML\",\"panelIndex\":14,\"row\":26,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-versions-de-PDF\",\"panelIndex\":15,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Repartition-des-DTD\",\"panelIndex\":18,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Répartition-logiciel-création-PDF\",\"panelIndex\":28,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-PDF-par-ratio-mots-slash-page\",\"panelIndex\":29,\"row\":20,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Repartition-XML-bien-ampersand-mal-formés\",\"panelIndex\":30,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"liste\",\"panelIndex\":31,\"row\":32,\"size_x\":12,\"size_y\":7,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-de-mots-PDF\",\"panelIndex\":32,\"row\":16,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Répartition-poids-des-PDF\",\"panelIndex\":33,\"row\":15,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"}]",
+      "optionsJSON": "{\"darkTheme\":true}",
+      "uiStateJSON": "{\"P-11\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-12\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-15\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-28\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-29\":{\"vis\":{\"legendOpen\":false}},\"P-30\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"colors\":{\"true\":\"#6ED0E0\"},\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-31\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":3,\"direction\":\"desc\"}}}},\"P-8\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-9\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"legendOpen\":true}}}",
+      "version": 1,
+      "timeRestore": true,
+      "timeTo": "now",
+      "timeFrom": "now-15m",
+      "refreshInterval": {
+        "display": "Off",
+        "pause": false,
+        "value": 0
+      },
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"fields.corpusname: *\",\"analyze_wildcard\":true}}}]}"
+      }
+    }
+  },
+  {
+    "_id": "analyse-detaillee",
+    "_type": "dashboard",
+    "_source": {
+      "title": "analyse-detaillee",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"col\":1,\"id\":\"TITRE-PDF\",\"panelIndex\":1,\"row\":13,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-XML\",\"panelIndex\":2,\"row\":24,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-générale\",\"panelIndex\":3,\"row\":1,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-fichiers\",\"panelIndex\":4,\"row\":3,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-corpus\",\"panelIndex\":6,\"row\":5,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-fichiers-corrompus\",\"panelIndex\":7,\"row\":7,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-Fichier-corrompus\",\"panelIndex\":8,\"row\":9,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Extensions-fichiers-corrompus\",\"panelIndex\":9,\"row\":9,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-Fichiers-Corrompus\",\"panelIndex\":10,\"row\":11,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Répartition-de-tous-les-fichiers-slash-Extension\",\"panelIndex\":11,\"row\":3,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-de-PDF\",\"panelIndex\":12,\"row\":15,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-d'XML\",\"panelIndex\":14,\"row\":26,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-versions-de-PDF\",\"panelIndex\":15,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Repartition-des-DTD\",\"panelIndex\":18,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Répartition-logiciel-création-PDF\",\"panelIndex\":28,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Répartition-PDF-par-ratio-mots-slash-page\",\"panelIndex\":29,\"row\":20,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Repartition-XML-bien-ampersand-mal-formés\",\"panelIndex\":30,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"liste\",\"panelIndex\":31,\"row\":66,\"size_x\":12,\"size_y\":7,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-de-mots-PDF\",\"panelIndex\":32,\"row\":16,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Répartition-poids-des-PDF\",\"panelIndex\":33,\"row\":15,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Sous-titre-XML-bien-formé\",\"panelIndex\":34,\"row\":32,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Sous-titre-XML-bien-formes-et-valides\",\"panelIndex\":36,\"row\":38,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Repartition-XML-valides-DTD\",\"panelIndex\":37,\"row\":34,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Liste-des-host-title\",\"panelIndex\":38,\"row\":48,\"size_x\":12,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-Abstracts\",\"panelIndex\":43,\"row\":53,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-par-année-de-publication\",\"panelIndex\":45,\"row\":62,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"repartition-code-langue\",\"panelIndex\":49,\"row\":53,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"repartition-nbre-refbibs\",\"panelIndex\":50,\"row\":56,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Réparation-par-nombre-de-keywords\",\"panelIndex\":51,\"row\":56,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-nombre-d'élement-dans-le-body\",\"panelIndex\":52,\"row\":59,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-ISSN-erronés\",\"panelIndex\":53,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-EISSN-erronés\",\"panelIndex\":54,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-DOI-erronés\",\"panelIndex\":55,\"row\":44,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Nombre-Volume-erronés\",\"panelIndex\":56,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-PublicationYear-erronés\",\"panelIndex\":57,\"row\":44,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Liste-pb-xml\",\"panelIndex\":58,\"row\":40,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Information-contenus-XML\",\"panelIndex\":59,\"row\":46,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-de-mots-par-pdf-slash-pages\",\"panelIndex\":60,\"row\":20,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"}]",
+      "optionsJSON": "{\"darkTheme\":true}",
+      "uiStateJSON": "{\"P-11\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-12\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-15\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-28\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-29\":{\"vis\":{\"legendOpen\":false}},\"P-30\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"colors\":{\".sgm\":\"#EF843C\",\".xml\":\"#705DA0\",\"false\":\"#BF1B00\",\"true\":\"#629E51\"},\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-31\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":\"asc\"}}}},\"P-37\":{\"vis\":{\"colors\":{\"true\":\"#508642\"}}},\"P-38\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-43\":{\"vis\":{\"colors\":{\"true\":\"#629E51\"}}},\"P-45\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-49\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-50\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-55\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-60\":{\"vis\":{\"colors\":{\"0 to 25\":\"#BF1B00\",\"100 to 200\":\"#9AC48A\",\"200 to 20,000\":\"#3F6833\",\"200 to 20000\":\"#508642\",\"25 to 100\":\"#E0752D\"}}},\"P-8\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-9\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"legendOpen\":true}}}",
+      "version": 1,
+      "timeRestore": true,
+      "timeTo": "now",
+      "timeFrom": "now-15m",
+      "refreshInterval": {
+        "display": "Off",
+        "pause": false,
+        "value": 0
+      },
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"fields.corpusname: \\\"cambridge\\\"\"}}}]}"
+      }
+    }
+  },
+  {
+    "_id": "numerique-premium",
+    "_type": "dashboard",
+    "_source": {
+      "title": "numerique-premium",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"col\":1,\"id\":\"TITRE-PDF\",\"panelIndex\":1,\"row\":13,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-XML\",\"panelIndex\":2,\"row\":24,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-générale\",\"panelIndex\":3,\"row\":1,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-fichiers\",\"panelIndex\":4,\"row\":3,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-corpus\",\"panelIndex\":6,\"row\":5,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-fichiers-corrompus\",\"panelIndex\":7,\"row\":7,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-Fichier-corrompus\",\"panelIndex\":8,\"row\":9,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Extensions-fichiers-corrompus\",\"panelIndex\":9,\"row\":9,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-Fichiers-Corrompus\",\"panelIndex\":10,\"row\":11,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Répartition-de-tous-les-fichiers-slash-Extension\",\"panelIndex\":11,\"row\":3,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-de-PDF\",\"panelIndex\":12,\"row\":15,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-d'XML\",\"panelIndex\":14,\"row\":26,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-versions-de-PDF\",\"panelIndex\":15,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Repartition-des-DTD\",\"panelIndex\":18,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Répartition-logiciel-création-PDF\",\"panelIndex\":28,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Répartition-PDF-par-ratio-mots-slash-page\",\"panelIndex\":29,\"row\":20,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Repartition-XML-bien-ampersand-mal-formés\",\"panelIndex\":30,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"liste\",\"panelIndex\":31,\"row\":66,\"size_x\":12,\"size_y\":7,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-de-mots-PDF\",\"panelIndex\":32,\"row\":16,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Répartition-poids-des-PDF\",\"panelIndex\":33,\"row\":15,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Sous-titre-XML-bien-formé\",\"panelIndex\":34,\"row\":32,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Sous-titre-XML-bien-formes-et-valides\",\"panelIndex\":36,\"row\":38,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Repartition-XML-valides-DTD\",\"panelIndex\":37,\"row\":34,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Liste-des-host-title\",\"panelIndex\":38,\"row\":48,\"size_x\":12,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-Abstracts\",\"panelIndex\":43,\"row\":53,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-par-année-de-publication\",\"panelIndex\":45,\"row\":62,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"repartition-code-langue\",\"panelIndex\":49,\"row\":53,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"repartition-nbre-refbibs\",\"panelIndex\":50,\"row\":56,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Réparation-par-nombre-de-keywords\",\"panelIndex\":51,\"row\":56,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-nombre-d'élement-dans-le-body\",\"panelIndex\":52,\"row\":59,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-ISSN-erronés\",\"panelIndex\":53,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-EISSN-erronés\",\"panelIndex\":54,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-DOI-erronés\",\"panelIndex\":55,\"row\":44,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Nombre-Volume-erronés\",\"panelIndex\":56,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-PublicationYear-erronés\",\"panelIndex\":57,\"row\":44,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Liste-pb-xml\",\"panelIndex\":58,\"row\":40,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Information-contenus-XML\",\"panelIndex\":59,\"row\":46,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-de-mots-par-pdf-slash-pages\",\"panelIndex\":60,\"row\":20,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"}]",
+      "optionsJSON": "{\"darkTheme\":true}",
+      "uiStateJSON": "{\"P-11\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-12\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-15\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-28\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-29\":{\"vis\":{\"legendOpen\":false}},\"P-30\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"colors\":{\".sgm\":\"#EF843C\",\".xml\":\"#705DA0\",\"false\":\"#BF1B00\",\"true\":\"#629E51\"},\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-31\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":\"asc\"}}}},\"P-37\":{\"vis\":{\"colors\":{\"true\":\"#508642\"}}},\"P-38\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-43\":{\"vis\":{\"colors\":{\"true\":\"#629E51\"}}},\"P-45\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-49\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-50\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-55\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-60\":{\"vis\":{\"colors\":{\"0 to 25\":\"#BF1B00\",\"100 to 200\":\"#9AC48A\",\"200 to 20,000\":\"#3F6833\",\"200 to 20000\":\"#508642\",\"25 to 100\":\"#E0752D\"}}},\"P-8\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-9\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"legendOpen\":true}}}",
+      "version": 1,
+      "timeRestore": true,
+      "timeTo": "now",
+      "timeFrom": "now-15m",
+      "refreshInterval": {
+        "display": "Off",
+        "pause": false,
+        "value": 0
+      },
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"fields.corpusname: \\\"numerique-premium\\\"\",\"analyze_wildcard\":true}}}]}"
+      }
+    }
+  },
+  {
+    "_id": "cambridge",
+    "_type": "dashboard",
+    "_source": {
+      "title": "cambridge",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"col\":1,\"id\":\"TITRE-PDF\",\"panelIndex\":1,\"row\":13,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-XML\",\"panelIndex\":2,\"row\":24,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-générale\",\"panelIndex\":3,\"row\":1,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-fichiers\",\"panelIndex\":4,\"row\":3,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-corpus\",\"panelIndex\":6,\"row\":5,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Titre-fichiers-corrompus\",\"panelIndex\":7,\"row\":7,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-Fichier-corrompus\",\"panelIndex\":8,\"row\":9,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Extensions-fichiers-corrompus\",\"panelIndex\":9,\"row\":9,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Taille-Fichiers-Corrompus\",\"panelIndex\":10,\"row\":11,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Répartition-de-tous-les-fichiers-slash-Extension\",\"panelIndex\":11,\"row\":3,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-de-PDF\",\"panelIndex\":12,\"row\":15,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nb-d'XML\",\"panelIndex\":14,\"row\":26,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-versions-de-PDF\",\"panelIndex\":15,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Repartition-des-DTD\",\"panelIndex\":18,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Répartition-logiciel-création-PDF\",\"panelIndex\":28,\"row\":17,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Répartition-PDF-par-ratio-mots-slash-page\",\"panelIndex\":29,\"row\":20,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Repartition-XML-bien-ampersand-mal-formés\",\"panelIndex\":30,\"row\":28,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"liste\",\"panelIndex\":31,\"row\":66,\"size_x\":12,\"size_y\":7,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-de-mots-PDF\",\"panelIndex\":32,\"row\":16,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Répartition-poids-des-PDF\",\"panelIndex\":33,\"row\":15,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Sous-titre-XML-bien-formé\",\"panelIndex\":34,\"row\":32,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Sous-titre-XML-bien-formes-et-valides\",\"panelIndex\":36,\"row\":38,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Repartition-XML-valides-DTD\",\"panelIndex\":37,\"row\":34,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Liste-des-host-title\",\"panelIndex\":38,\"row\":48,\"size_x\":12,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-Abstracts\",\"panelIndex\":43,\"row\":53,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-par-année-de-publication\",\"panelIndex\":45,\"row\":62,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"repartition-code-langue\",\"panelIndex\":49,\"row\":53,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"repartition-nbre-refbibs\",\"panelIndex\":50,\"row\":56,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Réparation-par-nombre-de-keywords\",\"panelIndex\":51,\"row\":56,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Répartition-nombre-d'élement-dans-le-body\",\"panelIndex\":52,\"row\":59,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-ISSN-erronés\",\"panelIndex\":53,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-EISSN-erronés\",\"panelIndex\":54,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Nombre-DOI-erronés\",\"panelIndex\":55,\"row\":44,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Nombre-Volume-erronés\",\"panelIndex\":56,\"row\":42,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-PublicationYear-erronés\",\"panelIndex\":57,\"row\":44,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Liste-pb-xml\",\"panelIndex\":58,\"row\":40,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Information-contenus-XML\",\"panelIndex\":59,\"row\":46,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nombre-de-mots-par-pdf-slash-pages\",\"panelIndex\":60,\"row\":20,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"}]",
+      "optionsJSON": "{\"darkTheme\":true}",
+      "uiStateJSON": "{\"P-11\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-12\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-15\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-28\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-29\":{\"vis\":{\"legendOpen\":false}},\"P-30\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"colors\":{\".sgm\":\"#EF843C\",\".xml\":\"#705DA0\",\"false\":\"#BF1B00\",\"true\":\"#629E51\"},\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-31\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":\"asc\"}}}},\"P-37\":{\"vis\":{\"colors\":{\"true\":\"#508642\"}}},\"P-38\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-43\":{\"vis\":{\"colors\":{\"true\":\"#629E51\"}}},\"P-45\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-49\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-50\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-55\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-60\":{\"vis\":{\"colors\":{\"0 to 25\":\"#BF1B00\",\"100 to 200\":\"#9AC48A\",\"200 to 20,000\":\"#3F6833\",\"200 to 20000\":\"#508642\",\"25 to 100\":\"#E0752D\"}}},\"P-8\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}}},\"P-9\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"legendOpen\":true}}}",
+      "version": 1,
+      "timeRestore": true,
+      "timeTo": "now",
+      "timeFrom": "now-15m",
+      "refreshInterval": {
+        "display": "Off",
+        "pause": false,
+        "value": 0
+      },
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"fields.corpusname: \\\"cambridge\\\"\",\"analyze_wildcard\":true}}}]}"
+      }
+    }
+  },
+  {
+    "_id": "New-Saved-Search",
+    "_type": "search",
+    "_source": {
+      "title": "New Saved Search",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "_source"
+      ],
+      "sort": [
+        "@timestamp",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+      }
+    }
+  },
+  {
+    "_id": "Titre-fichiers-corrompus",
+    "_type": "visualization",
+    "_source": {
+      "title": "Titre fichiers corrompus",
+      "visState": "{\"title\":\"Titre fichiers corrompus\",\"type\":\"markdown\",\"params\":{\"markdown\":\"**Fichiers problématiques**\\n======\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "TITRE-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "TITRE PDF",
+      "visState": "{\"title\":\"TITRE PDF\",\"type\":\"markdown\",\"params\":{\"markdown\":\"# **Informations sur les PDF**\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nb-d'XML",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nb d'XML",
+      "visState": "{\"title\":\"Nb d'XML\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Fichiers XML\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype: \\\"application/xml\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-de-tous-les-fichiers-slash-Extension",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition de tous les fichiers / Extension",
+      "visState": "{\"title\":\"Répartition de tous les fichiers / Extension\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.extension.raw\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Extensions\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"fields.mimetype.raw\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Repartition-Nb-de-mots-slash-pages-pdf",
+    "_type": "visualization",
+    "_source": {
+      "title": "Repartition Nb de mots / pages pdf",
+      "visState": "{\"title\":\"Repartition Nb de mots / pages pdf\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.pdfWordByPage\",\"ranges\":[{\"from\":0,\"to\":1},{\"from\":2,\"to\":5},{\"from\":6,\"to\":30},{\"from\":31,\"to\":200},{\"from\":201,\"to\":10000}],\"customLabel\":\"Nombre de mots par page\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"range\",\"schema\":\"group\",\"params\":{\"field\":\"fields.pdfWordByPage\",\"ranges\":[{\"from\":0,\"to\":1},{\"from\":2,\"to\":5},{\"from\":6,\"to\":30},{\"from\":31,\"to\":200},{\"from\":201,\"to\":10000}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Repartition-Nb-de-pages-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "Repartition Nb de pages PDF",
+      "visState": "{\"title\":\"Repartition Nb de pages PDF\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.pdfWordByPage\",\"ranges\":[{\"from\":0,\"to\":1},{\"from\":2,\"to\":5},{\"from\":6,\"to\":30},{\"from\":31,\"to\":200},{\"from\":201,\"to\":10000}],\"customLabel\":\"Nombre de mots par page\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"range\",\"schema\":\"group\",\"params\":{\"field\":\"fields.pdfWordByPage\",\"ranges\":[{\"from\":0,\"to\":1},{\"from\":2,\"to\":5},{\"from\":6,\"to\":30},{\"from\":31,\"to\":200},{\"from\":201,\"to\":10000}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Taille-corpus",
+    "_type": "visualization",
+    "_source": {
+      "title": "Taille corpus",
+      "visState": "{\"title\":\"Taille corpus\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.size\",\"customLabel\":\"Taille du corpus\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-PDF-par-ratio-mots-slash-page",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition PDF par ratio mots/page",
+      "visState": "{\"title\":\"Répartition PDF par ratio mots/page\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.pdfWordByPage\",\"interval\":20,\"min_doc_count\":false,\"extended_bounds\":{}}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Repartition-des-DTD",
+    "_type": "visualization",
+    "_source": {
+      "title": "Repartition des DTD",
+      "visState": "{\"title\":\"Repartition des DTD\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.doctype.sysid.raw\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "min-moy-max-pdfWordCount",
+    "_type": "visualization",
+    "_source": {
+      "title": "min-moy-max pdfWordCount",
+      "visState": "{\"title\":\"min-moy-max pdfWordCount\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfWordCount\"}},{\"id\":\"1\",\"enabled\":true,\"type\":\"median\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfWordCount\",\"percents\":[50]}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfWordCount\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Repartition-XML-valides",
+    "_type": "visualization",
+    "_source": {
+      "title": "Repartition XML valides",
+      "visState": "{\"title\":\"Repartition XML valides\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"fields.isValidAgainstDTD\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Fichier XML Bien formé / mal formé\",\"row\":true}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Sous-titre-XML-bien-formes-et-valides",
+    "_type": "visualization",
+    "_source": {
+      "title": "Sous titre XML bien formes et valides",
+      "visState": "{\"title\":\"Sous titre XML bien formes et valides\",\"type\":\"markdown\",\"params\":{\"markdown\":\"## ... Parmi ces documents valides dtd il y a :\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Sous-titre-XML-bien-formé",
+    "_type": "visualization",
+    "_source": {
+      "title": "Sous titre XML bien formé",
+      "visState": "{\"title\":\"Sous titre XML bien formé\",\"type\":\"markdown\",\"params\":{\"markdown\":\"## Parmi ces XML bien formés il y a :\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Titre-générale",
+    "_type": "visualization",
+    "_source": {
+      "title": "Titre générale",
+      "visState": "{\"title\":\"Titre générale\",\"type\":\"markdown\",\"params\":{\"markdown\":\"**Informations Générales**\\n======\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "TITRE-XML",
+    "_type": "visualization",
+    "_source": {
+      "title": "TITRE XML",
+      "visState": "{\"title\":\"TITRE XML\",\"type\":\"markdown\",\"params\":{\"markdown\":\"**Informations sur les XML**\\n=====\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Titre-XML",
+    "_type": "visualization",
+    "_source": {
+      "title": "TITRE XML",
+      "visState": "{\"title\":\"TITRE XML\",\"type\":\"markdown\",\"params\":{\"markdown\":\"Informations sur les XML\\n=====\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Mimetype-vertical",
+    "_type": "visualization",
+    "_source": {
+      "title": "Mimetype vertical",
+      "visState": "{\"title\":\"Mimetype vertical\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"percentage\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"fields.mimetype.raw\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-versions-de-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition versions de PDF",
+      "visState": "{\"title\":\"Répartition versions de PDF\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.pdfMetadata.PDFFormatVersion.raw\",\"size\":7,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Version PDF (7max)\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "MimeType-Vertical-separe",
+    "_type": "visualization",
+    "_source": {
+      "title": "MimeType Vertical separe",
+      "visState": "{\"title\":\"MimeType Vertical separe\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Répartition de tous les fichiers / Extension\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.extension.raw\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Extensions\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"fields.mimetype.raw\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "liste",
+    "_type": "visualization",
+    "_source": {
+      "title": "liste",
+      "visState": "{\"title\":\"liste\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":true,\"totalFunc\":\"count\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.mimetype.raw\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"_term\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.size\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.path.raw\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nb-fichiers",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nb fichiers",
+      "visState": "{\"title\":\"Nb fichiers\",\"type\":\"metric\",\"params\":{\"fontSize\":\"40\",\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Fichiers\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nb-de-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nb de PDF",
+      "visState": "{\"title\":\"Nb de PDF\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Fichiers PDF\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype: \\\"application/pdf\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-logiciel-création-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition logiciel création PDF",
+      "visState": "{\"title\":\"Répartition logiciel création PDF\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.pdfMetadata.Creator.raw\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-poids-des-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition poids des PDF",
+      "visState": "{\"title\":\"Répartition poids des PDF\",\"type\":\"metric\",\"params\":{\"fontSize\":\"30\",\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.size\",\"customLabel\":\"Minimum\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"median\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.size\",\"percents\":[50],\"customLabel\":\"Poids PDF\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.size\",\"customLabel\":\"Maximum\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype.raw:\\\"application/pdf\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-de-mots-par-pdf",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre de mots par pdf",
+      "visState": "{\"title\":\"Nombre de mots par pdf\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.pdfWordCount\",\"ranges\":[{\"from\":0,\"to\":25},{\"from\":25,\"to\":100},{\"from\":100,\"to\":200},{\"from\":200,\"to\":20000},{\"from\":20000,\"to\":1000000}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype: \\\"application/pdf\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-de-mots-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre de mots PDF",
+      "visState": "{\"title\":\"Nombre de mots PDF\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"30\"},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfWordCount\",\"customLabel\":\"\"}},{\"id\":\"1\",\"enabled\":true,\"type\":\"median\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfWordCount\",\"percents\":[50],\"customLabel\":\"\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfWordCount\",\"customLabel\":\"\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "New-Visualization",
+    "_type": "visualization",
+    "_source": {
+      "title": "New Visualization",
+      "visState": "{\"title\":\"New Visualization\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.title.raw\",\"size\":5000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "liste-des-title",
+    "_type": "visualization",
+    "_source": {
+      "title": "liste des title",
+      "visState": "{\"title\":\"liste des title\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.title.raw\",\"size\":5000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-PublisherID",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition PublisherID",
+      "visState": "{\"title\":\"Répartition PublisherID\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"fields.publisherId.raw\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Répartition PublisherID (5 plus gros)\",\"row\":true}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-Abstracts",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition Abstracts",
+      "visState": "{\"title\":\"Répartition Abstracts\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.hasAbstract\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-du-nombre-d'élements-dans-le-body",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition du nombre d'élements dans le body",
+      "visState": "{\"title\":\"Répartition du nombre d'élements dans le body\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbElementInBody\",\"interval\":20,\"extended_bounds\":{}}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":\"table\",\"fill\":false}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-par-année-de-publication",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition par année de publication",
+      "visState": "{\"title\":\"Répartition par année de publication\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.publicationYear\",\"interval\":10,\"extended_bounds\":{}}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-des-élements-dans-le-body",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition des élements dans le body",
+      "visState": "{\"title\":\"Répartition des élements dans le body\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.nbElementInBody\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"median\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.nbElementInBody\",\"percents\":[50]}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.nbElementInBody\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Liste-des-host-title",
+    "_type": "visualization",
+    "_source": {
+      "title": "Liste des host title",
+      "visState": "{\"title\":\"Liste des host title\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.hostTitle.raw\",\"size\":5000,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.issn.raw\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "repartition-nbre-refbibs",
+    "_type": "visualization",
+    "_source": {
+      "title": "repartition nbre refbibs",
+      "visState": "{\"title\":\"repartition nbre refbibs\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbRefBibs\",\"ranges\":[{\"from\":0,\"to\":0.9},{\"from\":1,\"to\":null}]}},{\"id\":\"3\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbRefBibs\",\"ranges\":[{\"from\":1,\"to\":5},{\"from\":5,\"to\":10},{\"from\":10,\"to\":50},{\"from\":50,\"to\":500},{\"from\":500,\"to\":5000}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":null,\"fill\":false}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "repartition-code-langue",
+    "_type": "visualization",
+    "_source": {
+      "title": "repartition code langue",
+      "visState": "{\"title\":\"repartition code langue\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.codeLanguage.raw\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":null,\"fill\":false}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-nombre-de-refBibs",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition nombre de refBibs",
+      "visState": "{\"title\":\"Répartition nombre de refBibs\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbRefBibs\",\"ranges\":[{\"from\":0,\"to\":20},{\"from\":20,\"to\":50},{\"from\":50,\"to\":200},{\"from\":200,\"to\":10000}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-de-host-title",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre de host title",
+      "visState": "{\"title\":\"Nombre de host title\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.hostTitle.raw\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":null,\"fill\":false}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.issn.raw:*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Réparation-par-nombre-de-keywords",
+    "_type": "visualization",
+    "_source": {
+      "title": "Réparation par nombre de keywords",
+      "visState": "{\"title\":\"Réparation par nombre de keywords\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbKeywords\",\"ranges\":[{\"from\":null,\"to\":0.9},{\"from\":1,\"to\":null}]}},{\"id\":\"3\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbKeywords\",\"ranges\":[{\"from\":1,\"to\":5},{\"from\":5,\"to\":10},{\"from\":10,\"to\":50},{\"from\":50,\"to\":500}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Taille-Fichiers-Corrompus",
+    "_type": "visualization",
+    "_source": {
+      "title": "Taille Fichiers Corrompus",
+      "visState": "{\"title\":\"Taille Fichiers Corrompus\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.size\",\"customLabel\":\"Taille des fichiers corrompus\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype: \\\"application/octet-stream\\\" OR fields.size: 0\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nb-Fichier-corrompus",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nb Fichier corrompus",
+      "visState": "{\"title\":\"Nb Fichier corrompus\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Fichiers potentiellement corrompus\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype: \\\"application/octet-stream\\\" OR fields.size: 0\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Extensions-fichiers-corrompus",
+    "_type": "visualization",
+    "_source": {
+      "title": "Extensions fichiers corrompus",
+      "visState": "{\"title\":\"Extensions fichiers corrompus\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.extension.raw\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Extensions\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"range\",\"schema\":\"group\",\"params\":{\"field\":\"fields.size\",\"ranges\":[{\"from\":null,\"to\":1},{\"from\":1,\"to\":null}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"colors\":{\"-∞ to 1B\":\"#FCE2DE\",\"1B to +∞\":\"#E24D42\"}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype: \\\"application/octet-stream\\\" OR fields.size: 0\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-nombre-d'élement-dans-le-body",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition nombre d'élement dans le body",
+      "visState": "{\"title\":\"Répartition nombre d'élement dans le body\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbElementInBody\",\"ranges\":[{\"from\":null,\"to\":0.1},{\"from\":1,\"to\":null}]}},{\"id\":\"3\",\"enabled\":false,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.nbElementInBody\",\"ranges\":[{\"from\":1,\"to\":50},{\"from\":50,\"to\":200},{\"from\":200,\"to\":1000},{\"from\":1000,\"to\":5000}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-PublicationYear-erronés",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre PublicationYear erronés",
+      "visState": "{\"title\":\"Nombre PublicationYear erronés\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.publicationYearIsValid: false\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-EISSN-erronés",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre EISSN erronés",
+      "visState": "{\"title\":\"Nombre EISSN erronés\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.eissnIsValid: false\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-ISSN-erronés",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre ISSN erronés",
+      "visState": "{\"title\":\"Nombre ISSN erronés\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.issnIsValid: false\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-DOI-erronés",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre DOI erronés",
+      "visState": "{\"title\":\"Nombre DOI erronés\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.doiIsValid: false\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Repartition-XML-bien-ampersand-mal-formés",
+    "_type": "visualization",
+    "_source": {
+      "title": "Repartition XML bien & mal formés",
+      "visState": "{\"title\":\"Repartition XML bien & mal formés\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.isWellFormed\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.extension.raw\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"colors\":{\"false\":\"#BF1B00\",\".sgm\":\"#EF843C\"}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-de-host-title-Uniques",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre de host title Uniques",
+      "visState": "{\"title\":\"Nombre de host title Uniques\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.hostTitle.raw\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":null,\"fill\":false}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.issn.raw:*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-de-ISSN-uniques",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre de ISSN uniques",
+      "visState": "{\"title\":\"Nombre de ISSN uniques\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.issn.raw\",\"customLabel\":\"Nombre d'ISSN uniques\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.issn.raw:*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-de-ISSN",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre de ISSN",
+      "visState": "{\"title\":\"Nombre de ISSN\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.issn.raw\",\"customLabel\":\"Nombre d'ISSN uniques\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.issn.raw:*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-Volume-erronés",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre Volume erronés",
+      "visState": "{\"title\":\"Nombre Volume erronés\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.volumeIsValid: false\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Information-contenus-XML",
+    "_type": "visualization",
+    "_source": {
+      "title": "Information contenus XML",
+      "visState": "{\"title\":\"Information contenus XML\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Informations sur les contenus XML:\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Répartition-par-nombre-de-page",
+    "_type": "visualization",
+    "_source": {
+      "title": "Répartition par nombre de page",
+      "visState": "{\"title\":\"Répartition par nombre de page\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"30\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfPageTotal\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"median\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfPageTotal\",\"percents\":[50]}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfPageTotal\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-total-de-pages-PDF",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre total de pages PDF",
+      "visState": "{\"title\":\"Nombre total de pages PDF\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"30\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"fields.pdfPageTotal\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Liste-pb-xml",
+    "_type": "visualization",
+    "_source": {
+      "title": "Liste pb xml",
+      "visState": "{\"title\":\"Liste pb xml\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Liste des problèmes dans les XML:\"},\"aggs\":[],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Nombre-de-mots-par-pdf-slash-pages",
+    "_type": "visualization",
+    "_source": {
+      "title": "Nombre de mots par pdf/pages",
+      "visState": "{\"title\":\"Nombre de mots par pdf/pages\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"range\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.pdfWordByPage\",\"ranges\":[{\"from\":25,\"to\":100},{\"from\":100,\"to\":200},{\"from\":200,\"to\":20000},{\"from\":20000,\"to\":1000000},{\"from\":0,\"to\":25}]}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"colors\":{\"200 to 20000\":\"#508642\",\"0 to 25\":\"#BF1B00\",\"25 to 100\":\"#E0752D\",\"100 to 200\":\"#9AC48A\"}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"fields.mimetype: \\\"application/pdf\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "liste-XML",
+    "_type": "visualization",
+    "_source": {
+      "title": "liste XML",
+      "visState": "{\"title\":\"liste XML\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":true,\"totalFunc\":\"count\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.path.raw\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fields.doi.raw\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Repartition-XML-valides-DTD",
+    "_type": "visualization",
+    "_source": {
+      "title": "Repartition XML valides DTD",
+      "visState": "{\"title\":\"Repartition XML valides DTD\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Nombre\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"fields.isValidAgainstDTD\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{\"vis\":{\"colors\":{\"false\":\"#BF1B00\"}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"analyse-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  }
+]

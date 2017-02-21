@@ -1,0 +1,429 @@
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com) by Lettie (Sage Publications) -->
+<!--	SAGE Article metadata information DTD
+	SAGEmeta 		Modified: October 3, 2003
+				Version 1.7
+									-->
+<!--  Change History-->
+<!--  Version 1.0.b1: May 17, 2002				-->
+<!--  Version 1.0.b2: June 6, 2002
+
+- changed DTD to "SAGE_meta.dtd"
+- changed <AIPmeta> element to <SAGEmeta>
+- added <references> element to <SAGEmeta> content model
+- added <aff-pub> element to <pub-info> content model
+- changed <journal>, <bk-info> and <conf-info> to <journal-ref>, <book-ref> and <conference-ref>, respectively
+- added <ppf> and <ppl> elements to <book-ref content model
+- added <artinfo> elements to <conference-ref> content model
+- added <confloc> element to <conference-ref> content model
+- added <url> element to <journal-ref>, <book-ref> and <conference-ref> content model -->
+<!--  Version 1.0.b3: June 18, 2002
+- added <pub-date> element to <pubinfo> content model  -->
+<!--  Version 1.0: June 26, 2002
+- changed content model of <art_title>, <art_stitle>, <affil>, <gau>, <full_text> and <keyword> to allow only PCDATA
+- corrected typographic error in <art_author> content model
+- changed content model of <c> to allow %text;
+- changed names of <artifno> and <pubinfo> to <art-ref> and <pub-ref>, respectively
+- changed content model of <journal-ref>, <art-ref>, <pub-ref>, <book-ref>, <conf-ref>, <confsdt> and <confedt> to allow #PCDATA
+- changed content model of <book-ref> to allow <pub-ref>
+
+				-->
+<!-- Version 1.1: July 8, 2002
+- Corrected the following typographic errors:
+1. Comment not ended for
+   a. ... Version 1.0.b2: ...
+   b. ... Version 1.0.b3: ...
+2. String "(" and ")" included in <!ENTITY % text
+3. Emphasis elements described in full in <!ENTITY % text
+4. String "(" and ")" removed in
+   a. <!ENTITY p
+   b. <!ENTITY c
+   c. <!ELEMENT other-ref
+   d. <!ELEMENT it
+   e. <!ELEMENT ul
+   f. <!ELEMENT bo
+   g. <!ELEMENT bi
+   h. <!ELEMENT scp
+   i. <!ELEMENT scr
+5. String "," is replaced by "|" in <!ATTLIST list
+6. #PCDATA is realigned in the following elements:
+    a. <!ELEMENT journal-ref
+    b. <!ELEMENT pub-ref
+    c. <!ELEMENT art-ref
+    d. <!ELEMENT book-ref
+    e. <!ELEMENT conference-ref
+7. Property of pub-name corrected in <!ELEMENT pub-ref
+8. Comment not started properly for
+    a. ... pub-ref ...
+    b. ... Publication Date ...
+    c. ... art-ref ...
+-->
+<!-- Version 1.2: July 8, 2002
+- changed <pub-date> to <dte>
+- Moved <vid>, <iid>, <ed>, <dte> from <pub-ref> to <journal-ref>
+- Added <edg> to <conference-ref>
+- Added <ed> to <book-ref>
+- Added <sup> and <sub> elements
+- Moved <aut> from <art-ref> to <journal-ref> and <conference-ref>
+-->
+<!-- Version 1.3: July 11, 2002
+- added entities for unknown and illegible text
+- included callouts for ISO entities
+- corrected syntax errors
+- added sup and sub to %text
+- replaced confstd and confedt with confdate
+- moved note outside of body
+-->
+<!-- Version 1.4: July 19, 2002
+- added empty element NA for mandatory information that is not available
+-->
+<!-- Version 1.5: October 2, 2002
+- added <dte> element to <book-ref> content model
+-->
+<!-- Version 1.6: July 21, 2003
+- added type attribute to <iss> element
+-->
+<!-- Version 1.7: October, 2003
+- added new <ss> element for issue season
+- added new <ss> element to <date> content model
+-->
+<!--Version 1.8: April, 2004 (SAGE CHANGE) 
+-changed the <other-ref> element to include the <url> tag 
+ <!ELEMENT other-ref (#PCDATA | it | ul | bo | bi | scp | scr | sub | sup | table | list | url)*>.    
+ This tag is backwards compliant. 
+- added element <descriptor> to <descriptors> tag 
+- added element <rejecteddescriptor> to <descriptors> tag
+- added attribute weight to both <descriptor> and  <rejecteddescriptor>
+- added element <E-ISSN> for electronic journals-->
+<!--Version 1.9: April, 2004 (SAGE CHANGE) 
+- added element <iss_title> to article info -->
+<!--Version 2.0: October, 2004 (SAGE CHANGE)
+- added element <jrn_stitle> to journal info -->
+<!--Version 2.1: changed requirement for first name to "not required" -->
+<!--Version 2.2: ENTITY DECLARATIONS  -->
+<!--Version 2.3: December, 2005 (SAGE CHANGE) 
+- added element article titles and subtitle emphasis  <!(sub|sup|bold|ital)*>-->
+<!--Version 2.4: February, 2006 (Apex change)
+- added addart and iss_editor for inter-article linking and issue editor information
+- added per_edt and grp_edt to editor name content -->
+<!-- Version 2.5: March 26, 2007
+-change by Lettie Conrad & Keith Lawrenz to support the <access> tag as an element within the art_info element
+- The required attributes of the tag currently include openaccess, free, and creativecommons -->
+<!--Version 2.6 june 4, 2007  by Dmitry Ikan (Sage Change)
+- added element art_subject to art_info to support the grouping of articles in a one level hierarchy on the HighWire TOC view pages.
+- added attribute leader_text to elements grp_aut and grp_edt to capture and display leading text such as "On the behalf of" outside of the associated element.
+- added ability to support more then one abstract to enable additional abstracts in foreign languages; by practice, the first abstract (no lang attribute) will always be English
+- added attribute "lang" to element abstract with fixed values to support current HighWire supported languages: (German(de), Spanish(es), Franch(fr), Italian(it), Portuguese(pt))
+- added attribute "sort" to the publication month <mm> tag to enable the association of a cross-year publication month (12-01) with the publication year. The allowed values are "first" and "last". First
+assocates the first month (12 in the given example) with the publication year and last associates the second month (01 in this case) with the publication year. This enables proper sorting of the
+publication month on the HighWire archive page.-->
+<!--Version 2.7 August 22, 2007
+Add collection (coll) attribute to descriptors element to indicate which taxonomy a set of descriptors apply to and added support for multiple descriptors elements in one file. -->
+
+<!--Version 2.8 February 26, 2009
+Add Permissions wrapper and containing copyright element / attribute structure - by K Lawrenz 2/26/2009  -->
+
+<!ENTITY % ISOdia PUBLIC
+"ISO 8879-1986//ENTITIES Diacritical Marks//EN"
+"ISOdia">
+%ISOdia;
+<!ENTITY % ISOtech PUBLIC
+"ISO 8879-1986//ENTITIES General Technical//EN"
+"ISOtech">
+%ISOtech;
+<!ENTITY % ISOgrk1 PUBLIC
+"ISO 8879-1986//ENTITIES Greek Letters//EN"
+"ISOgrk1">
+%ISOgrk1;
+<!ENTITY % ISOgrk2 PUBLIC
+"ISO 8879-1986//ENTITIES Monotoniko Greek//EN"
+"ISOgrk2">
+%ISOgrk2;
+<!ENTITY % ISOgrk3 PUBLIC
+"ISO 8879-1986//ENTITIES Greek Symbols//EN"
+"ISOgrk3">
+%ISOgrk3;
+<!ENTITY % ISOgrk4 PUBLIC
+"ISO 8879-1986//ENTITIES Alternative Greek Symbols//EN"
+"ISOgrk4">
+%ISOgrk4;
+<!ENTITY % ISOlat1 PUBLIC
+"ISO 8879-1986//ENTITIES Added Latin 1//EN"
+"ISOlat1">
+%ISOlat1;
+<!ENTITY % ISOlat2 PUBLIC
+"ISO 8879-1986//ENTITIES Added Latin 2//EN"
+"ISOlat2">
+%ISOlat2;
+<!ENTITY % ISOamsa PUBLIC
+"ISO 8879-1986//ENTITIES Added Math Symbols: Arrow Relations//EN"
+"ISOamsa">
+%ISOamsa;
+<!ENTITY % ISOnum PUBLIC
+"ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN"
+"ISOnum">
+%ISOnum;
+<!ENTITY % ISOpub PUBLIC
+"ISO 8879-1986//ENTITIES Publishing//EN"
+"ISOpub">
+%ISOpub;
+<!ENTITY unknown "[UNKNOWN]">
+<!ENTITY illegible "[ILLEGIBLE]">
+<!--  Parameter Entity Declarations -->
+<!-- emphasis text model -->
+<!ENTITY % empsis "(it|ul|bo|bi|scp|scr|sup|sub)*">
+<!--	it		italic style
+	ul		underline style
+	bo		bold style
+	bi		bold italic style
+	scp 		small caps style
+	scr		script style
+	sup		superscript style
+	sub		subscript style
+-->
+<!-- text element model -->
+<!ENTITY % text "(#PCDATA|it|ul|bo|bi|scp|scr|sub|sup|table|list)*">
+<!--	%empsis;		emphasis text model "it|ul|bo|bi|scp|scr"
+-->
+<!--  Element Definitions -->
+<!--  Header Element Definitions -->
+<!ELEMENT SAGEmeta (header, body, note?, references?)>
+<!ATTLIST SAGEmeta
+	doi CDATA #REQUIRED
+	type CDATA #REQUIRED
+>
+<!--	SAGEmeta	top-level element
+		doi - Digital Object Identifier as per Sage algorithm
+		type - document type (valid values TBD)	-->
+<!ELEMENT header (jrn_info, art_info)>
+<!ELEMENT jrn_info (jrn_title, jrn_stitle?, ISSN, E-ISSN?, vol, iss, date, pub_info*)>
+<!ELEMENT jrn_title (#PCDATA)>
+<!--	title of journal-->
+<!ELEMENT jrn_stitle (#PCDATA)>
+<!--	subtitle of journal-->
+<!ELEMENT ISSN (#PCDATA)>
+<!--	ISSN of journal-->
+<!ELEMENT E-ISSN (#PCDATA)>
+<!--	E-ISSN of journal-->
+<!ELEMENT vol (#PCDATA)>
+<!--	volume number -->
+<!ELEMENT iss (#PCDATA)>
+<!ATTLIST iss
+	type (sup) #IMPLIED
+>
+<!--	issue number -->
+<!ELEMENT date (yy?, ss?, mm?, dd?)>
+<!--	issue date -->
+<!ELEMENT mm (#PCDATA)>
+<!--	issue month -->
+<!ATTLIST mm
+	sort (first | last) #IMPLIED
+>
+<!ELEMENT dd (#PCDATA)>
+<!--	issue day -->
+<!ELEMENT ss (#PCDATA)>
+<!--	issue season -->
+<!ELEMENT yy (#PCDATA)>
+<!--	issue year -->
+<!ELEMENT pub_info (pub_name, pub_location)>
+<!ELEMENT pub_name (#PCDATA)>
+<!-- name of publisher -->
+<!ELEMENT pub_location (#PCDATA)>
+<!-- publisher location -->
+<!ELEMENT art_info (iss_title?, iss_editor?, art_subject?, art_title, art_stitle?, art_author, addart?, spn, epn, descriptors*, access?, permissions?)>
+<!ELEMENT iss_title (#PCDATA | it | ul | bo | bi | scp | scr | sub | sup)*>
+<!--	title of issue-->
+<!ELEMENT art_title (#PCDATA | it | ul | bo | bi | scp | scr | sub | sup)*>
+<!--	atl   article title -->
+<!ELEMENT art_stitle (#PCDATA | it | ul | bo | bi | scp | scr | sub | sup)*>
+<!--	atl   article sub-title -->
+<!-- access element to status an article as free, openaccess, etc. -->
+<!ELEMENT art_subject (#PCDATA)>
+<!--alt artile subject-->
+<!ELEMENT access %text;>
+<!ATTLIST access
+	type (free | openaccess | creativecommons) #REQUIRED
+>
+<!ELEMENT addart %text;>
+<!ATTLIST addart
+	type (err) #IMPLIED
+	vol CDATA #IMPLIED
+	pg CDATA #IMPLIED
+	doi CDATA #IMPLIED
+>
+<!--    related article linking -->
+<!ELEMENT iss_editor (NA | (per_edt | grp_edt)+)>
+<!--    issue editor          -->
+<!ELEMENT per_edt (fn?, mn?, ln, en?, deg?, affil?)>
+<!--	per_edt	person editor of article-->
+<!ELEMENT grp_edt (#PCDATA)>
+<!--	grp_edt	group editor of article-->
+<!ATTLIST grp_edt
+	leader_text CDATA #IMPLIED
+>
+<!ELEMENT descriptors (descriptor*, rejecteddescriptor*)>
+<!ATTLIST descriptors
+        coll  (CRIM | HEAL | COMM | URBA | SOCI | POLI | PSYC | MATE | EDUC | MGMT ) #IMPLIED
+>
+<!ELEMENT descriptor (#PCDATA)>
+<!ATTLIST descriptor
+	Weight CDATA #IMPLIED
+>
+<!--	descriptors	mandatory empty element for indexing-->
+<!ELEMENT rejecteddescriptor (#PCDATA)>
+<!ATTLIST rejecteddescriptor
+	Weight CDATA #IMPLIED
+>
+<!--	rejecteddescriptors	mandatory empty element for indexing-->
+<!-- Author Elements -->
+<!ELEMENT art_author (NA | (per_aut | grp_aut)+)>
+<!--	art_author	article author group
+
+	per_aut	person author of article
+	grp_aut	group author of article	-->
+<!ELEMENT NA EMPTY>
+<!--    place-holder for unavailable but mandatory information-->
+<!ELEMENT per_aut (fn?, mn?, ln, en?, deg?, affil?)>
+<!--	per_aut	person author of article-->
+<!ELEMENT fn (#PCDATA)>
+<!--	fn	first name of author of article-->
+<!ELEMENT mn (#PCDATA)>
+<!--	mn	middle name/intitial of author of article-->
+<!ELEMENT ln (#PCDATA)>
+<!--	ln	last name of author of article
+-->
+<!ELEMENT en (#PCDATA)>
+<!--	en	extension of name of author of article
+		(e.g., Jr., III, etc.)-->
+<!ELEMENT deg (#PCDATA)>
+<!--	deg	degrees for the author
+		(e.g., MD, PhD, etc.)-->
+<!ELEMENT affil (#PCDATA | eml)*>
+<!-- author affiliation-->
+<!ELEMENT eml (#PCDATA)>
+<!-- author email-->
+<!--	grp_aut	group author of article-->
+<!-- Creating a new "permissions" wrapper and elements inside to support copyright metadata for handling article level copyright exceptions for rightsLink administraction KL 2-26-2009-->
+<!ELEMENT  permissions (copyright-statement, copyright-year, copyright-holder)>
+<!ELEMENT copyright-statement (#PCDATA) >
+<!ELEMENT copyright-year (#PCDATA) >
+<!ELEMENT copyright-holder (#PCDATA) >
+<!ATTLIST copyright-holder
+                content-type (sage|society|author|other) #REQUIRED
+                >
+<!-- ending permissions wrapper-->
+
+<!ELEMENT spn (#PCDATA)>
+<!--	spn	start page number-->
+<!ELEMENT epn (#PCDATA)>
+<!--	epn	end page number-->
+<!ELEMENT grp_aut (#PCDATA)>
+<!-- Body Elements -->
+<!ATTLIST grp_aut
+	leader_text CDATA #IMPLIED
+>
+<!ELEMENT body (abstract*, keywords?, full_text)>
+<!-- contains text of article -->
+<!ELEMENT abstract (p)*>
+<!--	abstract	article abstract-->
+<!ATTLIST abstract
+	lang (es | de | fr | it | pt) #IMPLIED
+>
+<!ELEMENT keywords (keyword)*>
+<!--	keywords	list of article keywords-->
+<!ELEMENT keyword (#PCDATA)>
+<!--	keyword	individual article keyword-->
+<!ELEMENT note (p)*>
+<!--	note	article note -->
+<!ELEMENT p %text;>
+<!--	p	paragraph text-->
+<!ELEMENT list (li+)>
+<!ATTLIST list
+	type (ordered | unordered) #REQUIRED
+>
+<!--	list	list of items-->
+<!ELEMENT li (p*)>
+<!--	li	individual list item-->
+<!ELEMENT table (row+)>
+<!--	table	table text-->
+<!ELEMENT row (c+)>
+<!--	row	table row text-->
+<!ELEMENT c %text;>
+<!--	c	table cell text-->
+<!ELEMENT full_text (#PCDATA)>
+<!--	full_text	OCR text of article-->
+<!--Reference Elements-->
+<!ELEMENT references (citation+)>
+<!ELEMENT citation (conference-ref | book-ref | journal-ref | other-ref | url)*>
+<!--          Journal Citation -->
+<!ELEMENT journal-ref (#PCDATA | jtl | issn | vid | iid | ed | dte | aut | pub-ref | art-ref | url)*>
+<!ELEMENT jtl (#PCDATA)>
+<!ELEMENT issn (#PCDATA)>
+<!ELEMENT vid (#PCDATA)>
+<!-- Volume -->
+<!ELEMENT iid (#PCDATA)>
+<!-- Issue -->
+<!ELEMENT ed (#PCDATA)>
+<!-- Edition -->
+<!ELEMENT dte (#PCDATA)>
+<!-- Publication Date -->
+<!ELEMENT pub-ref (#PCDATA | pub-name | pub-place | aff-pub)*>
+<!-- pub-ref... -->
+<!ELEMENT pub-name (#PCDATA)>
+<!-- Publisher name -->
+<!ELEMENT pub-place (#PCDATA)>
+<!-- Publication place -->
+<!ELEMENT aff-pub (#PCDATA)>
+<!-- affiliated publisher -->
+<!-- art-ref... -->
+<!ELEMENT art-ref (#PCDATA | ppf | ppl | atl)*>
+<!ELEMENT ppf (#PCDATA)>
+<!-- Starting page (first) -->
+<!ELEMENT ppl (#PCDATA)>
+<!-- Ending page (last) -->
+<!ELEMENT atl (#PCDATA)>
+<!ELEMENT aut (au*)>
+<!ELEMENT au (#PCDATA)>
+<!--          Book Citation     -->
+<!ELEMENT book-ref (#PCDATA | btl | sertl | chaptl | isbn | edg | aut | ppf | ppl | url | ed | pub-ref | dte)*>
+<!ELEMENT btl (#PCDATA)>
+<!-- Book title -->
+<!ELEMENT sertl (#PCDATA)>
+<!-- Series title -->
+<!ELEMENT chaptl (#PCDATA)>
+<!-- Chapter title -->
+<!ELEMENT isbn (#PCDATA)>
+<!-- ISBN -->
+<!ELEMENT edg (editor*)>
+<!-- Book Editors -->
+<!ELEMENT editor (#PCDATA)>
+<!-- Book Editor -->
+<!--    Conference Citation -->
+<!ELEMENT conference-ref (#PCDATA | conftl | confloc | confdate | aut | art-ref | edg | url)*>
+<!ELEMENT conftl (#PCDATA)>
+<!-- Conference title -->
+<!ELEMENT confloc (#PCDATA)>
+<!-- Conference location -->
+<!ELEMENT confdate (#PCDATA)>
+<!-- Date of conference -->
+<!--    Other Citation -->
+<!ELEMENT other-ref (#PCDATA | it | ul | bo | bi | scp | scr | sub | sup | table | list | url)*>
+<!-- Undefined reference citation -->
+<!ELEMENT url (#PCDATA)>
+<!-- URL as tagged from the reference -->
+<!-- Emphasis Elements -->
+<!ELEMENT it %text;>
+<!--    it   italic style -->
+<!ELEMENT ul %text;>
+<!--    ul   underline style -->
+<!ELEMENT bo %text;>
+<!--    bo   bold style -->
+<!ELEMENT bi %text;>
+<!--    bi   bold italic style -->
+<!ELEMENT scp %text;>
+<!--    scp   small caps style -->
+<!ELEMENT scr %text;>
+<!--    scr   script style -->
+<!ELEMENT sup %text;>
+<!--    sup   superscript style -->
+<!ELEMENT sub %text;>
+<!--    sub   subscript style -->

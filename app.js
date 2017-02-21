@@ -11,11 +11,15 @@ const program = require('commander'),
 program
   .version('0.0.1')
   .usage('[options] <path>')
-  .option('-c, --corpusname <name>', 'Choose a corpus\'s name', 'default')
+  .option('-n, --corpusname <name>', 'Choose an identifier \'s Name', 'default')
+  .option('-c, --config <path>', 'Config json file path')
+  .option('-o, --output <all/json>', 'Output destination')
+  .option('-d, --dtd <path>', 'DTD folder path')
   .parse(process.argv);
 
-if (!process.argv.slice(2).length) {
+if (!program.args.length && !program.config) {
   program.outputHelp();
+  process.exit(0);
 }
 
 const pathInput = program.args[0];
@@ -33,18 +37,27 @@ let workers = [{
   module: "sisyphe-filetype"
 }, {
   name: "Sisyphe XML",
-  module: "sisyphe-xml"
+  module: "sisyphe-xml",
+  options: {
+    corpusname: program.corpusname,
+    config: program.config,
+    dtd: program.dtd
+  }
 }, {
   name: "Sisyphe PDF",
   module: "sisyphe-pdf"
 }, {
   name: "Sisyphe xpath",
-  module: "sisyphe-xpath"
+  module: "sisyphe-xpath",
+  options: {
+    corpusname: program.corpusname
+  }
 }, {
   name: "Sisyphe Output",
   module: "sisyphe-out",
   options: {
-    corpusname: program.corpusname
+    corpusname: program.corpusname,
+    output : program.output
   }
 }];
 
@@ -57,8 +70,12 @@ if (!pathInput && program.corpusname) {
       corpusname: program.corpusname
     }
   };
-  workers = [{name: "Sisyphe XML", module: "sisyphe-xml"}, 
-  {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname}}];
+  workers = [{
+    name: "Sisyphe XML", 
+    module: "sisyphe-xml", 
+    options: { corpusname: program.corpusname, config: program.config, dtd: program.dtd}
+  }, 
+  {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname,output : program.output}}];
   let sisyphe = new Sisyphe(starter, workers);
   sisyphe.start();
   return;
