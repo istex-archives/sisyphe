@@ -13,6 +13,7 @@ program
   .usage('[options] <path>')
   .option('-n, --corpusname <name>', 'Choose an identifier \'s Name', 'default')
   .option('-c, --config <path>', 'Config json file path')
+  .option('-o, --output <all/json>', 'Output destination')
   .option('-d, --dtd <path>', 'DTD folder path')
   .parse(process.argv);
 
@@ -55,7 +56,8 @@ let workers = [{
   name: "Sisyphe Output",
   module: "sisyphe-out",
   options: {
-    corpusname: program.corpusname
+    corpusname: program.corpusname,
+    output : program.output
   }
 }];
 
@@ -73,7 +75,7 @@ if (!pathInput && program.corpusname) {
     module: "sisyphe-xml", 
     options: { corpusname: program.corpusname, config: program.config, dtd: program.dtd}
   }, 
-  {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname}}];
+  {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname,output : program.output}}];
   let sisyphe = new Sisyphe(starter, workers);
   sisyphe.start();
   return;

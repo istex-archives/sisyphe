@@ -34,18 +34,24 @@ Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxm
 -V, --version            output the version number
 -n, --corpusname <name>  Choose an identifier 's Name
 -c, --config <path>      Config json file path
+-o, --output <all/json>  Output destination (only Json OR eslasticsearch+Json)
 -d, --dtd <path>         DTD folder path
 
 
 ### How it works ?
 
 Just start Sisyphe on a folder with any files in it.
+
+![Sisyphe-pic](/lauch-sisyphe.png)
+
 `node app.js -c folderName ~/Documents/customfolder/corpus`
+
+
 
 Sisyphe is now working in background with all your computer thread.
 Just take a coffee and wait , it will prevent you when it's done :)
 
-![Sisyphe-pic](/sisyphe.jpg)
+![Sisyphe-dashboard](/sisyphe.png)
 
 
 You should now have a file full of logs in `/yourcustomfolder/sisyphe/logs/sisyphe.log` (errors,info,duration..)

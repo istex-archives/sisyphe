@@ -15,7 +15,7 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "bluebird": "^3.4.1",
-    "bull": "^2.0.0",
+    "bullmatthd": "2.1.3",
     "commander": "^2.9.0",
     "debug": "^2.2.0",
     "elasticsearch": "^12.1.3",

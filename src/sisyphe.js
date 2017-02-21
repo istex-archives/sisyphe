@@ -164,7 +164,10 @@ class Sisyphe {
 
     setInterval(function(){
       clientRedis.hgetallAsync('sisyphe').then((values) => {
-        if(values) values.isOK = true;
+        if(!values) {
+          return;
+        };
+        values.isOK = true
         for (const prop in values) {
           if (values.hasOwnProperty(prop) && values[prop] === undefined) values.isOK = false;
         }
