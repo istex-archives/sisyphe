@@ -18,6 +18,7 @@ const sisypheOut = {},
 const template = require('./config/elasticsearch-template.json');
 
 sisypheOut.init = function (options) {
+  options.output = options.output || 'json';
   this.client = new elasticsearch.Client({
     host: elasticUrl,
     log: {
@@ -34,16 +35,19 @@ sisypheOut.init = function (options) {
       new (winston.transports.File)({
         filename: `logs/analyse-${options.corpusname}.json`,
         level: 'debug'
-      }),
-      new Elasticsearch({
-        level: 'info',
-        index: `analyse-${options.corpusname}`,
-        mappingTemplate: template,
-        client: this.client,
-        consistency: false, // A creuser
       })
     ]
   });
+  if(options.output === 'all'){
+    let esTransportOpts = {
+      level: 'info',
+      index: `analyse-${options.corpusname}`,
+      mappingTemplate: template,
+      client: this.client,
+      consistency: false // TODO: check why this option is important
+    }
+    this.logger.add(winston.transports.Elasticsearch,esTransportOpts);
+  }
   return this;
 };
 
@@ -79,7 +83,6 @@ sisypheOut.doTheJob = function (data, next) {
     } else {
       this.redisClient.incr(data.path);
       this.logger.info(data);
-      this.logger.debug(data);
       next(null, data);
     }
   }).catch(err => {
