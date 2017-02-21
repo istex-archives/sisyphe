@@ -30,12 +30,12 @@ Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxm
 
 ### Options
 
--h, --help               output usage information
--V, --version            output the version number
--n, --corpusname <name>  Choose an identifier 's Name
--c, --config <path>      Config json file path
--o, --output <all/json>  Output destination (only Json OR eslasticsearch+Json)
--d, --dtd <path>         DTD folder path
+- -h, --help               output usage information
+- -V, --version            output the version number
+- -n, --corpusname <name>  Choose an identifier 's Name
+- -c, --config <path>      Config json file path
+- -o, --output <all/json>  Output destination (only Json OR eslasticsearch+Json)
+- -d, --dtd <path>         DTD folder path
 
 
 ### How it works ?
