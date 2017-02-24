@@ -17,7 +17,7 @@ program
   .option('-d, --dtd <path>', 'DTD folder path')
   .parse(process.argv);
 
-if (!program.args.length && !program.config) {
+if (!program.args.length && !program.name) {
   program.outputHelp();
   process.exit(0);
 }
