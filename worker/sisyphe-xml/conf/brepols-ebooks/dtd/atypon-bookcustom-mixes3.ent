@@ -1,0 +1,192 @@
+<!-- ============================================================= -->
+<!--  MODULE:    NCBI Book DTD Over-ride Mixes Module              -->
+<!--  VERSION:   3.0                                               -->
+<!--  DATE:      Jan 2010                                          -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                        TYPICAL INVOCATION                     -->
+<!--
+"-//Atypon//DTD Atypon Systems NCBI Book DTD Suite Over-ride Mixes Module v3.0.8 20140909//EN"
+Delivered as file "atypon-bookcustom-mixes3.ent"                   -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     NCBI Book DTD of the                              -->
+<!--             Archiving and Interchange DTD Suite               -->
+<!--                                                               -->
+<!-- PURPOSE:    Declares over-ride values for the default element -->
+<!--             mixes in the Suite. These over-rides are specific -->
+<!--             to the NCBI Book DTD.                             -->
+<!--                                                               -->
+<!--             Note: Since PEs must be declared before they      -->
+<!--             are used, this module must be called before the   -->
+<!--             default mixes modules (%default-mixes;)           -->
+<!--                                                               -->
+<!-- CONTAINS:   1) PEs that define the element mixes to be        -->
+<!--                over-ridden                                    -->
+<!--                                                               -->
+<!-- CREATED FOR:                                                  -->
+<!--             Digital Archive of Journal Articles               -->
+<!--             National Center for Biotechnology Information     -->
+<!--                (NCBI)                                         -->
+<!--             National Library of Medicine (NLM)                -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             October 2004                                      -->
+<!--                                                               -->
+<!-- CREATED BY: Bart Trawick    (NCBI)                            -->
+<!--             Jeff Beck       (NCBI)                            -->
+<!--             Deborah Lapeyre (Mulberry Technologies, Inc.)     -->
+<!--             B. Tommie Usdin (Mulberry Technologies, Inc.)     -->
+<!--                                                               -->
+<!--             Suggestions for refinements and enhancements to   -->
+<!--             this DTD should be sent in email to:              -->
+<!--                 archive-dtd@ncbi.nlm.nih.gov                  -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    DTD VERSION/CHANGE HISTORY                 -->
+<!-- ============================================================= -->
+<!--
+
+Version  Reason/Occasion                   (who) vx.x (yyyy-mm-dd)
+
+     =============================================================
+     Version 3.0                       (DAL/BTU) v3.0 (2007-10-31)
+     
+     Version 3.0 is the first non-backward-compatible release.
+     In addition to the usual incremental changes, some
+     elements and attributes have been renamed and/or remodeled
+     to better meet user needs and to increase tag set consistency.
+     All module change histories are available through the Tag Suite 
+     web site at http://dtd.nlm.nih.gov. 
+
+     Details on version 3.0 are available at 
+           http://dtd.nlm.nih.gov/3.0.
+  
+  1. Updated public identifier to "v3.0 20080202//EN"              -->
+
+                        
+<!-- ============================================================= -->
+<!--                    BLOCK-LEVEL ELEMENT MIXES                  -->
+<!--                    (MIXES ARE COMPOSED USING CLASSES)         -->
+<!-- ============================================================= -->
+
+
+<!--                    BOOK PART LEVEL                            -->
+<!--                    Those elements that are may be used at the
+                        same hierarchical level as a <book-part>,
+                        where book-part is defined as the major unit
+                        of a book such as a chapter, part, module, 
+                        unit, etc.                                 -->
+<!ENTITY % book-part-level  
+                        "%book-part.class;"                          >
+                          
+
+
+<!--                    DOCUMENT FRONT MATTER ELEMENTS             -->
+<!--                    Front Matter Elements used by a book       -->
+<!ENTITY % doc-front-matter-mix
+                        "%front.class; | %front-back.class; |
+                         %just-table.class; |  %sec.class;"          >
+
+                        
+<!-- ============================================================= -->
+<!--                    INLINE ELEMENT MIXES                       -->
+<!--                    (MIXES ARE COMPOSED USING CLASSES)         -->
+<!-- ============================================================= -->
+
+
+<!--                    EMPHASIS MIX ELEMENTS                      -->
+<!--                    Elements that may be used inside most of the
+                        emphasis class elements                    
+                        Design Note: Inline mixes begin with an
+                        OR bar                                     -->
+<!ENTITY % emphasized-text  
+                        "| %appearance.class; | %address-link.class; | 
+                         %article-link.class; | %emphasis.class;  | 
+                         %inline-display.class; | 
+                         %inline-math.class; |  
+                         %math.class; |  %phrase.class; | 
+                         %simple-link.class; | %subsup.class;"       >
+                         
+
+<!--                    JUST RENDITION                             -->
+<!--                    Only the simplest of the typographic 
+                        emphasis elements, as well as subscript and
+                        superscript.  Usually used in a model that
+                        allows #PCDATA and this restricted mixture.
+                        This mix may be stripped down to only
+                        subscript and superscript by some, more
+                        restrictive DTDs.                         
+                        MAINTENANCE NOTE: This Parameter Entity
+                        and the related PE "rendition-plus" have
+                        been put in place to restrict the amount of
+                        variability that a person modifying the DTD
+                        through PE redefinition can achieve. Some
+                        elements have been set #PCDATA plus one PE
+                        and some have been set to #PCDATA plus the
+                        other in an effort to allow designers to
+                        modify entire groups of elements, but not
+                        to change similar models individually .   
+                        Design Note: Inline mixes begin with an
+                        OR bar                                     -->
+<!ENTITY % just-rendition
+                        "| %emphasis.class;  | 
+                         %phrase-content.class; | %subsup.class; |
+			 %inline-math.class;"                        >
+                         
+
+<!--                    RENDITION MARKUP PLUS                      -->
+<!--                    Only the simplest of the typographic 
+                        emphasis elements, as well as subscript and
+                        superscript.  Usually used in a model that
+                        allows #PCDATA and this restricted mixture.
+                        This mix may be enhanced slightly in some
+                        more permissive DTDs, and should always
+                        contain at least typographic emphasis, 
+                        subscript, and superscript.                -->
+<!ENTITY % rendition-plus
+                        "| %emphasis.class;  | 
+                         %phrase-content.class; | %subsup.class;"    > 
+
+                        
+<!-- ============================================================= -->
+<!--                    #PCDATA CONTENT MODEL MIXES                -->
+<!-- ============================================================= -->
+
+
+<!--                    EXTERNAL LINK ELEMENTS                     -->
+<!--                    The elements that can be included along with
+                        data characters inside the content model of
+                        an <ext-link>. This was modified to allow
+                        graphical elements inside <ext-link>, for
+                        those cases where, for example, an onscreen
+                        arrow is a link to a picture or a database.-->
+<!ENTITY % ext-link-elements
+                        "| %emphasis.class;| %inline-display.class; |
+                         %just-base-display-noalt.class; | 
+                         %phrase-content.class; | 
+                         %subsup.class;"                             >
+
+
+<!--                    X(CROSS) REFERENCE ELEMENTS                -->
+<!--                    The elements that can be included along with
+                        data characters inside the content model of
+                        an <xref>. This was modified to allow
+                        graphical elements inside <xref>, for
+                        those cases where, for example, an onscreen
+                        arrow is a link to a picture or a database.-->
+<!ENTITY % xref-elements
+                        "| %emphasis.class;| %inline-display.class; |
+                         %just-base-display-noalt.class; |
+                         %phrase-content.class; | 
+                         %subsup.class;"                             > 
+                          
+
+<!-- ================== End NCBI Book DTD Over-ride Mixes  ======= -->

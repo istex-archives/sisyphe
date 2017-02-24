@@ -1,0 +1,42 @@
+{
+  "metadata": [
+    {
+      "name": "publicationYear",
+      "regex": "^([0-9]{4})$",
+      "type": "Number",
+      "xpath": "/book/book-meta/pub-date/year"
+    },
+    {
+      "name": "doi",
+      "regex": "(10[.][0-9]{4,}[^\\s\"/<>]*/[^\\s\"<>]+)",
+      "type": "String",
+      "xpath": "/book/book-meta/book-id[@pub-id-type=\"doi\"]"
+    },
+    {
+      "name": "hasAbstract",
+      "type": "Boolean",
+      "xpath": "/book/book-meta/abstract"
+    },
+    {
+      "name": "publisherId",
+      "type": "String",
+      "xpath": "/book/book-meta/publisher/publisher-name"
+    },
+    {
+      "name": "hostTitle",
+      "type": "String",
+      "xpath": "/book/book-meta/book-title-group/book-title"
+    },
+    {
+      "name": "title",
+      "type": "String",
+      "xpath": "/book/body/book-part/book-part-meta/title-group/title"
+    },
+    {
+      "name": "codeLanguage",
+      "type": "Attribute",
+      "xpath": "/book/@xml:lang"
+    }
+  ],
+  "dtd": ["atypon-book3.dtd"]
+}

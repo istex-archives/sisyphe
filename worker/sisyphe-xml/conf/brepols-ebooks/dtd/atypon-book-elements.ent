@@ -1,0 +1,372 @@
+<!-- ============================================================= -->
+<!--  MODULE:    NCBI Book Atypon Specific Elements                -->
+<!--  VERSION:   3.0                                               -->
+<!--  DATE:      Jan 2010                                          -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                        TYPICAL INVOCATION                     -->
+<!--
+"-//Atypon//DTD Atypon Systems NCBI Book DTD Suite Atypon Specific Elements v3.0.8 20140909//EN"
+Delivered as file "atypon-book-elements.ent"                       -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Journal Archiving and Interchange DTD of the      -->
+<!--             Archiving and Interchange DTD Suite               -->
+<!--                                                               -->
+<!-- PURPOSE:    To declare the Parameter Entities (PEs) used to   -->
+<!--             over-ride the named element classes               -->
+<!--                                                               -->
+<!--             Note: Since PEs must be declared before they      -->
+<!--             are used, this module must be called before the   -->
+<!--             content modules that declare elements, and before -->
+<!--             the default classes module.                       -->
+<!--                                                               -->
+<!-- CONTAINS:   1) PEs for changing the contents of the default   -->
+<!--                element classes                                -->
+<!--                                                               -->
+<!-- CREATED FOR:                                                  -->
+<!--             Digital Archive of Journal Articles               -->
+<!--             National Center for Biotechnology Information     -->
+<!--                (NCBI)                                         -->
+<!--             National Library of Medicine (NLM)                -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             August 2004                                       -->
+<!--                                                               -->
+<!-- CREATED BY: Deborah Lapeyre (Mulberry Technologies, Inc.)     -->
+<!--             B. Tommie Usdin (Mulberry Technologies, Inc.)     -->
+<!--                                                               -->
+<!--             Suggestions for refinements and enhancements to   -->
+<!--             this DTD should be sent in email to:              -->
+<!--                 archive-dtd@ncbi.nlm.nih.gov                  -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    DTD VERSION/CHANGE HISTORY                 -->
+<!-- ============================================================= -->
+<!--
+
+Version  Reason/Occasion                   (who) vx.x (yyyy-mm-dd)
+
+     =============================================================
+     Version 3.0                       (DAL/BTU) v3.0 (2007-10-31)
+     
+     Version 3.0 is the first non-backward-compatible release.
+     In addition to the usual incremental changes, some
+     elements and attributes have been renamed and/or remodeled
+     to better meet user needs and to increase tag set consistency.
+     All module change histories are available through the Tag Suite 
+     web site at http://dtd.nlm.nih.gov. 
+
+     Details on version 3.0 are available at 
+           http://dtd.nlm.nih.gov/3.0.
+  
+  1. Updated public identifier to "v3.0 20080202//EN"              -->
+
+
+<!-- ============================================================= -->
+<!--                    METADATA CLASSES                           -->
+<!-- ============================================================= -->
+
+<!--                    BBOX                                       -->
+<!--                    Bounding Box Coordinates Element           -->
+<!--                    Atypon internal use only (Reserved)        -->
+<!ENTITY % bbox-atts
+          "pg      CDATA                              #REQUIRED
+	   x       CDATA                              #REQUIRED
+	   y       CDATA                              #REQUIRED
+	   w       CDATA                              #REQUIRED
+	   h       CDATA                              #REQUIRED
+	   words   CDATA                              #IMPLIED"      >
+
+<!ELEMENT  bbox          EMPTY                                       >
+
+<!ATTLIST  bbox
+             %bbox-atts;                                             >
+
+
+<!-- ============================================================= -->
+<!--                    BOOK METADATA ELEMENTS                     -->
+<!-- ============================================================= -->
+
+<!--                    BOOK CATEGORIES MODEL                      -->
+<!--                    Full content model for Book Categories     -->
+<!ENTITY % book-categories-model
+                        "(subj-group+)"                              >
+
+
+<!--                    BOOK CATEGORIES                            -->
+<!--                    Wrapper for categorization information for
+                        books.                                     -->
+<!ELEMENT  book-categories
+                         %book-categories-model;                     >
+
+
+<!-- ============================================================= -->
+<!--                    BOOK PART FRONT MATTER ELEMENTS            -->
+<!-- ============================================================= -->
+
+
+<!--                    BOOK PART IDENTIFIER                       -->
+<!--                    An identifier, such as a DOI or archive
+                        control number, for the work. There is a
+                        separate element for the ISBNs <isbn>.     
+                        Remarks: The "pub-id-type" attribute is the
+                        same attribute used with citations to note
+                        publication type.                          -->
+<!ELEMENT  book-part-id      (#PCDATA)                               >
+<!--         pub-id-type    
+                        Indicates what type of identifier this is or
+                        who assigned the identifier, for example,
+                        "pub-id" for a publisher's non-DOI
+                        identifier or "DOI" for a Digital Object
+                        Identifier.
+                        Valid Types include:
+                          art-access-id
+                                 - Generic article accession id for
+                                   interchange and retrieval between
+                                   archives
+                          coden  - Obsolete PDB/CCDC identifier (may
+                                   be present on older articles)
+                                   be present on older articles)
+                          doaj   - Directory of Open Access Journals
+                          doi    - Digital Object Identifier for
+                                   the article
+                          medline- NLM Medline identifier
+                          other  - None of the named identifiers
+                          pii    - Publisher Item Identifier, see
+                                    /epub/piius.htm
+                          pmcid  - PubMed Central identifier        
+                          pmid   - PubMed ID (see
+                                   www.ncbi.nlm.nih.gov/entrez/
+                                   query.fcgi?db=PubMed)         
+                          publisher-id - 
+                                   Publisher's identifying number 
+                                   such as an 'article-id', 'artnum',
+                                   'identifier', 'article- number', 
+                                   etc.
+                          sici   - Serial Item and Contribution 
+                                   Identifier (SICI). A journal 
+                                   article may have more than one 
+                                   SICI, one for a print version and
+                                   one for an electronic version.  -->
+<!ATTLIST  book-part-id  
+             %book-id-atts;                                          >
+
+
+<!-- ============================================================= -->
+<!--                    PERSON'S NAME ELEMENTS (BIBLIOGRAPHIC)     -->
+<!-- ============================================================= -->
+
+
+<!--                    CONTRIBUTOR IDENTIFIER ATTRIBUTES          -->
+<!--                    Attributes for the <contrib-id-atts>
+                        element.                                   -->
+<!ENTITY % contrib-id-atts
+            "content-type
+                        CDATA                             #IMPLIED
+             specific-use
+                        CDATA                             #IMPLIED
+             contrib-id-type
+                        CDATA                             #IMPLIED"  >
+
+
+<!--                    CONTRIBUTOR IDENTIFIER MODEL               -->
+<!--                    Content model for the <name-alternatives>
+                        element                                    -->
+<!ENTITY % contrib-id-model
+                        "(#PCDATA)"                                  >
+
+
+<!--                    CONTRIBUTOR IDENTIFIER                     -->
+<!--                    One identifier for a person such as a
+                        contributor or principal investigator. This
+                        element will hold an ORCID, a trusted
+                        publishers's identifier, or a JST or NII
+                        identifier.
+                        Details at:
+                        http://jats.nlm.nih.gov/archiving/tag-library/1.0/index.html?elem=contrib-id
+                        http://jats.nlm.nih.gov/publishing/tag-library/1.0/index.html?elem=contrib-id
+                        http://jats.nlm.nih.gov/articleauthoring/tag-library/1.0/index.html?elem=contrib-id
+                                                                   -->
+<!ELEMENT  contrib-id   %contrib-id-model;                           >
+<!ATTLIST  contrib-id
+             %contrib-id-atts;                                       >
+
+
+<!-- ============================================================= -->
+<!--                    STRUCTURAL ELEMENTS                        -->
+<!-- ============================================================= -->
+
+<!--                    CREDITS                                    -->
+<!--                    Photo credits, source, author, formal thanks,
+                        or other attribution information (other than
+                        the copyright material) concerning the
+                        origins, owners, creators, or licensing for
+                        an extract, a poem <verse-group> or similar
+                        element.                                   -->
+<!ELEMENT  credits      (#PCDATA %emphasized-text;)*                 >
+
+
+<!-- ============================================================= -->
+<!--                    BACK OF THE BOOK INDEX ELEMENTS            -->
+<!-- ============================================================= -->
+
+<!--                    INDEX TERM ATTRIBUTES                      -->
+<!--                    Attribute list for index term entries      -->
+<!ENTITY % index-term-atts
+             "id         ID                               #IMPLIED
+              role       CDATA                            #IMPLIED
+              sortas     CDATA                            #IMPLIED"  >
+
+<!--                    INDEX ENTRY ATTRIBUTES                     -->
+<!--                    Attribute list for index entries           -->
+<!ENTITY % index-entry-atts
+             "id         ID                               #IMPLIED
+              role       CDATA                            #IMPLIED
+	      linkends   IDREFS                           #IMPLIED"  >
+
+<!--                    INDEX DIV ATTRIBUTES                       -->
+<!--                    Attribute list for index-div               -->
+<!ENTITY % index-div-atts
+             "role       CDATA                            #IMPLIED
+              label      CDATA                            #IMPLIED
+              status     CDATA                            #IMPLIED"  >
+
+<!--                    INDEX ATTRIBUTES                           -->
+<!--                    Attribute list for index                   -->
+<!ENTITY % index-atts
+             "role       CDATA                            #IMPLIED
+              label      CDATA                            #IMPLIED
+              status     CDATA                            #IMPLIED"  >
+
+
+<!--                    INDEX TERM                                 -->
+<!--                    Used for marking terms to be included in
+                        the index at the end of the publication    -->
+<!ELEMENT index-term    (primary?, ( (secondary, ((tertiary,
+			  ( see | see-also+ )?)
+			  | see | see-also+ )? )
+			  | see | see-also+ )? )                     >
+
+<!ATTLIST index-term
+	    %index-term-atts; 					     >
+
+<!--                    INDEX-TERM ELEMENTS                        -->
+<!--                    The elements that can be included along with
+                        data characters inside the content model of
+                        an <index-term>  			   -->
+<!ENTITY % index-term-elements
+                        "%link-elements;"                            >
+
+<!--                    PRIMARY INDEX TERM                         -->
+<!--                    Used for marking primary index terms       -->
+<!ELEMENT primary       (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST primary
+	    %index-term-atts; 					     >
+
+<!--                    SECONDARY INDEX TERM                       -->
+<!--                    Used for marking secondary index terms     -->
+<!ELEMENT secondary     (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST secondary
+	    %index-term-atts; 					     >
+
+<!--                    TERTIARY INDEX TERM                        -->
+<!--                    Used for marking tertiary index terms      -->
+<!ELEMENT tertiary      (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST tertiary
+	    %index-term-atts; 					     >
+
+<!--                    SEE INDEX REFERENCE                        -->
+<!--                    Used for marking a "see" index reference   -->
+<!ELEMENT see           (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST see
+	    %index-term-atts; 					     >
+
+<!--                    SEE-ALSO INDEX REFERENCE                   -->
+<!--                    Used for marking a "see-also" index
+			reference  	 			   -->
+<!ELEMENT see-also       (#PCDATA %index-term-elements;)*            >
+
+<!ATTLIST see-also
+	    %index-term-atts; 					     >
+
+<!--                    INDEX ENTRY                                -->
+<!--                    Wraps all of the index terms associated with
+			a particular primary index term. This
+			includes an arbitrary list of secondary
+			and tertiary elements as well as <see> and
+			<see-also> elements		           -->
+<!ELEMENT index-entry   (primary-ie,
+                          ( see-ie | see-also-ie )*,
+                          (secondary-ie,
+                            ( see-ie | see-also-ie | tertiary-ie)*)*)>
+
+<!--                    PRIMARY INDEX TERM                         -->
+<!--                    Used for marking primary index terms       -->
+<!ELEMENT primary-ie    (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST primary-ie
+	    %index-entry-atts; 					     >
+
+<!--                    SECONDARY INDEX TERM                       -->
+<!--                    Used for marking secondary index terms     -->
+<!ELEMENT secondary-ie  (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST secondary-ie
+	    %index-entry-atts; 					     >
+
+<!--                    TERTIARY INDEX TERM                        -->
+<!--                    Used for marking tertiary index terms      -->
+<!ELEMENT tertiary-ie   (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST tertiary-ie
+	    %index-entry-atts; 					     >
+
+<!--                    SEE INDEX REFERENCE                        -->
+<!--                    Used for marking a "see" index reference   -->
+<!ELEMENT see-ie        (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST see-ie
+	    %index-entry-atts; 					     >
+
+<!--                    SEE-ALSO INDEX REFERENCE                   -->
+<!--                    Used for marking a "see-also" index
+			reference  	 			   -->
+<!ELEMENT see-also-ie   (#PCDATA %index-term-elements;)*             >
+
+<!ATTLIST see-also-ie
+	    %index-entry-atts; 					     >
+
+
+<!--                    INDEX-DIV				   -->
+<!--			IndexDiv identifies a section of an index.
+	                An index may be divided into sections in
+		        order to group entries, usually
+		        alphabetically                              -->
+<!ELEMENT index-div     (title?, index-entry+)                        >
+
+<!ATTLIST index-div
+	    %index-div-atts;					      >
+
+<!--                    INDEX					    -->
+<!--			An Index contains the formatted index of a
+			document. An index may begin with
+			introductory material, followed by any
+			number of index-entrys or index-divs        -->
+<!ELEMENT index         (title?, p*, (index-div* | index-entry*))     >
+
+<!ATTLIST index
+	    %index-atts;					      >
+
+<!-- ================== End Atypon Element Classes =============== -->
