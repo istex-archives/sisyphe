@@ -63,8 +63,8 @@
     }
   ],
   "dtd": [
-    "jats-publishing-dtd-0.4/JATS-journalpublishing0.dtd",
-    "jats-publishing-dtd-1.0/JATS-journalpublishing1.dtd",
-    "Publishing-2_2-dtd-June/journalpublishing.dtd"
+    "Atypon-JATS-1.0.5/Atypon-archivearticle1.dtd",
+    "Atypon-JATS-1.0.5/Atypon-Issue-Xml.dtd"
   ]
 }
+
