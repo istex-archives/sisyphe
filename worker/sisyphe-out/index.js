@@ -41,6 +41,7 @@ sisypheOut.init = function (options) {
   if(options.output === 'all'){
     let esTransportOpts = {
       level: 'info',
+      flushInterval : 15000,
       index: `analyse-${options.corpusname}`,
       mappingTemplate: template,
       client: this.client,
@@ -48,6 +49,9 @@ sisypheOut.init = function (options) {
     }
     this.logger.add(winston.transports.Elasticsearch,esTransportOpts);
   }
+  this.logger.on('error', err =>{
+    console.error('loggerError', err);
+  })
   return this;
 };
 
@@ -71,7 +75,7 @@ sisypheOut.doTheJob = function (data, next) {
         body: {
           // This is a partial update
           doc: {
-            fields: body,
+            fields: body
           }
         }
       }).then((resp) => {

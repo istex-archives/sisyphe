@@ -10,7 +10,7 @@ const ChainJobQueue = require('./chain-job-queue'),
   clientRedis = redis.createClient(),
   cluster = require('cluster'),
   ms = require('pretty-ms'),
-  numberFork = require('os').cpus().length / 2;
+  numberFork = require('os').cpus().length;
 
 const loggerInfo = new (winston.Logger)({
   exitOnError: false,
@@ -118,6 +118,7 @@ class Sisyphe {
 
       this.tableProgress = blessed.table({
         top: 20,
+        data: null,
         left: 'center',
         width: '50%',
         align: 'center',
@@ -172,14 +173,18 @@ class Sisyphe {
           if (values.hasOwnProperty(prop) && values[prop] === undefined) values.isOK = false;
         }
         // Above is the sisyphe dashboard console
-        let {totalGeneratedTask=0,totalPerformedTask=0,totalFailedTask=0} = values,
-          progress = totalGeneratedTask ? (totalPerformedTask/totalGeneratedTask)*100 : 0;
+        let {totalGeneratedTask=0,totalPerformedTask=0,totalFailedTask=0,currentGeneratedTask=0} = values,
+          progress = totalGeneratedTask ? (totalPerformedTask/totalGeneratedTask)*100 : 'Progress will be set when all tasks are generated';
 
         self.bar.setProgress(progress);
-        self.textProgress.setContent(`~ ${progress.toFixed(2)}%`);
-        self.tableProgress.setData([['{yellow-fg}totalGeneratedTask{/}', totalGeneratedTask],
-            ['{green-fg}totalPerformedTask{/}', totalPerformedTask],
-            ['{red-fg}totalFailedTask{/}', totalFailedTask]])
+        self.textProgress.setContent(`${isNaN(progress) ? progress : progress.toFixed(2) + '%'}`);
+        self.tableProgress.setData([
+          ['Type', 'Count'],
+          ['{green-fg}totalPerformedTask', `${totalPerformedTask}{/green-fg}`],
+          ['{yellow-fg}currentGeneratedTask', `${currentGeneratedTask}{/yellow-fg}`],
+          ['{yellow-fg}totalGeneratedTask', `${totalGeneratedTask}{/yellow-fg}`],
+          ['{red-fg}totalFailedTask', `${totalFailedTask}{/red-fg}`]
+        ])
         self.screen.render();
 
         const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
@@ -198,6 +203,11 @@ class Sisyphe {
             self.textProgress.setContent(`Finished, took ${duration}`);
             self.screen.render();
             loggerInfo.info(`Sisyphe Finshed all jobs after ${duration}`);
+            // for (var id in cluster.workers) {
+            //   cluster.workers[id].kill();
+            //   console.log(cluster.workers[id])
+            // }
+            cluster.disconnect();
           }).catch((error) => {
             // TODO : rajouter une gestion des erreur pour les logs
             loggerError.error(error);
@@ -274,6 +284,7 @@ class Sisyphe {
 
       this.starterModule.setFunctionEventOnData((data) => {
         this.starterModule.totalFile++;
+        clientRedis.hincrby('sisyphe', 'currentGeneratedTask', 1);
         this.workflow.addTask(data);
       });
 
