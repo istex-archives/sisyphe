@@ -203,10 +203,9 @@ class Sisyphe {
             self.textProgress.setContent(`Finished, took ${duration}`);
             self.screen.render();
             loggerInfo.info(`Sisyphe Finshed all jobs after ${duration}`);
-            // for (var id in cluster.workers) {
-            //   cluster.workers[id].kill();
-            //   console.log(cluster.workers[id])
-            // }
+            for (var id in cluster.workers) {
+              cluster.workers[id].kill();
+            }
             cluster.disconnect();
           }).catch((error) => {
             // TODO : rajouter une gestion des erreur pour les logs
