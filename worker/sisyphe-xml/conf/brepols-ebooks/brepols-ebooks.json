@@ -13,6 +13,18 @@
       "xpath": "/book/book-meta/book-id[@pub-id-type=\"doi\"]"
     },
     {
+      "name": "isbn",
+      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+      "type": "String",
+      "xpath": "/book/book-meta/isbn[@pub-type=\"ppub\"]"
+    },
+    {
+      "name": "eisbn",
+      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+      "type": "String",
+      "xpath": "/book/book-meta/isbn[@pub-type=\"epub\"]"
+    },
+    {
       "name": "hasAbstract",
       "type": "Boolean",
       "xpath": "/book/book-meta/abstract"
