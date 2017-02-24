@@ -1,0 +1,238 @@
+<!-- ============================================================= -->
+<!--  MODULE:    Journal Archiving DTD Customize Content and       -->
+<!--             Attributes Module                                 -->
+<!--  VERSION:   ANSI/NISO JATS Version 1.0 (Z39.96-2012)          -->
+<!--             Atypon Customization                              -->
+<!--  DATE:      August 2012                                       -->
+<!--                                                               -->
+<!--    Created from, and fully compatible with, the ANSI/NISO     -->
+<!--    Z39.96 Journal Article Tag Suite (JATS).                   -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                        TYPICAL INVOCATION                     -->
+<!--
+"-//Atypon//DTD Atypon JATS Journal Archiving and Interchange Issue XML DTD v1.0.5 20141020//EN"
+     Delivered as file "Atypon-Issue-Xml.dtd"                      -->
+<!-- ============================================================= -->
+
+<!ENTITY % archive-oasis-custom-modules.ent PUBLIC
+"-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD with OASIS Tables  DTD-Specific Modules v1.0 20120330//EN"
+"JATS-archive-oasis-custom-modules1.ent"                             >
+%archive-oasis-custom-modules.ent;
+
+<!ENTITY % modules.ent PUBLIC
+"-//NLM//DTD JATS (Z39.96) Archiving and Interchange DTD Suite Module of Modules v1.0 20120229//EN"
+"JATS-modules1.ent"                                                  >
+%modules.ent;
+
+<!-- ============================================================= -->
+<!--                    CUSTOMIZATION MODULES INVOKED              -->
+<!--                    Note: These modules must be called after   -->
+<!--                    all Module of Modules but before any other -->
+<!--                    modules. Unlike any other grouping, order  -->
+<!--                    of these modules matters.                  -->
+<!-- ============================================================= -->
+
+<!--                    DEFINE OASIS NAMESPACE ATTRIBUTE AND PREFIX-->
+<!--                    Names the module defines the OASIS CALS
+                        Exchange Model namespace, prefix, and
+                        pseudo-attribute @xmlns and all the
+			element qnames for CALS Tables.            -->
+%JATS-oasis-namespace.ent;			
+
+<!--                    DTD-SPECIFIC CLASS CUSTOMIZATIONS MODULE   -->
+<!--                    Names the module that holds the DTD-specific
+                        class definitions for the Journal Archiving
+                        and Interchange DTD that over-rides the
+			Suite defaults.                            -->
+%archive-oasis-custom-classes.ent;
+
+<!--                    DEFAULT ELEMENT CLASSES MODULE             -->
+<!--                    Names the module that holds the standard
+                        class definitions for the Journal Archiving
+                        and Interchange DTD Suite.                 -->
+%default-classes.ent;
+
+<!--                    DTD-SPECIFIC MIX CUSTOMIZATIONS MODULE     -->
+<!--                    Set up the Parameter Entities and element
+                        class definitions that will be used to
+                        over-ride some element mixes in this DTD.  -->
+%archivecustom-mixes.ent;
+
+<!--                    DEFAULT MIX CUSTOMIZATIONS MODULE          -->
+<!--                    Names the module that holds the standard
+                        mix definitions for the Journal Archiving
+                        and Interchange DTD Suite.                 -->
+%default-mixes.ent;
+
+<!-- ============================================================= -->
+<!--                JATS ELEMENTS RE-DEFINITION                    -->
+<!-- ============================================================= -->
+
+<!--  ISSUE TITLE ELEMENTS                                         -->
+<!--  Elements for use in the <issue-title> element  of Issue XML  -->
+<!ENTITY % issue-title-elements
+                     "| %all-phrase; | %break.class;"                >
+<!-- ============================================================= -->
+
+<!--                    DTD-SPECIFIC MODELS/ATTRIBUTES CUSTOMIZATIONS 
+                        MODULE                                     -->
+<!--                    Names the module that holds the over-rides
+                        of content models, attribute lists, elements
+                        lists to be used in content models, and
+                        attribute values. These are DTD-specific.  -->
+%archivecustom-models.ent;
+
+<!-- ============================================================= -->
+<!--                    COMMON (SHARED) ELEMENTS MODULE INVOKED    -->
+<!-- ============================================================= -->
+
+<!--                    COMMON (SHARED) DECLARATIONS               -->
+<!--                    Declarations for elements, attributes, 
+                        entities, and Notations that are shared by
+                        more than one class module. Note: Must be 
+                        called before any of the class modules.    -->
+%common.ent;
+
+<!-- ============================================================= -->
+<!--                   JOURNAL ARTICLE CLASS ELEMENTS              -->
+<!-- ============================================================= -->
+
+<!--                    ARTICLE METADATA ELEMENTS                  -->
+%articlemeta.ent;
+
+<!--                    DISPLAY (GRAPHICAL) ELEMENTS               -->
+%display.ent;
+
+<!--                    FORMATTING ELEMENT CLASSES                 -->
+<!--                    Elements that change rendition/display.    -->
+%format.ent;
+
+<!--                    JOURNAL METADATA ELEMENTS                  -->
+%journalmeta.ent;
+
+<!--                    LINK CLASS ELEMENTS                        -->
+%link.ent;
+
+<!--                    LIST CLASS ELEMENTS                        -->
+%list.ent;
+
+<!--                    PARAGRAPH-LEVEL ELEMENTS                   -->
+%para.ent;
+
+<!--                    PHRASE-LEVEL ELEMENTS                      -->
+%phrase.ent;
+
+<!--                    NOTATION ELEMENTS                          -->
+%notat.ent;
+
+<!--                    MATH ELEMENTS                              -->
+%math.ent;
+
+<!--                    SPECIAL CHARACTERS DECLARATIONS            -->
+<!--                    Standard XML special character entities 
+                        used in this DTD                           -->
+%xmlspecchars.ent;
+
+<!--                    CUSTOM SPECIAL CHARACTERS DECLARATIONS     -->
+<!--                    Custom special character entities created 
+                        specifically for use in this DTD Suite     -->
+%chars.ent;
+
+<!-- ============================================================= -->
+<!--                    TOP-LEVEL ISSUE-XML DEFINITION             -->
+<!-- ============================================================= -->
+
+<!ELEMENT issue-xml	( journal-meta?, issue-meta, toc* )          >
+
+<!ENTITY % issue-xml-atts 
+                     "order         NMTOKEN              #IMPLIED
+                      intended-date CDATA                #IMPLIED
+                      xml:lang      NMTOKEN              'en'
+                      xmlns:xlink   CDATA                #FIXED
+		                    'http://www.w3.org/1999/xlink'"  > 
+			  
+<!ATTLIST issue-xml %issue-xml-atts;                                 >
+
+<!-- ============================================================= -->
+<!--                  ISSUE METADATA ELEMENT DEFINITION            -->
+<!-- ============================================================= -->
+
+<!ELEMENT issue-meta ( contrib-group*, author-notes?,
+                       pub-date*,
+                       series-title*, series-text?,
+                       volume?, volume-id*, volume-series?,
+                       issue?, issue-id*, issue-title*,
+		       issue-sponsor*, issue-part?, supplement?,
+                       fpage?, lpage?, page-range?,
+                       copyright-statement?, copyright-year?,
+		       permissions?, self-uri*, related-issue*,
+		       kwd-group*, funding-group*, conference*,
+                       counts?, custom-meta-group? )                 >
+
+<!ENTITY  % issue-types
+           "(normal|ahead-of-print|just-accepted|forthcoming|news|part|volume-suppl|special|errata|letters|proofing|virtual|submitted)">
+
+<!ATTLIST issue-meta issue-type %issue-types; "normal"               >
+
+<!ELEMENT related-issue ( #PCDATA %related-article-elements; )*      >
+
+<!ENTITY % related-issue-atts
+          "id                 ID                          #IMPLIED
+           alternate-form-of  IDREF                       #IMPLIED
+           related-issue-type CDATA                       #REQUIRED
+           ext-link-type      CDATA                       #IMPLIED
+           vol                CDATA                       #IMPLIED
+           issue              CDATA                       #IMPLIED
+           journal-id         CDATA                       #IMPLIED  
+           %journal-id-atts;
+           %might-link-atts;"                                        >
+
+<!ATTLIST related-issue %related-issue-atts;                         >
+
+<!-- ============================================================= -->
+<!--                TABLE OF CONTENTS ELEMENTS DEFINITION          -->
+<!-- ============================================================= -->
+
+<!ELEMENT toc ( cover?,
+                 ( issue-subject-group | p | issue-article-meta )* ) >
+
+<!ENTITY % toc-types "(page-order|subject-heading-order|page-latin-numeric-order|page-numeric-latin-order)">
+
+<!ENTITY % toc-atts
+          "xml:lang   NMTOKEN                             #IMPLIED 
+           toc-type   %toc-types;                         #IMPLIED"  > 
+ 
+<!ATTLIST toc %toc-atts;                                             >
+
+<!ELEMENT cover ( graphic* | caption )                               >
+
+<!ENTITY % issue-article-meta-model
+          "( article-id+, title-group?,
+           ( contrib-group | aff | %x.class; )*, author-notes?,
+           ( (fpage?, lpage?, page-range?) | elocation-id )?,
+           ( %address-link.class; | product | supplementary-material )*,
+           history?, self-uri*, related-article*,
+           abstract*, trans-abstract*, toc-graphic*, counts? )"      >
+
+<!ELEMENT issue-article-meta %issue-article-meta-model;              >
+
+<!ATTLIST issue-article-meta format CDATA #IMPLIED                   >
+
+<!ELEMENT toc-graphic     %graphic-model;                            >
+
+<!ATTLIST toc-graphic     %graphic-atts;                             >
+
+<!ELEMENT issue-subject-group
+            ( issue-subject-title,
+	         ( issue-article-meta | p | issue-subject-group )*)  >
+
+<!ELEMENT issue-subject-title
+            ( p*, subject, p*, trans-issue-subject* )                >
+
+<!ELEMENT trans-issue-subject ( p*, subject, p* )                    >
+
+<!ATTLIST trans-issue-subject xml:lang           NMTOKEN   #IMPLIED  >

@@ -1,0 +1,38 @@
+<!--
+    "-//Atypon//DTD Literatum Content Submission Manifest DTD v4.2 20140519//EN"
+    Delivered as file "manifest.4.2.dtd"
+-->
+
+<!ELEMENT submission (ext-id?, callback?, processing-instructions?, properties?)>
+<!ATTLIST submission
+     group-doi CDATA #REQUIRED
+     submission-type (full|partial) #REQUIRED
+     dtd-version CDATA "4.2"	
+>
+
+<!ELEMENT ext-id (#PCDATA)>
+
+<!ELEMENT callback (email+)>
+<!ELEMENT email (#PCDATA)>
+
+<!ELEMENT processing-instructions (priority?, make-live?)>
+
+<!ELEMENT priority EMPTY>
+<!ATTLIST priority
+	level (low|normal|high) #REQUIRED
+>
+
+<!ELEMENT make-live EMPTY>
+<!ATTLIST make-live
+	on-condition (no-warnings|no-errors|no-fatals) #IMPLIED
+	at-time CDATA #IMPLIED
+>
+
+<!ELEMENT properties (property*)>
+
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+	name NMTOKEN #REQUIRED
+	value CDATA #IMPLIED
+>
+
