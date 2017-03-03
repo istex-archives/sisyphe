@@ -1,3 +1,6 @@
 {
-  "dtd": ["JATS-journalpublishing1.dtd"]
+  "metadata": [],
+  "dtd": [
+    "JATS-journalpublishing1.dtd"
+  ]
 }
