@@ -43,7 +43,7 @@
     {
       "name": "hostTitle",
       "type": "String",
-      "xpath": "/issue-xml/journal-meta/journal-title-group/journal-title"
+      "xpath": "/article/front/journal-meta/journal-title-group/journal-title"
     },
     {
       "name": "title",
