@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-pdf",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Get the PDF informations",
   "main": "index.js",
   "scripts": {
