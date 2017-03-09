@@ -52,10 +52,10 @@ sisyphePdf.getPdfWordCount = function (data) {
     })
   }).then((pagesContent) => {
     return pagesContent.map((pageContent) => {
-      const strings = pageContent.items.map(function (item) {
-        return item.str;
-      });
-      return strings.join('').split(/\s+/).length;
+      return pageContent.items.map((item) => item.str)
+        .join(' ')
+        .split(/\s+/)
+        .length;
     }).reduce((previous, current) => previous + current)
   });
 };
