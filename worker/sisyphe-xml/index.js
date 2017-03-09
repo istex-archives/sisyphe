@@ -212,14 +212,14 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
 sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
   const DTDs = arrayPathDTD;
   const dtdToValidateFirst = docObj.doctype.sysid;
-  Array.prototype.move = function (old_index, new_index) {
-    this.splice(new_index, 0, this.splice(old_index, 1)[0]);
-    return this;
-  };
+  function moveTo(array, old_index, new_index) {
+    array.splice(new_index, 0, array.splice(old_index, 1)[0]);
+    return array;
+  }
 
   return new Promise((resolve, reject) => {
     const indexDtdToValidateFirst = DTDs.map((pathDtd) => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
-    if (indexDtdToValidateFirst !== -1) DTDs.move(indexDtdToValidateFirst, 0);
+    if (indexDtdToValidateFirst !== -1) moveTo(DTDs, indexDtdToValidateFirst, 0);
 
     (function loop(arrayDTD) {
       if (arrayDTD.length) {
