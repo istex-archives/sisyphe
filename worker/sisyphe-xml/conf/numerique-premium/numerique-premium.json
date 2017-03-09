@@ -1,0 +1,59 @@
+{
+  "metadata": [
+    {
+      "name": "publicationYear",
+      "regex": "^([0-9]{4})$",
+      "type": "Number",
+      "xpath": "/book/book-meta/pub-date/year"
+    },
+    {
+      "name": "doi",
+      "regex": "(10[.][0-9]{4,}[^\\s\"/<>]*/[^\\s\"<>]+)",
+      "type": "String",
+      "xpath": "/book/book-meta/book-id[@book-id-type=\"doi\"]"
+    },
+    {
+      "name": "isbn",
+      "regex": "((978[-– ])?[0-9][0-9-– ]{10}[-– ][0-9xX])|((978)?[0-9]{9}[0-9])",
+      "type": "String",
+      "xpath": "/book/book-meta/isbn[@content-type=\"ppub\"]"
+    },
+    {
+      "name": "eisbn",
+      "regex": "((978[-– ])?[0-9][0-9-– ]{10}[-– ][0-9xX])|((978)?[0-9]{9}[0-9])",
+      "type": "String",
+      "xpath": "/book/book-meta/isbn[@content-type=\"epub\"]"
+    },
+    {
+      "name": "hasAbstract",
+      "type": "Boolean",
+      "xpath": "/book/book-meta/abstract"
+    },
+    {
+      "name": "publisherId",
+      "type": "String",
+      "xpath": "/book/book-meta/publisher/publisher-name"
+    },
+    {
+      "name": "hostTitle",
+      "type": "String",
+      "xpath": "/book/collection-meta/title-group/title"
+    },
+    {
+      "name": "title",
+      "type": "String",
+      "xpath": "/book/book-meta/book-title-group/book-title"
+    },
+    {
+      "name": "nbKeywords",
+      "type": "Count",
+      "xpath": "/book/book-meta/kwd-group/kwd"
+    },
+    {
+      "name": "codeLanguage",
+      "type": "Attribute",
+      "xpath": "/book/book-meta/abstract/p/@xml:lang"
+    }
+  ],
+  "dtd": ["BITS-book2.dtd"]
+}
