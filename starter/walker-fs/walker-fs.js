@@ -2,27 +2,50 @@
 
 const walk = require('walk'),
   path = require('path'),
-  fs = require('fs'),
+  bluebird = require('bluebird'),
+  fs = bluebird.promisifyAll(require('fs')),
+  crypto = require('crypto'),
   mime = require('mime');
 
 class WalkerFS {
   constructor(options) {
     this._path = options.path;
     this.corpusname = options.corpusname;
-    // Use an init function should be better
     this.totalFile = 0;
     this.now = Date.now();
-    this.functionEventOnFile = (root, stats) => {
-      const data = {
+    this.functionEventOnFile = (root, stats, next) => {
+      const fileInfo = {
         corpusname: this.corpusname,
         startAt: this.now,
         extension: path.extname(stats.name),
-        path: path.resolve(root + '/' + stats.name),
+        path: path.resolve(root, stats.name),
         name: stats.name,
         size: stats.size
       };
 
-      return data;
+      fs.accessAsync(fileInfo.path, fs.constants.R_OK).then(() => {
+        const hash = crypto.createHash('md5');
+        const LARGE_FILE_LIMIT = 1000000;
+        if (stats.size > LARGE_FILE_LIMIT ) {
+          const input = fs.createReadStream(fileInfo.path);
+          input.on('readable', () => {
+            const data = input.read();
+            if (data)
+              hash.update(data);
+            else {
+              fileInfo.hash = hash.digest('hex');
+              next(fileInfo)
+            }
+          })
+        } else {
+          fs.readFileAsync(fileInfo.path).then((data) => {
+            fileInfo.hash = hash.update(data).digest('hex');
+            next(fileInfo)
+          })
+        }
+      }).catch(() => {
+        next(fileInfo)
+      });
     };
 
     this.functionEventOnData = (data) => {
@@ -48,9 +71,10 @@ class WalkerFS {
   start() {
     const walker = walk.walk(this._path);
     walker.on('file', (root, stats, next) => {
-      const data = this.functionEventOnFile(root, stats);
-      walker.emit('data', data);
-      next()
+      this.functionEventOnFile(root, stats, (data) => {
+        walker.emit('data', data);
+        next()
+      });
     });
     walker.on('data', (data) => {
       this.functionEventOnData(data);
