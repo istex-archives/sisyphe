@@ -16,12 +16,7 @@ class WalkerElastic {
   }
 
   start() {
-    return this.getResultsFromES(this.elasticIndex, this.elasticReq)
-      .map(doc => {
-        this.functionEventOnData(doc)
-      }).then(() => {
-        this.functionEventOnEnd();
-      });
+    this.getResultsFromES(this.elasticIndex, this.elasticReq)
   }
 
   setFunctionEventOnFile(functionEventOnFile) {
@@ -44,39 +39,39 @@ class WalkerElastic {
    * @returns {Promise}
    */
   getResultsFromES(elasticIndex, elasticReq) {
-    const results = [];
+    let results = 0;
     const self = this;
 
-    return new Promise((resolve, reject) => {
-      this._client.search({
-        scroll: '30s',
-        index: 'analyse-' + elasticIndex,
-        q: elasticReq
-      }, function getMoreUntilDone(error, response) {
-        if (error) reject(error);
-        if (response.hasOwnProperty('hits') && response.hits.hasOwnProperty('hits')) {
-          response.hits.hits.forEach((hit) => {
-            // Be sure hit._source exists.
-            var objToSend = Object.assign({}, hit._source.fields);
-            objToSend.updateEs = {};
-            objToSend.updateEs._index = hit._index;
-            objToSend.updateEs._type = hit._type;
-            objToSend.updateEs._id = hit._id;
-            results.push(objToSend);
-          });
-        }
+    this._client.search({
+      scroll: '30s',
+      index: 'analyse-' + elasticIndex,
+      q: elasticReq
+    }, function getMoreUntilDone(error, response) {
+      if (error) {
+        console.error(error);
+        return;
+      };
+      if (response.hasOwnProperty('hits') && response.hits.hasOwnProperty('hits')) {
+        response.hits.hits.forEach((hit) => {
+          // Be sure hit._source exists.
+          var objToSend = Object.assign({}, hit._source.fields);
+          objToSend.updateEs = {};
+          objToSend.updateEs._index = hit._index;
+          objToSend.updateEs._type = hit._type;
+          objToSend.updateEs._id = hit._id;
+          results++;
+          self.functionEventOnData(objToSend);
+        });
+      }
 
-        if (results.length < response.hits.total) {
-          self._client.scroll({
-            scrollId: response._scroll_id,
-            scroll: '30s'
-          }, getMoreUntilDone);
-        } else {
-          resolve(results)
-        }
-      })
+      if (results < response.hits.total) {
+        self._client.scroll({
+          scrollId: response._scroll_id,
+          scroll: '30s'
+        }, getMoreUntilDone);
+      } else {
+        self.functionEventOnEnd();
+      }
     })
   }
 }
-
-module.exports = WalkerElastic;
