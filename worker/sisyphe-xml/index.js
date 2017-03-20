@@ -11,74 +11,82 @@ const assert = require('assert'),
 
 const xpathSelect = xpath.useNamespaces({"xml": "http://www.w3.org/XML/1998/namespace"});
 
+function to(promise, errorExt) {
+  return promise.then(function (data) {
+    return [null, data];
+  }).catch(function (err) {
+    if (errorExt) err = Object.assign(err, errorExt);
+    return [err];
+  });
+}
+
 const sisypheXml = {};
 
-var dtdPath,
-    configPath;
-
-sisypheXml.init = function(options){
-  dtdPath = options.dtd || null;
-  configPath = options.config || null;
+sisypheXml.init = function (options, corpusname) {
+  this.configDir = options.configDir || path.resolve('conf', corpusname);
+  this.pathToConf = path.resolve(this.configDir, corpusname, corpusname + '.json');
+  this.isConfExist = fs.existsSync(this.pathToConf);
+  if (this.isConfExist) {
+    const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
+    this.conf = JSON.parse(dataConf);
+  }
+  return this
 };
 
 sisypheXml.doTheJob = function (docObject, next) {
-  if (docObject.mimetype !== 'application/xml') {
-    return next(null, docObject);
-  }
-  // TODO : refactore this Promise Hell (like Callback Hell)
-  Promise.join(
-    this.getXmlDom(docObject.path),
-    this.getDoctype(docObject.path),
-    function (xmlDom, doctype) {
-      docObject.doctype = doctype;
-      return xmlDom;
-    }
-  ).then((xmlDom) => {
-    docObject.isWellFormed = true;
-    this.getConf(docObject.corpusname).then((conf) => {
+  if (docObject.mimetype !== 'application/xml') return next(null, docObject);
 
-      return this.checkConf(conf);
-    }).then((conf) => {
-      const dtdsPath = dtdPath 
-        ? conf.dtd.map((dtd) => path.resolve(dtdPath, 'dtd/', dtd))
-        : conf.dtd.map((dtd) => __dirname + '/conf/' + docObject.corpusname + '/dtd/' + dtd);
-      this.validateAgainstDTD(docObject, dtdsPath).then((validationDTDresult) => {
-        docObject.isValidAgainstDTD = true;
-        docObject.validationDTDInfos = validationDTDresult;
-      }).then(() => {
-        this.getMetadataInfos(conf, xmlDom).map((metadata) => {
+  (async() => {
+    let error, xmlDom, doctype, validationDTDResult;
+
+    [error, doctype] = await to(this.getDoctype(docObject.path));
+    if (doctype) docObject.doctype = doctype;
+
+    [error, xmlDom] = await to(this.getXmlDom(docObject.path));
+    if (error) {
+      docObject.isWellFormed = false;
+      docObject.error = error.toString();
+      return docObject;
+    } else {
+      docObject.isWellFormed = true;
+    }
+
+    if (!this.isConfExist) return docObject;
+
+    const dtdsPath = this.conf.dtd.map((dtd) => path.resolve(this.configDir, docObject.corpusname, 'dtd', dtd));
+    [error, validationDTDResult] = await to(this.validateAgainstDTD(docObject, dtdsPath));
+    if (error) {
+      docObject.isValidAgainstDTD = false;
+      docObject.error = error.toString();
+      return docObject;
+    } else {
+      docObject.isValidAgainstDTD = true;
+      docObject.validationDTDInfos = validationDTDResult;
+      let metadatas;
+      [error, metadatas] = await to(this.getMetadataInfos(this.conf, xmlDom));
+      if (error) {
+        docObject.metadataErrors = error.toString();
+        return docObject;
+      } else {
+        metadatas.map((metadata) => {
           if (metadata.hasOwnProperty('isValueValid')) {
             docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
             if (metadata.isValueValid) {
               docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-            }
-            else {
+            } else {
               docObject[metadata.name + 'Error'] = metadata.value;
             }
           } else {
             docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
           }
-        }).then(() => {
-          next(null, docObject);
-        }).catch((error) => {
-          docObject.metadataErrors = error.toString();
-          next(null, docObject);
         });
-      }).catch((error) => {
-        docObject.isValidAgainstDTD = false;
-        docObject.error = error;
-        next(null, docObject);
-      });
-    }).catch({code: 'ENOENT'}, () => {
-      next(null, docObject);
-    }).catch((error) => {
-      docObject.error = error;
-      next(null, docObject);
-    });
+        return docObject;
+      }
+    }
+  })().then((docObject) => {
+    next(null, docObject)
   }).catch((error) => {
-    docObject.isWellFormed = false;
-    docObject.error = error;
-    next(null, docObject);
+    next(error)
   });
 };
 
@@ -129,27 +137,27 @@ sisypheXml.getDoctype = function (xmlFilePath) {
   })
 };
 
-sisypheXml.getConf = function (corpusname) {                      
-  const pathToConf = configPath || __dirname + '/conf/' + corpusname + '/' + corpusname + '.json';
-  return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
-    return fs.readFileAsync(pathToConf, 'utf8')
-  }).then((dataConf) => {
-    return JSON.parse(dataConf);
-  });
-};
-
-sisypheXml.checkConf = function (confObj) {
-  return new Promise((resolve) => {
-    assert(confObj.hasOwnProperty('metadata'));
-    assert(Array.isArray(confObj.metadata));
-    confObj.metadata.map((metadata) => {
-      assert(metadata.hasOwnProperty('name'));
-      assert(metadata.hasOwnProperty('type'));
-      assert(metadata.hasOwnProperty('xpath'));
-    });
-    resolve(confObj);
-  })
-};
+// sisypheXml.getConf = function (corpusname) {
+//   const pathToConf = configPath || __dirname + '/conf/' + corpusname + '/' + corpusname + '.json';
+//   return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
+//     return fs.readFileAsync(pathToConf, 'utf8')
+//   }).then((dataConf) => {
+//     return JSON.parse(dataConf);
+//   });
+// };
+//
+// sisypheXml.checkConf = function (confObj) {
+//   return new Promise((resolve) => {
+//     assert(confObj.hasOwnProperty('metadata'));
+//     assert(Array.isArray(confObj.metadata));
+//     confObj.metadata.map((metadata) => {
+//       assert(metadata.hasOwnProperty('name'));
+//       assert(metadata.hasOwnProperty('type'));
+//       assert(metadata.hasOwnProperty('xpath'));
+//     });
+//     resolve();
+//   })
+// };
 
 sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
   return Promise.map(confObj.metadata, (metadata) => {
@@ -211,15 +219,19 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
 
 sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
   const DTDs = arrayPathDTD;
-  const dtdToValidateFirst = docObj.doctype.sysid;
+
+
   function moveTo(array, old_index, new_index) {
     array.splice(new_index, 0, array.splice(old_index, 1)[0]);
     return array;
   }
 
   return new Promise((resolve, reject) => {
-    const indexDtdToValidateFirst = DTDs.map((pathDtd) => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
-    if (indexDtdToValidateFirst !== -1) moveTo(DTDs, indexDtdToValidateFirst, 0);
+    if (docObj.hasOwnProperty('doctype')) {
+      const dtdToValidateFirst = docObj.doctype.sysid;
+      const indexDtdToValidateFirst = DTDs.map((pathDtd) => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
+      if (indexDtdToValidateFirst !== -1) moveTo(DTDs, indexDtdToValidateFirst, 0);
+    }
 
     (function loop(arrayDTD) {
       if (arrayDTD.length) {
