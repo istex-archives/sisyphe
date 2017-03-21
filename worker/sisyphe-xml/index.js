@@ -29,7 +29,11 @@ sisypheXml.init = function (options, corpusname) {
   if (this.isConfExist) {
     const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
     this.conf = JSON.parse(dataConf);
+    if (this.conf.hasOwnProperty('dtd') && Array.isArray(this.conf.dtd)) {
+      this.dtdsPath = this.conf.dtd.map((dtd) => path.resolve(this.configDir, corpusname, 'dtd', dtd));
+    }
   }
+
   return this
 };
 
@@ -53,8 +57,7 @@ sisypheXml.doTheJob = function (docObject, next) {
 
     if (!this.isConfExist) return docObject;
 
-    const dtdsPath = this.conf.dtd.map((dtd) => path.resolve(this.configDir, docObject.corpusname, 'dtd', dtd));
-    [error, validationDTDResult] = await to(this.validateAgainstDTD(docObject, dtdsPath));
+    [error, validationDTDResult] = await to(this.validateAgainstDTD(docObject, this.dtdsPath));
     if (error) {
       docObject.isValidAgainstDTD = false;
       docObject.error = error.toString();
@@ -218,8 +221,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
 };
 
 sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
-  const DTDs = arrayPathDTD;
-
+  const DTDs = arrayPathDTD.slice();
 
   function moveTo(array, old_index, new_index) {
     array.splice(new_index, 0, array.splice(old_index, 1)[0]);
