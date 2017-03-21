@@ -40,8 +40,8 @@ sisypheXml.init = function (options, corpusname) {
 sisypheXml.doTheJob = function (docObject, next) {
   if (docObject.mimetype !== 'application/xml') return next(null, docObject);
 
-  (async() => {
-    let error, xmlDom, doctype, validationDTDResult;
+  (async () => {
+    let error, xmlDom, validationDTDResult;
 
     [error, docObject.doctype] = await to(this.getDoctype(docObject.path));
 
@@ -50,7 +50,7 @@ sisypheXml.doTheJob = function (docObject, next) {
       docObject.isWellFormed = false;
       return docObject;
     }
-    
+
     docObject.isWellFormed = true;
 
     if (!this.isConfExist) return docObject;
@@ -84,7 +84,7 @@ sisypheXml.doTheJob = function (docObject, next) {
     });
     return docObject;
   })().then((docObject) => {
-    if(docObject.error) docObject.error = JSON.stringify(docObject.error);
+    if (docObject.error) docObject.error = JSON.stringify(docObject.error);
     next(null, docObject)
   }).catch((error) => {
     next(error)
