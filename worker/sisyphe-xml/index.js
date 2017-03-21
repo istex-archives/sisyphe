@@ -140,28 +140,6 @@ sisypheXml.getDoctype = function (xmlFilePath) {
   })
 };
 
-// sisypheXml.getConf = function (corpusname) {
-//   const pathToConf = configPath || __dirname + '/conf/' + corpusname + '/' + corpusname + '.json';
-//   return fs.accessAsync(pathToConf, fs.constants.R_OK).then(() => {
-//     return fs.readFileAsync(pathToConf, 'utf8')
-//   }).then((dataConf) => {
-//     return JSON.parse(dataConf);
-//   });
-// };
-//
-// sisypheXml.checkConf = function (confObj) {
-//   return new Promise((resolve) => {
-//     assert(confObj.hasOwnProperty('metadata'));
-//     assert(Array.isArray(confObj.metadata));
-//     confObj.metadata.map((metadata) => {
-//       assert(metadata.hasOwnProperty('name'));
-//       assert(metadata.hasOwnProperty('type'));
-//       assert(metadata.hasOwnProperty('xpath'));
-//     });
-//     resolve();
-//   })
-// };
-
 sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
   return Promise.map(confObj.metadata, (metadata) => {
     // Select the first XPATH possibility
