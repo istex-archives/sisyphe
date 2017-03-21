@@ -12,9 +12,8 @@ program
   .version('0.0.1')
   .usage('[options] <path>')
   .option('-n, --corpusname <name>', 'Choose an identifier \'s Name', 'default')
-  .option('-c, --config <path>', 'Config json file path')
+  .option('-c, --config-dir <path>', 'Config folder path')
   .option('-o, --output <all/json>', 'Output destination')
-  .option('-d, --dtd <path>', 'DTD folder path')
   .parse(process.argv);
 
 if (program.name === 'default') {
@@ -40,8 +39,7 @@ let workers = [{
   module: "sisyphe-xml",
   options: {
     corpusname: program.corpusname,
-    config: program.config,
-    dtd: program.dtd
+    configDir: program.configDir
   }
 }, {
   name: "Sisyphe PDF",
@@ -73,7 +71,10 @@ if (!pathInput && program.corpusname) {
   workers = [{
     name: "Sisyphe XML",
     module: "sisyphe-xml",
-    options: {corpusname: program.corpusname, config: program.config, dtd: program.dtd}
+    options: {
+      corpusname: program.corpusname,
+      configDir: program.configDir
+    }
   },
     {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname, output: program.output}}];
   let sisyphe = new Sisyphe(starter, workers);

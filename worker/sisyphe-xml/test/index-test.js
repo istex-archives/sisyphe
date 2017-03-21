@@ -2,6 +2,7 @@
 
 const chai = require('chai'),
   exec = require('child_process').exec,
+  path = require('path'),
   DOMParser = require('xmldom').DOMParser,
   expect = chai.expect,
   sisypheXml = require('../index.js');
@@ -24,17 +25,20 @@ const docWithNotValidXml = Object.assign({path: __dirname + '/data/test-not-vali
 describe('Dependancies', () => {
   it('should have acces to xmlstarlet', (done) => {
     exec('which xmlstarlet', (err, stdout, stderr) => {
-      void expect(err).to.be.null;
-      void expect(stderr).to.be.empty;
-      void expect(stdout).to.be.not.null;
+      expect(err).to.be.null;
+      expect(stderr).to.be.empty;
+      expect(stdout).to.be.not.null;
       done();
     });
   });
 });
 
 describe('doTheJob', function () {
+  const testSisypheXml = Object.create(sisypheXml);
+  testSisypheXml.init({configDir: path.resolve(__dirname, '../conf')}, 'default');
+
   it('should add some info about a wellformed XML and valid DTD', function (done) {
-    sisypheXml.doTheJob(doc, (error, docOutput) => {
+    testSisypheXml.doTheJob(doc, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
@@ -53,7 +57,7 @@ describe('doTheJob', function () {
   });
 
   it('should add some info about a not wellformed XML', function (done) {
-    sisypheXml.doTheJob(docWithNotWellFormedXml, (error, docOutput) => {
+    testSisypheXml.doTheJob(docWithNotWellFormedXml, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
@@ -62,7 +66,7 @@ describe('doTheJob', function () {
   });
 
   it('should add some info about a XML whith bad doctype', function (done) {
-    sisypheXml.doTheJob(docWithBadDoctypeInXml, (error, docOutput) => {
+    testSisypheXml.doTheJob(docWithBadDoctypeInXml, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
@@ -71,7 +75,7 @@ describe('doTheJob', function () {
   });
 
   it('should add some info about a XML whith an unknown doctype but valid after all', function (done) {
-    sisypheXml.doTheJob(docWithUnknownDoctype, (error, docOutput) => {
+    testSisypheXml.doTheJob(docWithUnknownDoctype, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
@@ -84,7 +88,7 @@ describe('doTheJob', function () {
   });
 
   it('should add some info about a not valid XML', function (done) {
-    sisypheXml.doTheJob(docWithNotValidXml, (error, docOutput) => {
+    testSisypheXml.doTheJob(docWithNotValidXml, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
@@ -129,55 +133,6 @@ describe('getDoctype', function () {
       expect(error.type).to.equal('doctype');
     })
   })
-});
-
-
-describe('getConf', function () {
-  it('should get a object conf from a config file', function () {
-    return sisypheXml.getConf('default').then((defaultConfObj) => {
-      expect(defaultConfObj).to.be.an('object');
-    })
-  });
-
-  it('should catch an error when getting an unknown config file', function () {
-    return sisypheXml.getConf('unknown').catch({code: 'ENOENT'}, (error) => {
-      expect(error).to.be.an.instanceof(Error);
-    })
-  })
-});
-
-describe('checkConf', function () {
-  it('should check a correct config file', function () {
-    const confObjInput = {
-      "metadata": [
-        {
-          "name": "someInfos",
-          "regex": "^([a-z]{8})$",
-          "type": "String",
-          "xpath": "/xpath/to/my/infos"
-        }
-      ]
-    };
-    return sisypheXml.checkConf(confObjInput).then((confObjOuput) => {
-      expect(confObjInput).to.be.equal(confObjOuput);
-    });
-  });
-
-  it('should catch an error with wrong config file', function () {
-    const confObjInput = {
-      "metadata": [
-        {
-          "singing": "in the rain",
-          "wtf": "dude",
-        }
-      ]
-    };
-    return sisypheXml.checkConf(confObjInput).catch((error) => {
-      expect(error).to.be.an('object');
-      expect(error.name).to.be.equal('AssertionError');
-    });
-  })
-
 });
 
 describe('getMetadataInfos', function () {
@@ -299,7 +254,10 @@ describe('validateAgainstDTD', function () {
       pubid: 'my doctype of doom',
       sysid: 'mydoctype.dtd'
     };
-    const arrayPathDTD = ['test/dtd/myBADdoctype.dtd', 'test/dtd/mydoctype.dtd'];
+    const arrayPathDTD = [
+      path.resolve(__dirname, '../test/dtd/myBADdoctype.dtd'),
+      path.resolve(__dirname, '../test/dtd/mydoctype.dtd')
+    ];
     return sisypheXml.validateAgainstDTD(doc, arrayPathDTD).then((result) => {
       expect(result).to.be.an('object');
       expect(result).to.have.property('dtd');
