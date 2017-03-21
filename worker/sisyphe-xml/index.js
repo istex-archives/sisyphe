@@ -43,49 +43,46 @@ sisypheXml.doTheJob = function (docObject, next) {
   (async() => {
     let error, xmlDom, doctype, validationDTDResult;
 
-    [error, doctype] = await to(this.getDoctype(docObject.path));
-    if (doctype) docObject.doctype = doctype;
+    [error, docObject.doctype] = await to(this.getDoctype(docObject.path));
 
-    [error, xmlDom] = await to(this.getXmlDom(docObject.path));
-    if (error) {
+    [docObject.error, xmlDom] = await to(this.getXmlDom(docObject.path));
+    if (docObject.error) {
       docObject.isWellFormed = false;
-      docObject.error = error.toString();
       return docObject;
-    } else {
-      docObject.isWellFormed = true;
     }
+    
+    docObject.isWellFormed = true;
 
     if (!this.isConfExist) return docObject;
 
     [error, validationDTDResult] = await to(this.validateAgainstDTD(docObject, this.dtdsPath));
-    if (error) {
+    if (docObject.error) {
       docObject.isValidAgainstDTD = false;
-      docObject.error = error.toString();
       return docObject;
-    } else {
-      docObject.isValidAgainstDTD = true;
-      docObject.validationDTDInfos = validationDTDResult;
-      let metadatas;
-      [error, metadatas] = await to(this.getMetadataInfos(this.conf, xmlDom));
-      if (error) {
-        docObject.metadataErrors = error.toString();
-        return docObject;
-      } else {
-        metadatas.map((metadata) => {
-          if (metadata.hasOwnProperty('isValueValid')) {
-            docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
-            if (metadata.isValueValid) {
-              docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-            } else {
-              docObject[metadata.name + 'Error'] = metadata.value;
-            }
-          } else {
-            docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
-          }
-        });
-        return docObject;
-      }
     }
+
+    docObject.isValidAgainstDTD = true;
+    docObject.validationDTDInfos = validationDTDResult;
+    let metadatas;
+    [docObject.error, metadatas] = await to(this.getMetadataInfos(this.conf, xmlDom));
+    if (docObject.error) {
+      return docObject;
+    }
+
+    metadatas.map((metadata) => {
+      if (!metadata.hasOwnProperty('isValueValid')) {
+        // no isValueValid , we stop here
+        docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+        return;
+      }
+      docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
+      if (metadata.isValueValid) {
+        docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+      } else {
+        docObject[metadata.name + 'Error'] = metadata.value;
+      }
+    });
+    return docObject;
   })().then((docObject) => {
     next(null, docObject)
   }).catch((error) => {
@@ -151,7 +148,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
           break;
         }
       }
-      if (!metadata.element) metadata.element = []
+      metadata.element = metadata.element || [];
     } else {
       metadata.element = xpathSelect(metadata.xpath, xmlDom);
     }
@@ -183,7 +180,6 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
           metadata.value = metadata.element.length;
           break;
         case "Attribute":
-          if (metadata.element.length) metadata.value = metadata.element[0].value;
           if (metadata.element.length) metadata.value = metadata.element[0].value;
           break;
       }
