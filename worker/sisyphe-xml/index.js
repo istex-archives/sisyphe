@@ -84,6 +84,7 @@ sisypheXml.doTheJob = function (docObject, next) {
     });
     return docObject;
   })().then((docObject) => {
+    if(docObject.error) docObject.error = JSON.stringify(docObject.error);
     next(null, docObject)
   }).catch((error) => {
     next(error)
