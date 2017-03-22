@@ -35,7 +35,7 @@ describe('Dependancies', () => {
 
 describe('doTheJob', function () {
   const testSisypheXml = Object.create(sisypheXml);
-  testSisypheXml.init({configDir: path.resolve(__dirname, '../conf')}, 'default');
+  testSisypheXml.init({configDir: path.resolve(__dirname, '../conf'), corpusname: 'default'});
 
   it('should add some info about a wellformed XML and valid DTD', function (done) {
     testSisypheXml.doTheJob(doc, (error, docOutput) => {
