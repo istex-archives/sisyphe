@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-xml",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Get the XML informations",
   "main": "index.js",
   "scripts": {
