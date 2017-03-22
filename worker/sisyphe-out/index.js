@@ -38,16 +38,16 @@ sisypheOut.init = function (options) {
       })
     ]
   });
-  if(options.output === 'all'){
+  if (options.output === 'all') {
     let esTransportOpts = {
       level: 'info',
-      flushInterval : 15000,
+      flushInterval: 15000,
       index: `analyse-${options.corpusname}`,
       mappingTemplate: template,
       client: this.client,
       consistency: false // TODO: check why this option is important
-    }
-    this.logger.add(winston.transports.Elasticsearch,esTransportOpts);
+    };
+    this.logger.add(winston.transports.Elasticsearch, esTransportOpts);
   }
   this.loggerError = fs.createWriteStream(`logs/analyse-${options.corpusname}.log`);
   return this;
@@ -76,7 +76,7 @@ sisypheOut.doTheJob = function (data, next) {
             fields: body
           }
         }
-      }).then((resp) => {
+      }).then(() => {
         this.redisClient.incr(data.path);
         next(null, data);
       }).catch(error => {
@@ -85,9 +85,9 @@ sisypheOut.doTheJob = function (data, next) {
     } else {
       this.redisClient.incr(data.path);
       this.logger.info(data);
-      this.logger.on('error', err =>{
+      this.logger.on('error', (err) => {
         this.loggerError.write(err);
-      })
+      });
       next(null, data);
     }
   }).catch(err => {
