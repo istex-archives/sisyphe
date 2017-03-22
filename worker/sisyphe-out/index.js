@@ -1,9 +1,9 @@
 'use strict';
 
-const redisHost = process.env.REDIS_HOST || 'localhost',
-  redisPort = process.env.REDIS_PORT || '6379',
-  redisDB = 2,
-  elasticUrl = process.env.ELASTIC_URL || 'localhost:9200';
+const REDIS_HOST = process.env.REDIS_HOST || 'localhost',
+  REDIS_PORT = process.env.REDIS_PORT || '6379',
+  REDIS_DB = 2,
+  ELASTIC_URL = process.env.ELASTIC_URL || 'localhost:9200';
 
 const sisypheOut = {},
   fs = require('fs'),
@@ -20,14 +20,14 @@ const template = require('./config/elasticsearch-template.json');
 sisypheOut.init = function (options) {
   options.output = options.output || 'json';
   this.client = new elasticsearch.Client({
-    host: elasticUrl,
+    host: ELASTIC_URL,
     log: {
       type: 'file',
       level: ['error', 'warning'],
       path: path.resolve(__dirname, `logs/elasticsearch-${options.corpusname}.log`)
     }
   });
-  this.redisClient = redis.createClient(`//${redisHost}:${redisPort}`, {db: redisDB});
+  this.redisClient = redis.createClient(`//${REDIS_HOST}:${REDIS_PORT}`, {db: REDIS_DB});
   this.logger = new winston.Logger();
   this.logger.configure({
     exitOnError: false,
