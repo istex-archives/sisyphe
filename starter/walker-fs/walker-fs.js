@@ -15,8 +15,8 @@ class WalkerFS {
     this.totalFile = 0;
     this.now = Date.now();
     // prepare the checksum outputDir
-    mkdirp.sync('checksum');
-    this.checksum = fs.createWriteStream(`checksum/${this.corpusname}.csv`);
+    fs.mkdirSync('checksum');
+    this.checksum = fs.createWriteStream(`checksum/${this.corpusname}-${this.now}.csv`);
     this.functionEventOnFile = (root, stats, next) => {
       const fileInfo = {
         corpusname: this.corpusname,
@@ -30,7 +30,7 @@ class WalkerFS {
       fs.accessAsync(fileInfo.path, fs.constants.R_OK).then(() => {
         const hash = crypto.createHash('md5');
         const LARGE_FILE_LIMIT = 1000000;
-        if (stats.size > LARGE_FILE_LIMIT ) {
+        if (stats.size > LARGE_FILE_LIMIT) {
           const input = fs.createReadStream(fileInfo.path);
           input.on('readable', () => {
             const data = input.read();
@@ -38,14 +38,14 @@ class WalkerFS {
               hash.update(data);
             else {
               fileInfo.hash = hash.digest('hex');
-              this.checksum.write(`"${fileInfo.path}";"${fileInfo.hash}"\n`)
+              this.checksum.write(`"${fileInfo.path}";"${fileInfo.hash}"\n`);
               next(fileInfo)
             }
           })
         } else {
           fs.readFileAsync(fileInfo.path).then((data) => {
             fileInfo.hash = hash.update(data).digest('hex');
-            this.checksum.write(`"${fileInfo.path}";"${fileInfo.hash}"\n`)
+            this.checksum.write(`"${fileInfo.path}";"${fileInfo.hash}"\n`);
             next(fileInfo)
           })
         }
