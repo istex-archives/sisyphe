@@ -49,9 +49,7 @@ sisypheOut.init = function (options) {
     }
     this.logger.add(winston.transports.Elasticsearch,esTransportOpts);
   }
-  this.logger.on('error', err =>{
-    console.error('loggerError', err);
-  })
+  this.loggerError = fs.createWriteStream(`logs/analyse-${options.corpusname}.log`);
   return this;
 };
 
@@ -87,6 +85,9 @@ sisypheOut.doTheJob = function (data, next) {
     } else {
       this.redisClient.incr(data.path);
       this.logger.info(data);
+      this.logger.on('error', err =>{
+        this.loggerError.write(err);
+      })
       next(null, data);
     }
   }).catch(err => {
