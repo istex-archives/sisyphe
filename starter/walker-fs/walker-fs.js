@@ -3,6 +3,7 @@
 const walk = require('walk'),
   path = require('path'),
   bluebird = require('bluebird'),
+  mkdirp = require('mkdirp'),
   fs = bluebird.promisifyAll(require('fs')),
   crypto = require('crypto'),
   mime = require('mime');
@@ -13,6 +14,9 @@ class WalkerFS {
     this.corpusname = options.corpusname;
     this.totalFile = 0;
     this.now = Date.now();
+    // prepare the checksum outputDir
+    mkdirp.sync('checksum');
+    this.checksum = fs.createWriteStream(`checksum/${this.corpusname}.csv`);
     this.functionEventOnFile = (root, stats, next) => {
       const fileInfo = {
         corpusname: this.corpusname,
@@ -34,12 +38,14 @@ class WalkerFS {
               hash.update(data);
             else {
               fileInfo.hash = hash.digest('hex');
+              this.checksum.write(`"${fileInfo.path}";"${fileInfo.hash}"\n`)
               next(fileInfo)
             }
           })
         } else {
           fs.readFileAsync(fileInfo.path).then((data) => {
             fileInfo.hash = hash.update(data).digest('hex');
+            this.checksum.write(`"${fileInfo.path}";"${fileInfo.hash}"\n`)
             next(fileInfo)
           })
         }

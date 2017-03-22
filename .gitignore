@@ -5,6 +5,7 @@ npm-debug.log*
 job/
 temp/
 xpaths
+checksum
 
 # Runtime data
 pids
