@@ -22,15 +22,15 @@ function to(promise, errorExt) {
 
 const sisypheXml = {};
 
-sisypheXml.init = function (options, corpusname) {
-  this.configDir = options.configDir || path.resolve('conf', corpusname);
-  this.pathToConf = path.resolve(this.configDir, corpusname, corpusname + '.json');
+sisypheXml.init = function (options) {
+  this.configDir = options.configDir || path.resolve('conf', options.corpusname);
+  this.pathToConf = path.resolve(this.configDir, options.corpusname, options.corpusname + '.json');
   this.isConfExist = fs.existsSync(this.pathToConf);
   if (this.isConfExist) {
     const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
     this.conf = JSON.parse(dataConf);
     if (this.conf.hasOwnProperty('dtd') && Array.isArray(this.conf.dtd)) {
-      this.dtdsPath = this.conf.dtd.map((dtd) => path.resolve(this.configDir, corpusname, 'dtd', dtd));
+      this.dtdsPath = this.conf.dtd.map((dtd) => path.resolve(this.configDir, options.corpusname, 'dtd', dtd));
     }
   }
 
