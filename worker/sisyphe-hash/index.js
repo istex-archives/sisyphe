@@ -8,8 +8,8 @@ const bluebird = require('bluebird'),
 const sisypheHash = {};
 
 sisypheHash.init = function (options) {
-  this.now = Date.now();
-  this.checksum = fs.createWriteStream(path.resolve(__dirname, '../..', `checksum/${options.corpusname}-${this.now}.csv`));
+  this.startAt = options.startAt;
+  this.checksum = fs.createWriteStream(path.resolve(__dirname, '../..', `checksum/${options.corpusname}-${this.startAt}.csv`));
   return this;
 };
 

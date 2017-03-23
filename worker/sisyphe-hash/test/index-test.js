@@ -33,7 +33,11 @@ describe('doTheJob', () => {
       .doTheJob(docWithSmallPdf, (error, docOutput) => {
         if (error) done(error);
         expect(docOutput.hash).to.be.equal('97a36af46c74151b55378c02055f796b');
-        const pathFileChecksum = path.resolve(__dirname, '../../..', `checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)
+        const pathFileChecksum = path.resolve(
+          __dirname,
+          '../../..',
+          `checksum/${docOutput.corpusname}-${sisypheHashTest.startAt}.csv`
+        );
         expect(fs.existsSync(pathFileChecksum)).to.be.true;
         done();
       })
@@ -46,7 +50,11 @@ describe('doTheJob', () => {
       .doTheJob(docWithBigPdf, (error, docOutput) => {
         if (error) done(error);
         expect(docOutput.hash).to.be.equal('992987a7e299fe7b76a792a5c2605688');
-        const pathFileChecksum = path.resolve(__dirname, '../../..', `checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)
+        const pathFileChecksum = path.resolve(
+          __dirname,
+          '../../..',
+          `checksum/${docOutput.corpusname}-${sisypheHashTest.startAt}.csv`
+        );
         expect(fs.existsSync(pathFileChecksum)).to.be.true;
         done();
       })
