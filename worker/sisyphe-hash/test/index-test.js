@@ -2,6 +2,7 @@
 
 const fs = require('fs'),
   rimraf = require('rimraf'),
+  path = require('path'),
   chai = require('chai'),
   expect = chai.expect,
   sisypheHash = require('../index.js');
@@ -32,7 +33,8 @@ describe('doTheJob', () => {
       .doTheJob(docWithSmallPdf, (error, docOutput) => {
         if (error) done(error);
         expect(docOutput.hash).to.be.equal('97a36af46c74151b55378c02055f796b');
-        expect(fs.existsSync(`checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)).to.be.true;
+        const pathFileChecksum = path.resolve(__dirname, '../../..', `checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)
+        expect(fs.existsSync(pathFileChecksum)).to.be.true;
         done();
       })
   });
@@ -44,7 +46,8 @@ describe('doTheJob', () => {
       .doTheJob(docWithBigPdf, (error, docOutput) => {
         if (error) done(error);
         expect(docOutput.hash).to.be.equal('992987a7e299fe7b76a792a5c2605688');
-        expect(fs.existsSync(`checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)).to.be.true;
+        const pathFileChecksum = path.resolve(__dirname, '../../..', `checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)
+        expect(fs.existsSync(pathFileChecksum)).to.be.true;
         done();
       })
   });

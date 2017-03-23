@@ -1,6 +1,7 @@
 'use strict';
 
 const bluebird = require('bluebird'),
+  path = require('path'),
   fs = bluebird.promisifyAll(require('fs')),
   crypto = require('crypto');
 
@@ -8,14 +9,15 @@ const sisypheHash = {};
 
 sisypheHash.init = function (options) {
   this.now = Date.now();
-  this.checksum = fs.createWriteStream(`checksum/${options.corpusname}-${this.now}.csv`);
+  this.checksum = fs.createWriteStream(path.resolve(__dirname, '../..', `checksum/${options.corpusname}-${this.now}.csv`));
   return this;
 };
 
 sisypheHash.doTheJob = function (docObject, next) {
   // prepare the checksum outputDir
-  const isChecksumDirectoryExist = fs.existsSync('checksum');
-  if (!isChecksumDirectoryExist) fs.mkdirSync('checksum');
+  const pathChecksumDir = path.resolve(__dirname, '../..', 'checksum');
+  const isChecksumDirectoryExist = fs.existsSync(pathChecksumDir);
+  if (!isChecksumDirectoryExist) fs.mkdirSync(pathChecksumDir);
 
   fs.accessAsync(docObject.path, fs.constants.R_OK).then(() => {
     const LARGE_FILE_LIMIT = 1000000;
