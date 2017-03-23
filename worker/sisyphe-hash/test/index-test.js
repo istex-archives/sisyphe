@@ -1,0 +1,71 @@
+'use strict';
+
+const fs = require('fs'),
+  rimraf = require('rimraf'),
+  chai = require('chai'),
+  expect = chai.expect,
+  sisypheHash = require('../index.js');
+
+const baseDoc = {
+  corpusname: 'test',
+  mimetype: 'application/pdf',
+  startAt: 12345678900,
+  extension: '.pdf'
+};
+
+const docWithSmallPdf = Object.assign({
+  path: __dirname + '/data/small.pdf',
+  name: 'small.pdf',
+  size: 77123
+}, baseDoc);
+const docWithBigPdf = Object.assign({
+  path: __dirname + '/data/big.pdf',
+  name: 'big.pdf',
+  size: 101688487
+}, baseDoc);
+
+describe('doTheJob', () => {
+  it('should do the job with a small file', (done) => {
+    const sisypheHashTest = Object.create(sisypheHash);
+    sisypheHashTest
+      .init({corpusname: 'test'})
+      .doTheJob(docWithSmallPdf, (error, docOutput) => {
+        if (error) done(error);
+        expect(docOutput.hash).to.be.equal('97a36af46c74151b55378c02055f796b');
+        expect(fs.existsSync(`checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)).to.be.true;
+        done();
+      })
+  });
+
+  it('should do the job with a big file', (done) => {
+    const sisypheHashTest = Object.create(sisypheHash);
+    sisypheHashTest
+      .init({corpusname: 'test'})
+      .doTheJob(docWithBigPdf, (error, docOutput) => {
+        if (error) done(error);
+        expect(docOutput.hash).to.be.equal('992987a7e299fe7b76a792a5c2605688');
+        expect(fs.existsSync(`checksum/${docOutput.corpusname}-${sisypheHashTest.now}.csv`)).to.be.true;
+        done();
+      })
+  });
+
+  after(() => {
+    rimraf.sync('checksum/test*')
+  })
+});
+
+describe('generateHashFromABigFile', () => {
+  it('should return a hash from a big file', () => {
+    return sisypheHash.generateHashFromABigFile(__dirname + '/data/big.pdf').then((hash) => {
+      expect(hash).to.be.equal('992987a7e299fe7b76a792a5c2605688')
+    })
+  })
+});
+
+describe('generateHashFromASmallFile', () => {
+  it('should return a hash from a small file', () => {
+    return sisypheHash.generateHashFromASmallFile(__dirname + '/data/small.pdf').then((hash) => {
+      expect(hash).to.be.equal('97a36af46c74151b55378c02055f796b')
+    })
+  })
+});
