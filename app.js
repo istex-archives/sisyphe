@@ -22,6 +22,7 @@ if (program.name === 'default') {
 }
 
 const pathInput = program.args[0];
+const startAt = Date.now();
 
 let starter = {
   module: "walker-fs",
@@ -51,6 +52,12 @@ let workers = [{
     corpusname: program.corpusname
   }
 }, {
+  name: "Sisyphe hash",
+  module: "sisyphe-hash",
+  options: {
+    corpusname: program.corpusname
+  }
+}, {
   name: "Sisyphe Output",
   module: "sisyphe-out",
   options: {
@@ -75,8 +82,14 @@ if (!pathInput && program.corpusname) {
       corpusname: program.corpusname,
       configDir: program.configDir
     }
-  },
-    {name: "Sisyphe Output", module: "sisyphe-out", options: {corpusname: program.corpusname, output: program.output}}];
+  }, {
+    name: "Sisyphe Output",
+    module: "sisyphe-out",
+    options: {
+      corpusname: program.corpusname,
+      output: program.output
+    }
+  }];
   let sisyphe = new Sisyphe(starter, workers);
   sisyphe.start();
   return;
