@@ -1,9 +1,9 @@
 'use strict';
 
-const redisHost = process.env.REDIS_HOST || 'localhost',
-  redisPort = process.env.REDIS_PORT || '6379',
-  redisDB = 2,
-  elasticUrl = process.env.ELASTIC_URL || 'localhost:9200';
+const REDIS_HOST = process.env.REDIS_HOST || 'localhost',
+  REDIS_PORT = process.env.REDIS_PORT || '6379',
+  REDIS_DB = 2,
+  ELASTIC_URL = process.env.ELASTIC_URL || 'localhost:9200';
 
 const sisypheOut = {},
   fs = require('fs'),
@@ -20,14 +20,14 @@ const template = require('./config/elasticsearch-template.json');
 sisypheOut.init = function (options) {
   options.output = options.output || 'json';
   this.client = new elasticsearch.Client({
-    host: elasticUrl,
+    host: ELASTIC_URL,
     log: {
       type: 'file',
       level: ['error', 'warning'],
       path: path.resolve(__dirname, `logs/elasticsearch-${options.corpusname}.log`)
     }
   });
-  this.redisClient = redis.createClient(`//${redisHost}:${redisPort}`, {db: redisDB});
+  this.redisClient = redis.createClient(`//${REDIS_HOST}:${REDIS_PORT}`, {db: REDIS_DB});
   this.logger = new winston.Logger();
   this.logger.configure({
     exitOnError: false,
@@ -38,20 +38,18 @@ sisypheOut.init = function (options) {
       })
     ]
   });
-  if(options.output === 'all'){
+  if (options.output === 'all') {
     let esTransportOpts = {
       level: 'info',
-      flushInterval : 15000,
+      flushInterval: 15000,
       index: `analyse-${options.corpusname}`,
       mappingTemplate: template,
       client: this.client,
       consistency: false // TODO: check why this option is important
-    }
-    this.logger.add(winston.transports.Elasticsearch,esTransportOpts);
+    };
+    this.logger.add(winston.transports.Elasticsearch, esTransportOpts);
   }
-  this.logger.on('error', err =>{
-    console.error('loggerError', err);
-  })
+  this.loggerError = fs.createWriteStream(`logs/analyse-${options.corpusname}.log`);
   return this;
 };
 
@@ -78,7 +76,7 @@ sisypheOut.doTheJob = function (data, next) {
             fields: body
           }
         }
-      }).then((resp) => {
+      }).then(() => {
         this.redisClient.incr(data.path);
         next(null, data);
       }).catch(error => {
@@ -87,6 +85,9 @@ sisypheOut.doTheJob = function (data, next) {
     } else {
       this.redisClient.incr(data.path);
       this.logger.info(data);
+      this.logger.on('error', (err) => {
+        this.loggerError.write(err);
+      });
       next(null, data);
     }
   }).catch(err => {
