@@ -28,8 +28,7 @@ let starter = {
   module: "walker-fs",
   options: {
     path: pathInput,
-    corpusname: program.corpusname,
-    startAt
+    corpusname: program.corpusname
   }
 };
 
@@ -56,8 +55,7 @@ let workers = [{
   name: "Sisyphe hash",
   module: "sisyphe-hash",
   options: {
-    corpusname: program.corpusname,
-    startAt
+    corpusname: program.corpusname
   }
 }, {
   name: "Sisyphe Output",

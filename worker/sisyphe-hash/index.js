@@ -7,12 +7,6 @@ const bluebird = require('bluebird'),
 
 const sisypheHash = {};
 
-sisypheHash.init = function (options) {
-  this.startAt = options.startAt;
-  this.checksum = fs.createWriteStream(path.resolve(__dirname, '../..', `checksum/${options.corpusname}-${this.startAt}.csv`));
-  return this;
-};
-
 sisypheHash.doTheJob = function (docObject, next) {
   // prepare the checksum outputDir
   const pathChecksumDir = path.resolve(__dirname, '../..', 'checksum');
@@ -28,7 +22,9 @@ sisypheHash.doTheJob = function (docObject, next) {
     }
   }).then((hash) => {
     docObject.hash = hash;
-    this.checksum.write(`"${docObject.path}";"${docObject.hash}"\n`);
+    const pathFileHash = path.resolve(__dirname, '../..', `checksum/${docObject.corpusname}-${docObject.startAt}.csv`);
+    return fs.appendFileAsync(pathFileHash, `"${docObject.path}";"${docObject.hash}"\n`);
+  }).then(() => {
     next(null, docObject)
   }).catch((error) => {
     docObject.error = JSON.stringify(error);

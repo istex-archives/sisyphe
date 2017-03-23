@@ -28,40 +28,41 @@ const docWithBigPdf = Object.assign({
 describe('doTheJob', () => {
   it('should do the job with a small file', (done) => {
     const sisypheHashTest = Object.create(sisypheHash);
-    sisypheHashTest
-      .init({corpusname: 'test'})
-      .doTheJob(docWithSmallPdf, (error, docOutput) => {
-        if (error) done(error);
-        expect(docOutput.hash).to.be.equal('97a36af46c74151b55378c02055f796b');
-        const pathFileChecksum = path.resolve(
-          __dirname,
-          '../../..',
-          `checksum/${docOutput.corpusname}-${sisypheHashTest.startAt}.csv`
-        );
-        expect(fs.existsSync(pathFileChecksum)).to.be.true;
-        done();
-      })
+    sisypheHashTest.doTheJob(docWithSmallPdf, (error, docOutput) => {
+      if (error) done(error);
+      expect(docOutput.hash).to.be.equal('97a36af46c74151b55378c02055f796b');
+      const pathFileChecksum = path.resolve(
+        __dirname,
+        '../../..',
+        `checksum/${docOutput.corpusname}-${docOutput.startAt}.csv`
+      );
+      expect(fs.existsSync(pathFileChecksum)).to.be.true;
+      done();
+    })
   });
 
   it('should do the job with a big file', (done) => {
     const sisypheHashTest = Object.create(sisypheHash);
-    sisypheHashTest
-      .init({corpusname: 'test'})
-      .doTheJob(docWithBigPdf, (error, docOutput) => {
-        if (error) done(error);
-        expect(docOutput.hash).to.be.equal('992987a7e299fe7b76a792a5c2605688');
-        const pathFileChecksum = path.resolve(
-          __dirname,
-          '../../..',
-          `checksum/${docOutput.corpusname}-${sisypheHashTest.startAt}.csv`
-        );
-        expect(fs.existsSync(pathFileChecksum)).to.be.true;
-        done();
-      })
+    sisypheHashTest.doTheJob(docWithBigPdf, (error, docOutput) => {
+      if (error) done(error);
+      expect(docOutput.hash).to.be.equal('992987a7e299fe7b76a792a5c2605688');
+      const pathFileChecksum = path.resolve(
+        __dirname,
+        '../../..',
+        `checksum/${docOutput.corpusname}-${docOutput.startAt}.csv`
+      );
+      expect(fs.existsSync(pathFileChecksum)).to.be.true;
+      done();
+    })
   });
 
   after(() => {
-    rimraf.sync('checksum/test*')
+    const pathFileChecksum = path.resolve(
+      __dirname,
+      '../../..',
+      `checksum/test*.csv`
+    );
+    rimraf.sync(pathFileChecksum)
   })
 });
 
