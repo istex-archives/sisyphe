@@ -41,7 +41,7 @@ sisypheOut.init = function (options) {
   if (options.output === 'all') {
     let esTransportOpts = {
       level: 'info',
-      flushInterval: 15000,
+      flushInterval: 8000,
       index: `analyse-${options.corpusname}`,
       mappingTemplate: template,
       client: this.client,
@@ -50,6 +50,9 @@ sisypheOut.init = function (options) {
     this.logger.add(winston.transports.Elasticsearch, esTransportOpts);
   }
   this.loggerError = fs.createWriteStream(`logs/analyse-${options.corpusname}.log`);
+  this.logger.on('error', (err) => {
+    this.loggerError.write(err.toString());
+  });
   return this;
 };
 
@@ -85,9 +88,6 @@ sisypheOut.doTheJob = function (data, next) {
     } else {
       this.redisClient.incr(data.path);
       this.logger.info(data);
-      this.logger.on('error', (err) => {
-        this.loggerError.write(err);
-      });
       next(null, data);
     }
   }).catch(err => {
