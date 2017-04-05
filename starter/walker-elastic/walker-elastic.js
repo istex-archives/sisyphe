@@ -75,3 +75,4 @@ class WalkerElastic {
     })
   }
 }
+module.exports = WalkerElastic;
