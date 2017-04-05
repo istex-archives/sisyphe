@@ -25,7 +25,8 @@ const docWithBigPdf = Object.assign({
   size: 101688487
 }, baseDoc);
 
-describe('doTheJob', () => {
+describe('doTheJob', function () {
+  this.timeout(0);
   it('should do the job with a small file', (done) => {
     const sisypheHashTest = Object.create(sisypheHash);
     sisypheHashTest.doTheJob(docWithSmallPdf, (error, docOutput) => {
@@ -66,7 +67,8 @@ describe('doTheJob', () => {
   })
 });
 
-describe('generateHashFromABigFile', () => {
+describe('generateHashFromABigFile', function () {
+  this.timeout(0);
   it('should return a hash from a big file', () => {
     return sisypheHash.generateHashFromABigFile(__dirname + '/data/big.pdf').then((hash) => {
       expect(hash).to.be.equal('992987a7e299fe7b76a792a5c2605688')
@@ -74,7 +76,8 @@ describe('generateHashFromABigFile', () => {
   })
 });
 
-describe('generateHashFromASmallFile', () => {
+describe('generateHashFromASmallFile', function () {
+  this.timeout(0);
   it('should return a hash from a small file', () => {
     return sisypheHash.generateHashFromASmallFile(__dirname + '/data/small.pdf').then((hash) => {
       expect(hash).to.be.equal('97a36af46c74151b55378c02055f796b')
