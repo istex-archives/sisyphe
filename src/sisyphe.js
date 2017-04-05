@@ -10,7 +10,7 @@ const ChainJobQueue = require('./chain-job-queue'),
   clientRedis = redis.createClient(),
   cluster = require('cluster'),
   ms = require('pretty-ms'),
-  numberFork = require('os').cpus().length;
+  numberFork = Math.floor(require('os').cpus().length * 3 / 4);
 
 const loggerInfo = new (winston.Logger)({
   exitOnError: false,
@@ -52,19 +52,19 @@ class Sisyphe {
       name: "SisypheXML",
       module: "sisyphe-xml"
     }, {
-      name : "SisyphePDF",
+      name: "SisyphePDF",
       module: "sisyphe-pdf"
     }, {
-      name : "SisypheXPATH",
-      module : "sisyphe-xpath"
+      name: "SisypheXPATH",
+      module: "sisyphe-xpath"
     }];
     this.workers = workers || defaultWorkers;
     if (cluster.isMaster) {
       this.screen = blessed.screen({
         smartCSR: true
       });
-       // exit the program by using esc q or ctl-c
-      this.screen.key(['escape', 'q', 'C-c'], (ch, key) =>{
+      // exit the program by using esc q or ctl-c
+      this.screen.key(['escape', 'q', 'C-c'], (ch, key) => {
         return process.exit(0);
       });
       this.textProgress = blessed.box({
@@ -89,7 +89,7 @@ class Sisyphe {
         style: {
           fg: 'green', bg: 'default',
           bar: {bg: 'green', fg: 'blue'},
-          border: { fg: 'default', bg: 'default'}
+          border: {fg: 'default', bg: 'default'}
         },
         pch: ' ',
         top: 8,
@@ -125,16 +125,16 @@ class Sisyphe {
         height: 10,
         draggable: true,
         tags: true,
-        noCellBorders : false,
+        noCellBorders: false,
         border: 'dashed',
         fillCellBorders: true,
         style: {
-          cell : {
+          cell: {
             fg: 'white',
-            border: { fg: 'default', bg: 'default'}
+            border: {fg: 'default', bg: 'default'}
           },
           fg: 'white',
-          border: { fg: 'default', bg: 'default'}
+          border: {fg: 'default', bg: 'default'}
         }
       });
       this.screen.append(this.textProgress);
@@ -163,18 +163,18 @@ class Sisyphe {
 
     let self = this;
 
-    setInterval(function(){
+    setInterval(function () {
       clientRedis.hgetallAsync('sisyphe').then((values) => {
-        if(!values) {
+        if (!values) {
           return;
-        };
-        values.isOK = true
+        }
+        values.isOK = true;
         for (const prop in values) {
           if (values.hasOwnProperty(prop) && values[prop] === undefined) values.isOK = false;
         }
         // Above is the sisyphe dashboard console
-        let {totalGeneratedTask=0,totalPerformedTask=0,totalFailedTask=0,currentGeneratedTask=0} = values,
-          progress = totalGeneratedTask ? (totalPerformedTask/totalGeneratedTask)*100 : 'Progress will be set when all tasks are generated';
+        let {totalGeneratedTask = 0, totalPerformedTask = 0, totalFailedTask = 0, currentGeneratedTask = 0} = values,
+          progress = totalGeneratedTask ? (totalPerformedTask / totalGeneratedTask) * 100 : 'Progress will be set when all tasks are generated';
 
         self.bar.setProgress(progress);
         self.textProgress.setContent(`${isNaN(progress) ? progress : progress.toFixed(2) + '%'}`);
@@ -184,7 +184,7 @@ class Sisyphe {
           ['{yellow-fg}currentGeneratedTask', `${currentGeneratedTask}{/yellow-fg}`],
           ['{yellow-fg}totalGeneratedTask', `${totalGeneratedTask}{/yellow-fg}`],
           ['{red-fg}totalFailedTask', `${totalFailedTask}{/red-fg}`]
-        ])
+        ]);
         self.screen.render();
 
         const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
@@ -199,7 +199,7 @@ class Sisyphe {
             loggerInfo.info('All finalJob executed !');
             clientRedis.del('sisyphe');
             self.sisypheEndAt = new Date().getTime();
-            let duration = ms(self.sisypheEndAt-self.sisypheStartAt);
+            let duration = ms(self.sisypheEndAt - self.sisypheStartAt);
             self.textProgress.setContent(`Finished, took ${duration}`);
             self.screen.render();
             loggerInfo.info(`Sisyphe Finshed all jobs after ${duration}`);
