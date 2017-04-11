@@ -23,7 +23,7 @@ function to(promise, errorExt) {
 const sisypheXml = {};
 
 sisypheXml.init = function (options) {
-  this.configDir = options.configDir || path.resolve('conf', options.corpusname);
+  this.configDir = options.configDir || path.resolve(__dirname, 'conf');
   this.pathToConf = path.resolve(this.configDir, options.corpusname, options.corpusname + '.json');
   this.isConfExist = fs.existsSync(this.pathToConf);
   if (this.isConfExist) {
