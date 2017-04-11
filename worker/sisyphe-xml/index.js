@@ -24,8 +24,18 @@ const sisypheXml = {};
 
 sisypheXml.init = function (options) {
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
-  this.pathToConf = path.resolve(this.configDir, options.corpusname, options.corpusname + '.json');
-  this.isConfExist = fs.existsSync(this.pathToConf);
+  let confContents = fs.readdirSync(this.configDir);
+  //We search the nearest config in configDir
+  for(var folder of confContents){
+    console.log(`folder ${folder}`)
+    if(options.corpusname.includes(folder)){  
+      console.log(`folderIncludes ${folder}`) 
+      this.pathToConf = path.resolve(this.configDir, folder, 'sisyphe-xml' + '.json');
+      console.log(this.pathToConf) 
+      break;
+    }
+  }
+  this.isConfExist = this.pathToConf && fs.existsSync(this.pathToConf);
   if (this.isConfExist) {
     const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
     this.conf = JSON.parse(dataConf);
