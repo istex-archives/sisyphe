@@ -8,6 +8,31 @@ Module which generate XML's information for Sisyphe
 ## Requirements:
 Tested with Redis@3.2.6 & Node 6.9 & XmlStarlet@1.6.1(libxml2@2.9.4)
 
+## Structure Directory
+All you have to do is to add your dtd & your "sisyphe-xml.json" conf file into your configFolders,
+configFolders can be any folder on your computer (it's -c argument when you start sisyphe).
+Sisyphe-xml will try to match the best config dir to use .
+If no any configFolder are given sisyphe-xml will try to get config file in worker/sisyphe-xml/conf
+
+eg: 
+
+```
+.
+├── a                        
+└── sample                           
+    └── path                   
+    │   └── test
+            └── DTD
+            └── sisyphe-xml.json
+    │   └── some
+            └── DTD
+            └── sisyphe-xml.json
+    │   └── any
+    │   └── others
+```
+
+The command : `node app.js -n test2 -c /a/sample/path` will find that "test" is the best option to use.
+
 
 ## How it works ?
 This module use XmlStarlet NodeJs wrapper to check xmldata, it add in data :
@@ -25,7 +50,7 @@ Sisyphe xml will firstly check if XML is wellformed or not.
 If XML is wellformed, Sisyphe-xml is able to check XML against DTD, you just have to create a directory in `sisyphe-xml/conf/folderName`
 where "folderNamme" is the folderName you entered in sisyphe command.
 
-In the nearly created folder you have to create a "folderName.json". You will enter XML configuration in it.
+In the nearly created folder you have to create a "sisyphe-xml.json". You will enter XML configuration in it.
 
 
 #### Info
