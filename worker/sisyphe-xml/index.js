@@ -27,11 +27,9 @@ sisypheXml.init = function (options) {
   let confContents = fs.readdirSync(this.configDir);
   //We search the nearest config in configDir
   for(var folder of confContents){
-    console.log(`folder ${folder}`)
-    if(options.corpusname.includes(folder)){  
-      console.log(`folderIncludes ${folder}`) 
+    let currPath = path.join(this.configDir,folder)
+    if(fs.lstatSync(currPath).isDirectory() && options.corpusname.includes(folder)){  
       this.pathToConf = path.resolve(this.configDir, folder, 'sisyphe-xml' + '.json');
-      console.log(this.pathToConf) 
       break;
     }
   }
