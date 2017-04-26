@@ -7,7 +7,8 @@ const assert = require('assert'),
   Promise = require('bluebird'),
   fs = Promise.promisifyAll(require('fs')),
   exec = Promise.promisify(require('child_process').exec),
-  getDoctype = require("get-doctype");
+  getDoctype = require("get-doctype"),
+  cloneDeep = require('lodash.clonedeep');
 
 const xpathSelect = xpath.useNamespaces({"xml": "http://www.w3.org/XML/1998/namespace"});
 
@@ -72,6 +73,7 @@ sisypheXml.doTheJob = function (docObject, next) {
     docObject.isValidAgainstDTD = true;
     docObject.validationDTDInfos = validationDTDResult;
     let metadatas;
+    const conf = cloneDeep(this.conf);
     [docObject.error, metadatas] = await to(this.getMetadataInfos(this.conf, xmlDom));
     if (docObject.error) {
       return docObject;
