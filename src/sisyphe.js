@@ -37,7 +37,7 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
 class Sisyphe {
-  constructor(starter, workers) {
+  constructor(starter, workers, isInspected) {
     const defaultStarter = {
       module: "walker-fs",
       options: {
@@ -45,6 +45,7 @@ class Sisyphe {
       }
     };
     this.starter = starter || defaultStarter;
+    this.isInspected = isInspected || false;
     const defaultWorkers = [{
       name: "SisypheFileType",
       module: "sisyphe-filetype"
@@ -59,7 +60,7 @@ class Sisyphe {
       module: "sisyphe-xpath"
     }];
     this.workers = workers || defaultWorkers;
-    if (cluster.isMaster) {
+    if (cluster.isMaster  && !this.isInspected) {
       this.screen = blessed.screen({
         smartCSR: true
       });
@@ -175,17 +176,18 @@ class Sisyphe {
         // Above is the sisyphe dashboard console
         let {totalGeneratedTask = 0, totalPerformedTask = 0, totalFailedTask = 0, currentGeneratedTask = 0} = values,
           progress = totalGeneratedTask ? (totalPerformedTask / totalGeneratedTask) * 100 : 'Progress will be set when all tasks are generated';
-
-        self.bar.setProgress(progress);
-        self.textProgress.setContent(`${isNaN(progress) ? progress : progress.toFixed(2) + '%'}`);
-        self.tableProgress.setData([
-          ['Type', 'Count'],
-          ['{green-fg}totalPerformedTask', `${totalPerformedTask}{/green-fg}`],
-          ['{yellow-fg}currentGeneratedTask', `${currentGeneratedTask}{/yellow-fg}`],
-          ['{yellow-fg}totalGeneratedTask', `${totalGeneratedTask}{/yellow-fg}`],
-          ['{red-fg}totalFailedTask', `${totalFailedTask}{/red-fg}`]
-        ]);
-        self.screen.render();
+        if (!this.isInspected) {
+          self.bar.setProgress(progress);
+          self.textProgress.setContent(`${isNaN(progress) ? progress : progress.toFixed(2) + '%'}`);
+          self.tableProgress.setData([
+            ['Type', 'Count'],
+            ['{green-fg}totalPerformedTask', `${totalPerformedTask}{/green-fg}`],
+            ['{yellow-fg}currentGeneratedTask', `${currentGeneratedTask}{/yellow-fg}`],
+            ['{yellow-fg}totalGeneratedTask', `${totalGeneratedTask}{/yellow-fg}`],
+            ['{red-fg}totalFailedTask', `${totalFailedTask}{/red-fg}`]
+          ]);
+          self.screen.render();
+        }
 
         const totalJobs = +[values.totalPerformedTask] + +[values.totalFailedTask];
         if (values.isOK && totalJobs >= +values.totalGeneratedTask) {
@@ -200,8 +202,10 @@ class Sisyphe {
             clientRedis.del('sisyphe');
             self.sisypheEndAt = new Date().getTime();
             let duration = ms(self.sisypheEndAt - self.sisypheStartAt);
-            self.textProgress.setContent(`Finished, took ${duration}`);
-            self.screen.render();
+            if (!this.isInspected) {
+              self.textProgress.setContent(`Finished, took ${duration}`);
+              self.screen.render();
+            }
             loggerInfo.info(`Sisyphe Finshed all jobs after ${duration}`);
             for (var id in cluster.workers) {
               cluster.workers[id].kill();
@@ -225,8 +229,8 @@ class Sisyphe {
           const fork = cluster.fork();
           fork.on('online', () => {
             loggerInfo.info('fork created');
-            this.list.add(`fork created`)
-            this.screen.render();
+            this.list.add(`fork created`);
+            if (!this.isInspected) this.screen.render();
           });
           fork.on('exit', () => {
             cluster.fork();

@@ -16,6 +16,16 @@ program
   .option('-o, --output <all/json>', 'Output destination')
   .parse(process.argv);
 
+//Check if debug mode is on
+var isInspected = false;
+for(var arg of process.execArgv){
+  console.log(arg);
+  if(arg.includes('--inspect')){
+    isInspected = true;
+    break;
+  }
+}
+
 if (program.name === 'default') {
   program.outputHelp();
   process.exit(0);
@@ -90,16 +100,16 @@ if (!pathInput && program.corpusname) {
       output: program.output
     }
   }];
-  let sisyphe = new Sisyphe(starter, workers);
+  let sisyphe = new Sisyphe(starter, workers, isInspected);
   sisyphe.start();
   return;
 }
 
 fs.statAsync(pathInput).catch((error) => {
-  console.log(error);
+  console.error(error);
   process.exit(1);
 }).then(() => {
-  return new Sisyphe(starter, workers);
+  return new Sisyphe(starter, workers, isInspected);
 }).then((sisyphe) => {
   sisyphe.start();
 });
