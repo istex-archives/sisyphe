@@ -8,7 +8,7 @@ A [sisyphe](https://github.com/istex/sisyphe) module which will generate checksu
 ### What does it do ?
 This module will add a "hash" property into json element & create a .csv in a checksum folder containing all hash & path to file 
 
-![sisyphe-hash](/)
+![sisyphe-hash](/worker/sisyphe-hash/sisyphe-hash.png)
 
 ### How it works ?
 It read file (async or via stream depending on its size) & then it create a md5 hash of it
