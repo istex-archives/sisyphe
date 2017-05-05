@@ -34,7 +34,6 @@ Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxm
 - -n, --corpusname <name>  Choose an identifier 's Name
 - -c, --config <path>      Config json file path
 - -o, --output <all/json>  Output destination (only Json OR eslasticsearch+Json)
-- -d, --dtd <path>         DTD folder path
 
 
 ### How it works ?
@@ -56,11 +55,12 @@ You should now have a file full of logs in `/yourcustomfolder/sisyphe/logs/sisyp
 There is a list of default modules (focused on xml & pdf).
 
 Those URL NEED to be updated when merge branch will be ok.
+- [Sisyphe-HASH](/worker/sisyphe-hash) Will generate checksum of found files
 - [Sisyphe-FILETYPE](/worker/sisyphe-filetype) Will detect mimetype,extension, corrupted files..
 - [Sisyphe-PDF](/worker/sisyphe-pdf) Will get info from PDF (version, author, meta...)
-- [Sisyphe-XML](/worker/sisyphe-xml) Will check if it's wellformed, valid-dtd's, get element from balises ...
-- [Sisyphe-XPATH](/worker/sisyphe-xpath)  Will generate a complete list of xpath from the folder submited
-- [Sisyphe-OUT](/worker/sisyphe-out) Will export data to json file & ElasticSearch
+- [Sisyphe-XML](/worker/sisyphe-xml) Will check if it's wellformed, valid-dtd's, get elements from balises ...
+- [Sisyphe-XPATH](/worker/sisyphe-xpath)  Will generate a complete list of xpaths from submitted folder
+- [Sisyphe-OUT](/worker/sisyphe-out) Will export data to json file & ElasticSearch database
 
 You can create your own module & add it to sisyphe :
 => This part is not written yet
