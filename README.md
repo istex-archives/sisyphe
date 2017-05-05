@@ -5,7 +5,7 @@
 
 ## Sisyphe
 
-Sisyphe is a generic NodeJS folder analyser & a ([lerna](https://github.com/lerna/lerna)) git [monorepo](https://github.com/babel/babel/blob/master/doc/design/monorepo.md).
+Sisyphe is a generic NodeJS recursive folder analyser terminal application & a ([lerna](https://github.com/lerna/lerna)) git [monorepo](https://github.com/babel/babel/blob/master/doc/design/monorepo.md).
 
 ![Sisyphe-pic](/sisyphe.gif)
 
