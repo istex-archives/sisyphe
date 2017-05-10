@@ -3,10 +3,25 @@
 const pkg = require('./../package.json'),
   chai = require('chai'),
   expect = chai.expect,
-  Queue = require('bull'),
-  ChainJobQueue = require('./../src/chain-job-queue');
+  should = chai.should(),
+  Queue = require('bull');
+
+chai.use(require("chai-events"));
+
+describe(`${pkg.name} REDIS`, function (done) {
+  let clientRedis = null;
+  const  redis = require('redis');
+  beforeEach(function() {
+    clientRedis = redis.createClient();
+  });
+  it('should have redis started for bull to work', function () {
+    let p = clientRedis.should.emit("connect");
+    return p;
+  });
+});
 
 describe(pkg.name + '/src/chain-job-queue.js', function () {
+  const ChainJobQueue = require('./../src/chain-job-queue');
   describe('constructor', function () {
     it('Should initialize some variables', function () {
       const chain = new ChainJobQueue();

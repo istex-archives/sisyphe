@@ -1,13 +1,10 @@
 'use strict';
 
-const ChainJobQueue = require('./chain-job-queue'),
-  path = require('path'),
-  bluebird = require('bluebird'),
+const path = require('path'),
+  Promise = require('bluebird'),
   winston = require('winston'),
-  fs = bluebird.promisifyAll(require('fs')),
+  fs = Promise.promisifyAll(require('fs')),
   blessed = require('blessed'),
-  redis = require('redis'),
-  clientRedis = redis.createClient(),
   cluster = require('cluster'),
   ms = require('pretty-ms'),
   numberFork = Math.floor(require('os').cpus().length * 3 / 4);
@@ -33,8 +30,20 @@ const loggerError = new (winston.Logger)({
     })
   ]
 });
-bluebird.promisifyAll(redis.RedisClient.prototype);
-bluebird.promisifyAll(redis.Multi.prototype);
+
+// Check at redis connection
+const  redis = require('redis'),
+clientRedis = redis.createClient();
+
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
+
+clientRedis.on('error', err=>{
+  console.error(`Redis does not seems launched`);
+  loggerError.error(err);
+});
+
+const ChainJobQueue = require('./chain-job-queue');
 
 class Sisyphe {
   constructor(starter, workers, isInspected) {
@@ -155,10 +164,10 @@ class Sisyphe {
 
   heartbeat() {
     const callFinishers = () => {
-      return bluebird.filter(this.workflow.listWorker, (worker) => {
+      return Promise.filter(this.workflow.listWorker, (worker) => {
         return worker.features.finalJob !== undefined
       }).map((worker) => {
-        return bluebird.promisify(worker.features.finalJob)();
+        return Promise.promisify(worker.features.finalJob)();
       })
     };
 
@@ -251,7 +260,7 @@ class Sisyphe {
     const workerDirectory = path.resolve(__dirname + "/../worker");
     this.workflow = new ChainJobQueue();
 
-    return bluebird.map(this.workers, (worker) => {
+    return Promise.map(this.workers, (worker) => {
       return fs.accessAsync(workerDirectory + "/" + worker.module)
     }).then(() => {
       return this.workers.map((worker) => {

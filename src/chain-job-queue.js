@@ -1,13 +1,11 @@
 'use strict';
 
 const Queue = require('bull'),
-  bluebird = require('bluebird'),
-  redis = require('redis'),
+  Promise = require('bluebird'),
   kuler = require('kuler'),
   winston = require('winston'),
   debounce = require('lodash/debounce'),
-  throttle = require('lodash/throttle'),
-  clientRedis = redis.createClient();
+  throttle = require('lodash/throttle');
 
 const logger = new (winston.Logger)({
   exitOnError: false,
@@ -21,8 +19,17 @@ const logger = new (winston.Logger)({
   ]
 });
 
-bluebird.promisifyAll(redis.RedisClient.prototype);
-bluebird.promisifyAll(redis.Multi.prototype);
+// Check redis connection
+const redis = require('redis'),
+clientRedis = redis.createClient();
+
+clientRedis.on('error', err=>{
+  console.error(`Redis does not seems launched`);
+  logger.error(err);
+});
+
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
 
 class ChainJobQueue {
   constructor(redisPort, redisHost) {
