@@ -8,12 +8,21 @@ const program = require('commander'),
   path = require('path'),
   fs = bluebird.promisifyAll(require('fs'));
 
+
+function appender(xs) {
+  xs = xs || [];
+  return function (x) {
+    xs.push(x);
+    return xs;
+  };
+}
 program
   .version('0.0.1')
   .usage('[options] <path>')
   .option('-n, --corpusname <name>', 'Choose an identifier \'s Name', 'default')
   .option('-c, --config-dir <path>', 'Config folder path')
   .option('-o, --output <all/json>', 'Output destination')
+  .option('-r, --remove-module <name>', 'Remove module name from the workflow', appender(), [])
   .parse(process.argv);
 
 //Check if debug mode is on
@@ -26,7 +35,7 @@ for(var arg of process.execArgv){
   }
 }
 
-if (program.name === 'default') {
+if (program.corpusname === 'default') {
   program.outputHelp();
   process.exit(0);
 }
@@ -42,39 +51,44 @@ let starter = {
   }
 };
 
+let options = {
+  corpusname: program.corpusname,
+  configDir: program.configDir,
+  output: program.output
+};
+
 let workers = [{
-  name: "Sisyphe FileType",
+  name: "filetype",
   module: "sisyphe-filetype"
 }, {
-  name: "Sisyphe XML",
+  name: "xml",
   module: "sisyphe-xml",
-  options: {
-    corpusname: program.corpusname,
-    configDir: program.configDir
-  }
+  options
 }, {
-  name: "Sisyphe PDF",
-  module: "sisyphe-pdf"
+  name: "pdf",
+  module: "sisyphe-pdf",
+  options
 }, {
-  name: "Sisyphe xpath",
+  name: "xpath",
   module: "sisyphe-xpath",
-  options: {
-    corpusname: program.corpusname
-  }
+  options
 }, {
-  name: "Sisyphe hash",
+  name: "hash",
   module: "sisyphe-hash",
-  options: {
-    corpusname: program.corpusname
-  }
+  options
 }, {
-  name: "Sisyphe Output",
+  name: "out",
   module: "sisyphe-out",
-  options: {
-    corpusname: program.corpusname,
-    output: program.output
-  }
+  options
 }];
+
+
+// remove unwanted module
+if(program.removeModule){
+  workers = workers.filter(obj=>{
+    return !program.removeModule.includes(obj.name);
+  });
+}
 
 // This is an Update
 if (!pathInput && program.corpusname) {
