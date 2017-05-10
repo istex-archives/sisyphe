@@ -54,12 +54,14 @@ let starter = {
 let options = {
   corpusname: program.corpusname,
   configDir: program.configDir,
-  output: program.output
+  output: program.output,
+  isInspected
 };
 
 let workers = [{
   name: "filetype",
-  module: "sisyphe-filetype"
+  module: "sisyphe-filetype",
+  options
 }, {
   name: "xml",
   module: "sisyphe-xml",

@@ -3,32 +3,42 @@
 const bluebird = require('bluebird'),
   path = require('path'),
   fs = bluebird.promisifyAll(require('fs')),
+  colors = require('ansicolors'),
   crypto = require('crypto');
 
 const sisypheHash = {};
 
-sisypheHash.doTheJob = function (docObject, next) {
+sisypheHash.init = function (options) {
+  this.isInspected = options.isInspected || false;
+};
+
+sisypheHash.doTheJob = function (data, next) {
+
+  if(this.isInspected){
+    console.log(`${colors.magenta('hash')}: ${data.name}`);
+  }
+
   // prepare the checksum outputDir
   const pathChecksumDir = path.resolve(__dirname, '../..', 'checksum');
   const isChecksumDirectoryExist = fs.existsSync(pathChecksumDir);
   if (!isChecksumDirectoryExist) fs.mkdirSync(pathChecksumDir);
 
-  fs.accessAsync(docObject.path, fs.constants.R_OK).then(() => {
+  fs.accessAsync(data.path, fs.constants.R_OK).then(() => {
     const LARGE_FILE_LIMIT = 1000000;
-    if (docObject.size > LARGE_FILE_LIMIT) {
-      return this.generateHashFromABigFile(docObject.path)
+    if (data.size > LARGE_FILE_LIMIT) {
+      return this.generateHashFromABigFile(data.path)
     } else {
-      return this.generateHashFromASmallFile(docObject.path)
+      return this.generateHashFromASmallFile(data.path)
     }
   }).then((hash) => {
-    docObject.hash = hash;
-    const pathFileHash = path.resolve(__dirname, '../..', `checksum/${docObject.corpusname}-${docObject.startAt}.csv`);
-    return fs.appendFileAsync(pathFileHash, `"${docObject.path}";"${docObject.hash}"\n`);
+    data.hash = hash;
+    const pathFileHash = path.resolve(__dirname, '../..', `checksum/${data.corpusname}-${data.startAt}.csv`);
+    return fs.appendFileAsync(pathFileHash, `"${data.path}";"${data.hash}"\n`);
   }).then(() => {
-    next(null, docObject)
+    next(null, data);
   }).catch((error) => {
-    docObject.error = JSON.stringify(error);
-    next(null, docObject)
+    data.error = JSON.stringify(error);
+    next(null, data);
   });
 };
 

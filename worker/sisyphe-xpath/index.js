@@ -6,6 +6,7 @@ const redisHost = process.env.REDIS_HOST || 'localhost',
 const config = require('./config.json'),
   FromXml = require('xpath-generator').FromXml,
   Promise = require('bluebird'),
+  colors = require('ansicolors'),
   redis = Promise.promisifyAll(require('redis')),
   fs = Promise.promisifyAll(require('fs')),
   path = require('path'),
@@ -22,6 +23,7 @@ var fullXpaths = new Set(),
 
 sisypheXpath.init = function(options){
 
+  this.isInspected = options.isInspected || false;
   config.xpathsOutput = config.xpathsOutput || '/applis/istex/xpaths/';
   config.debug = (config.hasOwnProperty('debug')) ? config.debug : false; 
   config.redisDB = config.redisDB || 1;
@@ -35,6 +37,9 @@ sisypheXpath.init = function(options){
 sisypheXpath.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml' || !data.isWellFormed) {
     return next(null, data);
+  }
+  if(this.isInspected){
+    console.log(`${colors.green('xpath')}: ${data.name}`);
   }
   xml.generate(data.path, true).then(result => {
     if(data.debug === true) data.xpath = result;

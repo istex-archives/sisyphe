@@ -13,6 +13,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "ansicolors": "^0.3.2",
     "blessed": "^0.1.81",
     "bluebird": "^3.4.1",
     "bull": "https://github.com/MatthD/bull.git",
