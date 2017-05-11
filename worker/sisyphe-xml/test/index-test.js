@@ -22,7 +22,7 @@ const docWithNotWellFormedXml = Object.assign({path: __dirname + '/data/test-not
 const docWithUnknownDoctype = Object.assign({path: __dirname + '/data/test-unknown-doctype.xml'}, baseDoc);
 const docWithNotValidXml = Object.assign({path: __dirname + '/data/test-not-valid-dtd.xml'}, baseDoc);
 
-describe('Dependancies', () => {
+describe('Dependencies', () => {
   it('should have acces to xmlstarlet', (done) => {
     exec('which xmlstarlet', (err, stdout, stderr) => {
       expect(err).to.be.null;
