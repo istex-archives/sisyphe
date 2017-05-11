@@ -54,7 +54,9 @@ In the nearly created folder you have to create a "sisyphe-xml.json" config file
 
 In the config file you just have to put your relative mains entries dtd's path:
 
-eg```javascript
+eg
+
+```javascript
 {
   dtd: ['folder/file1.dtd', 'folder/file2.dtd']
 }
@@ -83,7 +85,9 @@ There are 2 options you can use:
 
 You will have to create your own sisyphe-xml.json config files, you will have to writte an array of objects containing xpath name, path & type.
 
-eg```javascript
+eg
+
+```javascript
 {
   medatada: [{name, type xpath},{name, type xpath, regex},{...}]
 }
@@ -96,7 +100,9 @@ Regex: A javascript regex to check if the value returned is in a correct form. [
 
 In the end you should have something like:
 
-eg```javascript
+eg
+
+```javascript
 {
   medatada: [{"name": "publicationYear", "type": "Number", "xpath": "///article-meta/pub-date/year", "regex": "^([0-9]{4})$" },{...}]
 }
