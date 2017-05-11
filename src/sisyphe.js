@@ -124,7 +124,7 @@ class Sisyphe {
             fg: 'blue'
           }
         }
-      })
+      });
 
       this.tableProgress = blessed.table({
         top: 20,
@@ -239,7 +239,7 @@ class Sisyphe {
           fork.on('online', () => {
             loggerInfo.info('fork created');
             this.list.add(`fork created`);
-            if (!this.isInspected) this.screen.render();
+            if (!this.isInspected) {this.screen.render()};
           });
           fork.on('exit', () => {
             cluster.fork();
@@ -258,7 +258,7 @@ class Sisyphe {
 
   initializeWorker() {
     const workerDirectory = path.resolve(__dirname + "/../worker");
-    this.workflow = new ChainJobQueue();
+    this.workflow = new ChainJobQueue(null,null,this.isInspected);
 
     return Promise.map(this.workers, (worker) => {
       return fs.accessAsync(workerDirectory + "/" + worker.module)

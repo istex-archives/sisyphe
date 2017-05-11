@@ -65,10 +65,16 @@ Those URL NEED to be updated when merge branch will be ok.
 You can create your own module & add it to sisyphe :
 => This part is not written yet
 
-
 ### Developpement on worker
 
-When you work on worker, just: 
+#### DEBUG Mod
+
+To use debug mod you will just have to add the parameter --inspect to node;
+
+eg `node --inspect app.js ..`
+You can use debug mod in somes IDE too (webstorm for eg)
+
+When you work on worker, just:
 - Commit your changes as easy
 - Do a `npm run updated` (to check what worker has changed)
 - Do a `npm run publish` (it will ask you to change version of module worker & publish it to github)
