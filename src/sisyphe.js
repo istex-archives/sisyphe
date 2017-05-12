@@ -56,17 +56,23 @@ class Sisyphe {
     this.starter = starter || defaultStarter;
     this.isInspected = isInspected || false;
     const defaultWorkers = [{
-      name: "SisypheFileType",
+      name: "hash",
+      module: "sisyphe-hash"
+    },{
+      name: "filetype",
       module: "sisyphe-filetype"
     }, {
-      name: "SisypheXML",
+      name: "xml",
       module: "sisyphe-xml"
     }, {
-      name: "SisyphePDF",
+      name: "pdf",
       module: "sisyphe-pdf"
     }, {
-      name: "SisypheXPATH",
+      name: "xpath",
       module: "sisyphe-xpath"
+    },{
+      name: "out",
+      module: "sisyphe-out"
     }];
     this.workers = workers || defaultWorkers;
     if (cluster.isMaster  && !this.isInspected) {
