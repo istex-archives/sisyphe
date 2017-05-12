@@ -2,9 +2,7 @@
 
 const chai = require('chai'),
   kuler = require('kuler'),
-  doTheJob = require('../index.js').doTheJob,
-  finalJob = require('../index.js').finalJob,
-  initJob = require('../index.js').init,
+  sisypheXpath = require('../index.js'),
   expect = chai.expect,
   path = require('path'),
   rimraf = require('rimraf'),
@@ -52,7 +50,7 @@ describe('DoTheJob', () => {
       size: 500
     };
 
-    doTheJob(objTest, (err, data) => {
+    sisypheXpath.doTheJob(objTest, (err, data) => {
       if (err) {
         return done(err);
       }
@@ -71,7 +69,7 @@ describe('DoTheJob', () => {
       size: 500
     };
 
-    doTheJob(objTest, (err, data) => {
+    sisypheXpath.doTheJob(objTest, function(err, data) {
       try {
         expect(function () {
           if (err && err.instanceof(Error)) {
@@ -97,9 +95,9 @@ describe('DoTheJob', () => {
       debug : true
     };
 
-    initJob({corpusname : 'test'});
+    sisypheXpath.init({corpusname : 'test'});
 
-    doTheJob(objTest, (err, data) => {
+    sisypheXpath.doTheJob(objTest, (err, data) => {
       if (err) {
         return done(err);
       }
@@ -114,8 +112,8 @@ describe('DoTheJob', () => {
 
 describe('FinalJob', () => {
   it('Final Job should not failed during work', (done) => {
-    initJob({corpusname : 'test'});
-    finalJob((err) => {
+    sisypheXpath.init({corpusname : 'test'});
+    sisypheXpath.finalJob((err) => {
       if (err) {
         return done(err)
       }
