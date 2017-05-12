@@ -22,6 +22,7 @@ program
   .option('-n, --corpusname <name>', 'Choose an identifier \'s Name', 'default')
   .option('-c, --config-dir <path>', 'Config folder path')
   .option('-o, --output <all/json>', 'Output destination')
+  .option('-t, --thread <number>', 'Number of fork to create via Node cluster')
   .option('-r, --remove-module <name>', 'Remove module name from the workflow', appender(), [])
   .parse(process.argv);
 
@@ -116,8 +117,8 @@ if (!pathInput && program.corpusname) {
       output: program.output
     }
   }];
-  let sisyphe = new Sisyphe(starter, workers, isInspected);
-  sisyphe.start();
+  let sisyphe = new Sisyphe(starter, workers, isInspected, program.thread);
+  sisyphe.start(program.thread);
   return;
 }
 
@@ -127,7 +128,7 @@ fs.statAsync(pathInput).catch((error) => {
 }).then(() => {
   return new Sisyphe(starter, workers, isInspected);
 }).then((sisyphe) => {
-  sisyphe.start();
+  sisyphe.start(program.thread);
 });
 
 

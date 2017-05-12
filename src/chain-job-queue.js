@@ -24,7 +24,7 @@ const redis = require('redis'),
 clientRedis = redis.createClient();
 
 clientRedis.on('error', err=>{
-  console.error(`Redis does not seems launched`);
+  console.error(`Redis does not appears to be started`);
   logger.error(err);
 });
 

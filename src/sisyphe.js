@@ -7,7 +7,7 @@ const path = require('path'),
   blessed = require('blessed'),
   cluster = require('cluster'),
   ms = require('pretty-ms'),
-  numberFork = Math.floor(require('os').cpus().length * 3 / 4);
+  nbOfCpus = require('os').cpus().length;
 
 const loggerInfo = new (winston.Logger)({
   exitOnError: false,
@@ -231,7 +231,7 @@ class Sisyphe {
     }, 2000);
   }
 
-  start() {
+  start(numberFork=(Math.floor(nbOfCpus * 3 / 4))) {
     this.initializeWorker().then(() => {
       if (cluster.isMaster) {
         for (let i = 0; i < numberFork; i++) {
