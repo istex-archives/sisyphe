@@ -45,7 +45,7 @@ sisypheXpath.doTheJob = function (data, next) {
     if(data.debug === true) data.xpath = result;
     let keys = Object.keys(result);
     for (let i = 0; i < keys.length; i++) {
-      redisClient.hincrby(keys[i], 'count' ,result[keys[i]].count);
+      redisClient.hincrby(keys[i], 'countElement' ,result[keys[i]].countElement);
       // Set attributes in hash key
       let attributesRedis = [];
       for(var attr in result[keys[i]].attributes){
@@ -76,7 +76,7 @@ sisypheXpath.finalJob = function (done) {
     });
     xpathsStream.on('open', () => {
       scanAsync(0, '*').map((result) => {
-        return xpathsStream.writeAsync(`${result.key};${result.count};${result.attributes.toString()}\n`);
+        return xpathsStream.writeAsync(`${result.key};${result.countElement};${result.attributes.toString()}\n`);
       }).then(() => {
         xpathsStream.close();
         done();
@@ -101,10 +101,10 @@ function scanAsync(cursor, pattern) {
     if (cursor !== 0) return scanAsync(cursor, '*');
     return Promise.map(fullXpaths, (key) => {
       return redisClient.hgetallAsync(key).then(value => {
-        let count  = value.count;
-        delete value.count;
+        let countElement  = value.countElement;
+        delete value.countElement;
         let attributes = Object.keys(value);
-        return {key: key, count: count, attributes: attributes}
+        return {key: key, countElement: countElement, attributes: attributes}
       });
     })
   });

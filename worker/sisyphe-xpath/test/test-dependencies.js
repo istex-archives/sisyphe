@@ -104,7 +104,7 @@ describe('DoTheJob', () => {
       expect(data.xpath).to.exist;
       expect(data.xpath).to.be.an('object');
       expect(data.xpath).to.be.not.empty;
-      expect(data.xpath[Object.keys(data.xpath)[0]]).to.have.property('count');
+      expect(data.xpath[Object.keys(data.xpath)[0]]).to.have.property('countElement');
       return done();
     })
   });
