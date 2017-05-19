@@ -159,6 +159,10 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
     // Select the first XPATH possibility
     if (Array.isArray(metadata.xpath)) {
       for (let i = 0; i < metadata.xpath.length; i++) {
+        //string is special because we need all text in its child too
+        if(metadata.type === 'String') {
+          metadata.xpath[i] = `string(${metadata.xpath[i]})`;
+        }
         const itemElement = xpathSelect(metadata.xpath[i], xmlDom);
         if (itemElement.length) {
           metadata.element = itemElement;
@@ -167,11 +171,14 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
       }
       metadata.element = metadata.element || [];
     } else {
+      //string is special because we need all text in its child too
+      if(metadata.type === 'string') {
+        metadata.xpath[i] = `string(${metadata.xpath})`;
+      }
       metadata.element = xpathSelect(metadata.xpath, xmlDom);
     }
-
     if (metadata.hasOwnProperty('element')) {
-      metadata.element.isEmpty = metadata.element.length;
+      if(metadata.type !== 'String') metadata.element.isEmpty = metadata.element.length;
       if (metadata.element.isEmpty) {
         metadata.element.hasFirstChild = metadata.element[0].hasOwnProperty('firstChild');
       }
@@ -181,9 +188,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
 
       switch (metadata.type) {
         case "String":
-          if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
-            metadata.value = metadata.element[0].firstChild.data;
-          }
+            metadata.value = (metadata.element.length && (typeof metadata.element === 'string')) ? metadata.element: null;
           break;
         case "Number":
           if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
@@ -201,6 +206,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
           break;
       }
     }
+
     return metadata;
   }).map((metadata) => {
     if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {

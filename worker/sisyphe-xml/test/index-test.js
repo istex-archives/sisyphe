@@ -145,6 +145,11 @@ describe('getMetadataInfos', function () {
           "type": "String",
           "xpath": "/xpath/to/my/infos"
         }, {
+          "name": "substring",
+          "regex": "\bwelcome\b/i",
+          "type": "String",
+          "xpath": "string(/xpath/to/my/main)"
+        }, {
           "name": "someInfosWithAutoClosedElement",
           "type": "String",
           "xpath": "/xpath/to/my/title"
@@ -177,7 +182,7 @@ describe('getMetadataInfos', function () {
           "name": "hasNoInfos",
           "type": "Boolean",
           "xpath": "/xpath/to/no/infos"
-        }, {
+        },{
           "name": "hasInfosWithArray",
           "type": "Boolean",
           "xpath": ["XPATH/TO/MY/INFOS", "/xpath/to/my/infos"]
@@ -214,6 +219,7 @@ describe('getMetadataInfos', function () {
     <to>
         <my>
             <infos>trezaqwx</infos>
+            <main><italic>N° </italic>trezaqwx <bold>end</bold></main>
             <number>1234</number>
             <title/>
             <p>lorem ipsum dolor sit amet</p>
@@ -230,7 +236,7 @@ describe('getMetadataInfos', function () {
       if (metadata.hasOwnProperty('regex')) {
         expect(metadata.regex).to.be.a('string');
       }
-      if (metadata.hasOwnProperty('value') && metadata.type === 'String') {
+      if (metadata.hasOwnProperty('value') && metadata.value && metadata.type === 'String') {
         expect(metadata.value).to.be.a('string');
       }
       if (metadata.type === 'Count') {
