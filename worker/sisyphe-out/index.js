@@ -36,6 +36,8 @@ sisypheOut.init = function (options) {
     transports: [
       new (winston.transports.File)({
         filename: `logs/analyse-${options.corpusname}.json`,
+        highWaterMark: 24,
+        json: true,
         level: 'debug'
       })
     ]
