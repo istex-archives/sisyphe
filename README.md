@@ -32,6 +32,7 @@ Test with NodeJS@6.9, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxm
 - -h, --help               output usage information
 - -V, --version            output the version number
 - -n, --corpusname <name>  Choose an identifier 's Name
+- -r, --remove-module <name> Remove one or some worker module
 - -c, --config <path>      Config json file path
 - -o, --output <all/json>  Output destination (only Json OR eslasticsearch+Json)
 
@@ -62,8 +63,9 @@ Those URL NEED to be updated when merge branch will be ok.
 - [Sisyphe-XPATH](/worker/sisyphe-xpath)  Will generate a complete list of xpaths from submitted folder
 - [Sisyphe-OUT](/worker/sisyphe-out) Will export data to json file & ElasticSearch database
 
-You can create your own module & add it to sisyphe :
-=> This part is not written yet
+To start sisyphe without some module just do 
+
+`./app.js -r hash -r xml ...`
 
 ### Developpement on worker
 
