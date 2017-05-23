@@ -1,0 +1,99 @@
+{
+  "metadata": [
+    {
+      "name": "category",
+      "type": "String",
+      "xpath": "/article/front//subject"
+    },
+    {
+      "name": "publicationYear",
+      "regex": "^([0-9]{4})$",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/pub-date/year"
+    },
+    {
+      "name": "doi",
+      "regex": "(10[.][0-9]{4,}[^\\s\"/<>]*/[^\\s\"<>]+)",
+      "type": "String",
+      "xpath": "/article/front/article-meta/article-id[@pub-id-type=\"doi\"]"
+    },
+    {
+      "name": "eissn",
+      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/issn[@pub-type=\"epub\"]"
+    },
+    {
+      "name": "hasAbstract",
+      "type": "Boolean",
+      "xpath": "/article/front/article-meta/abstract"
+    },
+    {
+      "name": "issn",
+      "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/issn[@pub-type=\"ppub\"]"
+    },
+    {
+      "name": "issue",
+      "regex": "(\\d)+",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/issue"
+    },
+    {
+      "name": "publisherId",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/journal-id[@journal-id-type=\"publisher-id\"]"
+    },
+    {
+      "name": "hostTitle",
+      "type": "String",
+      "xpath": "/article/front/journal-meta/journal-title"
+    },
+    {
+      "name": "title",
+      "type": "String",
+      "xpath": "/article/front/article-meta/title-group/article-title"
+    },
+    {
+      "name": "nbKeywords",
+      "type": "Count",
+      "xpath": "/article/front/article-meta/kwd-group/kwd"
+    },
+    {
+      "name": "nbRefBibs",
+      "type": "Count",
+      "xpath": "/article/back/ref-list/ref"
+    },
+    {
+      "name": "volume",
+      "regex": "(\\d)+",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/volume"
+    },
+        {
+      "name": "nbElementInBody",
+      "type": "Count",
+      "xpath": "/article/body/*"
+    },
+    {
+      "name": "nbParagraphInBody",
+      "type": "Count",
+      "xpath": "/article/body/p"
+    },
+    {
+      "name": "nbSectionInBody",
+      "type": "Count",
+      "xpath": "/article/body/sec"
+    },
+    {
+      "name": "codeLanguage",
+      "type": "Attribute",
+      "xpath": "/article/@xml:lang"
+    }
+  ],
+  "dtd": [
+    "journal-publishing-dtd-2.3/journalpublishing.dtd",
+    "journal-publishing-dtd-2.2/journalpublishing.dtd"
+  ]
+}
