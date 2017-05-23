@@ -1,9 +1,9 @@
 {
   "metadata": [
     {
-      "name": "category",
-      "type": "String",
-      "xpath": "/article/front//subject"
+      "name": "content-type",
+      "type": "Attribute",
+      "xpath": "/article/@xml:article-type"
     },
     {
       "name": "publicationYear",
@@ -24,15 +24,21 @@
       "xpath": "/article/front/journal-meta/issn[@pub-type=\"epub\"]"
     },
     {
-      "name": "hasAbstract",
-      "type": "Boolean",
-      "xpath": "/article/front/article-meta/abstract"
-    },
-    {
       "name": "issn",
       "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
       "type": "String",
       "xpath": "/article/front/journal-meta/issn[@pub-type=\"ppub\"]"
+    },
+    {
+      "name": "isbn",
+      "regex": "((978[-– ])?[0-9][0-9-– ]{10}[-– ][0-9xX])|((978)?[0-9]{9}[0-9])",
+      "type": "String",
+      "xpath": "/article/front/article-meta/volume-id[@pub-id-type=\"isbn\"]"
+    },
+    {
+      "name": "hasAbstract",
+      "type": "Boolean",
+      "xpath": "/article/front/article-meta/abstract"
     },
     {
       "name": "issue",
@@ -46,9 +52,14 @@
       "xpath": "/article/front/journal-meta/journal-id[@journal-id-type=\"publisher-id\"]"
     },
     {
-      "name": "hostTitle",
+      "name": "serieTitle",
       "type": "String",
       "xpath": "/article/front/journal-meta/journal-title"
+    },
+    {
+      "name": "hostTitle",
+      "type": "String",
+      "xpath": "/article/front/article-meta/issue-title"
     },
     {
       "name": "title",
@@ -74,22 +85,17 @@
         {
       "name": "nbElementInBody",
       "type": "Count",
-      "xpath": "/article/body/*"
+      "xpath": "/article/body//*"
     },
     {
       "name": "nbParagraphInBody",
       "type": "Count",
-      "xpath": "/article/body/p"
+      "xpath": "/article/body//p"
     },
     {
       "name": "nbSectionInBody",
       "type": "Count",
-      "xpath": "/article/body/sec"
-    },
-    {
-      "name": "codeLanguage",
-      "type": "Attribute",
-      "xpath": "/article/@xml:lang"
+      "xpath": "/article/body//sec"
     }
   ],
   "dtd": [
