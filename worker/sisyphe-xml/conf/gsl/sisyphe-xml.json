@@ -3,7 +3,7 @@
     {
       "name": "content-type",
       "type": "Attribute",
-      "xpath": "/article/@xml:article-type"
+      "xpath": "/article/@article-type"
     },
     {
       "name": "publicationYear",
