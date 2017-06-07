@@ -188,7 +188,13 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
 
       switch (metadata.type) {
         case "String":
-            metadata.value = (metadata.element.length && (typeof metadata.element === 'string')) ? metadata.element: null;
+          if((metadata.element.length && (typeof metadata.element === 'string'))){
+            metadata.value =  metadata.element;
+          }
+          else if ((typeof metadata.element === 'object') &&
+            metadata.element[0] && metadata.element[0].firstChild && metadata.element[0].firstChild.data) {
+              metadata.value = metadata.element[0].firstChild.data;
+            }
           break;
         case "Number":
           if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
