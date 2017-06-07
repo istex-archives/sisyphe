@@ -102,21 +102,6 @@ if (!pathInput && program.corpusname) {
       corpusname: program.corpusname
     }
   };
-  workers = [{
-    name: "Sisyphe XML",
-    module: "sisyphe-xml",
-    options: {
-      corpusname: program.corpusname,
-      configDir: program.configDir
-    }
-  }, {
-    name: "Sisyphe Output",
-    module: "sisyphe-out",
-    options: {
-      corpusname: program.corpusname,
-      output: program.output
-    }
-  }];
   let sisyphe = new Sisyphe(starter, workers, isInspected, program.thread);
   sisyphe.start(program.thread);
   return;
