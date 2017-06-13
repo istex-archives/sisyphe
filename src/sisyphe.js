@@ -244,13 +244,17 @@ class Sisyphe {
           const fork = cluster.fork();
           fork.on('online', () => {
             loggerInfo.info('fork created');
-            this.list.add(`fork created`);
-            if (!this.isInspected) {this.screen.render()};
+            if (!this.isInspected) {
+              this.list.add(`fork created`);
+              this.screen.render()
+            };
           });
           fork.on('exit', () => {
             cluster.fork();
             loggerInfo.info('fork exit');
-            this.list.add(`fork exit`)
+            if (!this.isInspected) {
+              this.list.add(`fork exit`)
+            }
           });
         }
         this.initializeStarter()
