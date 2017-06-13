@@ -80,7 +80,7 @@ sisypheXml.doTheJob = function (data, next) {
     data.validationDTDInfos = validationDTDResult;
     let metadatas;
     const conf = cloneDeep(this.conf);
-    [data.error, metadatas] = await to(this.getMetadataInfos(this.conf, xmlDom));
+    [data.error, metadatas] = await to(this.getMetadataInfos(conf, xmlDom));
     if (data.error) {
       return data;
     }
