@@ -237,8 +237,8 @@ for(let i = 0; i < clusterList.length; i++){
   clusterList[i].on('message', function (message) {
     //if it's the lastest job
     if(message.error){
-      debugLog.info(`Sisyphe-module-error: ${message.module}: `, message.error);
-      sisypheMonitor.log.log(`Sisyphe-module-error: ${message.module}: `);
+      debugLog.info(`Sisyphe-module-error: ${message.type}: `, message.error);
+      sisypheMonitor.log.log(`Sisyphe-module-error: ${message.type}: `);
       return;
     }
     if(message.id === workers.length-1){

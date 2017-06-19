@@ -32,6 +32,10 @@ function doTasks(taskNb,cb){
   queue.process(`${workers[taskNb].name}${process.env.WORKER_ID}`, 1, function (job, done) {
     job.data.info.processorNumber = process.env.WORKER_ID;
     task[taskNb].doTheJob(job.data, function (err, data) {
+      if(err){
+        process.send({id: data.info.id, type: data.info.type, processedFiles: true, error: true});
+        return;
+      }
       // Send info to master to increment data
       process.send({id: data.info.id, type: data.info.type, processedFiles: true});
       // There are more worker to do with this job process

@@ -54,7 +54,7 @@ sisypheXpath.doTheJob = function (data, next) {
     }
     return next(null, data);
   }).catch(err => {
-    return next(err);
+    return next(err, data);
   });
 };
 
