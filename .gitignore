@@ -6,7 +6,6 @@ job/
 temp/
 xpaths
 checksum
-package-lock.json
 
 # Runtime data
 pids
