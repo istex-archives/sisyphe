@@ -16,22 +16,18 @@ const config = require('./config.json'),
 const sisypheXpath = {},
   xml = new FromXml();
 
-var fullXpaths = new Set(),
-  outputFile,
-  outputPath,
-  redisClient;
+var redisClient;
 
-sisypheXpath.init = function(options){
-
-  this.isInspected = options.isInspected || false;
-  config.xpathsOutput = config.xpathsOutput || '/applis/istex/xpaths/';
-  config.debug = (config.hasOwnProperty('debug')) ? config.debug : false; 
+sisypheXpath.init = function(options={corpusname: "default"}){
+  this.isInspected = options && options.isInspected || false;
+  config.debug = (config.hasOwnProperty('debug')) ? config.debug : false;
   config.redisDB = config.redisDB || 1;
 
-  outputPath = path.resolve(config.xpathsOutput, options.corpusname);
-  outputFile = path.resolve(outputPath, `xpaths-${options.corpusname}.csv`);
-
   redisClient = redis.createClient(`//${redisHost}:${redisPort}`, {db: config.redisDB});
+  redisClient.on('error', function (error) {
+    process.send({error, id: process.env.WORKER_ID, module: options.name});
+  });
+
 };
 
 sisypheXpath.doTheJob = function (data, next) {
@@ -59,14 +55,34 @@ sisypheXpath.doTheJob = function (data, next) {
     return next(null, data);
   }).catch(err => {
     return next(err);
-  })
+  });
 };
 
-sisypheXpath.finalJob = function (done) {
+sisypheXpath.finalJob = function (options,done) {
+
+  // This function return the value for all redis xpaths keys
+  function scanAsync(cursor, pattern) {
+    return redisClient.scanAsync(cursor, 'MATCH', pattern).then(reply => {
+      cursor = +reply[0];
+      for (let i = 0; i < reply[1].length; i++) {
+        fullXpaths.add(reply[1][i]);
+      }
+      if (cursor !== 0) return scanAsync(cursor, '*');
+      return Promise.map(fullXpaths, (key) => {
+        return redisClient.hgetallAsync(key).then(value => {
+          let countElement  = value.countElement;
+          delete value.countElement;
+          let attributes = Object.keys(value);
+          return {key: key, countElement: countElement, attributes: attributes}
+        });
+      })
+    });
+  }
+
+  let fullXpaths = new Set(),
+    outputPath = path.resolve(__dirname, '../..', 'xpaths', options.corpusname),
+    outputFile = path.resolve(outputPath, `xpaths-${Date.now().toString()}.csv`);
   // When no more data in queue, sisyphe will execute it
-  //Until a better way
-  outputPath = outputPath || path.resolve(config.xpathsOutput, Date.now().toString());
-  outputFile = outputFile || path.resolve(outputPath, 'xpaths-list.csv');
   redisClient = redisClient || redis.createClient(`//${redisHost}:${redisPort}`, {db: config.redisDB});
 
   mkdirp.mkdirpAsync(outputPath).then(() => {
@@ -81,33 +97,15 @@ sisypheXpath.finalJob = function (done) {
         xpathsStream.close();
         done();
       }).catch(err => {
-        done(err)
-      })
+        done(err);
+      });
     });
     xpathsStream.on('close', () => {
       redisClient.flushdb();
-    })
+    });
   }).catch(err => {
     return done(err);
   });
 };
-
-function scanAsync(cursor, pattern) {
-  return redisClient.scanAsync(cursor, 'MATCH', pattern).then(reply => {
-    cursor = +reply[0];
-    for (let i = 0; i < reply[1].length; i++) {
-      fullXpaths.add(reply[1][i]);
-    }
-    if (cursor !== 0) return scanAsync(cursor, '*');
-    return Promise.map(fullXpaths, (key) => {
-      return redisClient.hgetallAsync(key).then(value => {
-        let countElement  = value.countElement;
-        delete value.countElement;
-        let attributes = Object.keys(value);
-        return {key: key, countElement: countElement, attributes: attributes}
-      });
-    })
-  });
-}
 
 module.exports = sisypheXpath;

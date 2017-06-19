@@ -22,14 +22,12 @@ sisypheOut.init = function (options) {
   this.isInspected = options.isInspected || false;
   options.output = options.output || 'json';
   this.client = new elasticsearch.Client({
-    host: ELASTIC_URL,
-    log: {
-      type: 'file',
-      level: ['error', 'warning'],
-      path: path.resolve(__dirname, `logs/elasticsearch-${options.corpusname}.log`)
-    }
+    host: ELASTIC_URL
   });
   this.redisClient = redis.createClient(`//${REDIS_HOST}:${REDIS_PORT}`, {db: REDIS_DB});
+  this.redisClient .on('error', function (error) {
+    process.send({error, id: process.env.WORKER_ID, module: options.name});
+  });
   this.logger = new winston.Logger();
   this.logger.configure({
     exitOnError: false,
@@ -54,9 +52,6 @@ sisypheOut.init = function (options) {
     this.logger.add(winston.transports.Elasticsearch, esTransportOpts);
   }
   this.loggerError = fs.createWriteStream(`logs/analyse-${options.corpusname}.log`);
-  this.logger.on('error', (err) => {
-    this.loggerError.write(err.toString());
-  });
   return this;
 };
 

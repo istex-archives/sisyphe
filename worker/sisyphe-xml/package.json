@@ -10,14 +10,14 @@
   "license": "MIT",
   "dependencies": {
     "await-to-js": "^1.0.1",
-    "bluebird": "^3.4.6",
-    "get-doctype": "^1.0.0",
+    "bluebird": "^3.5.0",
+    "get-doctype": "^1.0.1",
     "lodash.clonedeep": "^4.5.0",
     "xmldom": "git+https://github.com/rmeja/xmldom.git",
     "xpath": "0.0.23"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^3.1.2"
+    "mocha": "^3.4.2"
   }
 }
