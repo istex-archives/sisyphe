@@ -6,15 +6,8 @@ const walk = require('walk'),
   path = require('path'),
   EventEmitter = require("events").EventEmitter;
 
-let excludeDirFilter = through2.obj(function (item, enc, next) {
-  if (!item.stats.isDirectory()) {
-    this.push(item);
-  }
-  next();
-});
-
 function Walk(input){
-  this.input = input;
+  this._input = input;
 }
 
 util.inherits(Walk, EventEmitter);
@@ -22,7 +15,7 @@ Walk.prototype.getFiles = function() {
   var self = this;
   let walkEvent = new EventEmitter(),
     items = [],
-    walker = walk.walk(this._path);
+    walker = walk.walk(this._input);
 
   walker
   .on('file', function (root, stats, next) {

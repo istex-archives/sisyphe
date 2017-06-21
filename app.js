@@ -172,8 +172,8 @@ walkInDisk.on('files', function (files) {
   for(var i = 0; i < files.length; i++){
     currentFoundFiles++;
     let randomProcessor = Math.floor(Math.random() * clusterWorkerSize);
-    queue.create(`${workers[0].name}${randomProcessor}`, { info: { id: 0, type: workers[0].name}, path: files[i]})
-    .save();
+    files[i].info = { id: 0, type: workers[0].name};
+    queue.create(`${workers[0].name}${randomProcessor}`, files[i]).removeOnComplete( true ).save();
   }
 })
 .on('end', function () {
