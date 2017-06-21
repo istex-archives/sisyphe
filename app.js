@@ -162,7 +162,7 @@ queue.on('error', function( err ) {
 });
 
 //Start walking folder
-let currentFoundFiles = 0, totalPerformedFiles= 0, totalFailedTask= '', totalFoundFiles = '';
+let currentFoundFiles = 0, totalPerformedFiles= 0, totalFailedTask= 0, totalFoundFiles = 0;
 walkInDisk.getFiles();
 
 /*
@@ -237,6 +237,7 @@ for(let i = 0; i < clusterList.length; i++){
   clusterList[i].on('message', function (message) {
     //if it's the lastest job
     if(message.error){
+      totalFailedTask++;
       debugLog.info(`Sisyphe-module-error: ${message.type}: `, message.error);
       sisypheMonitor.log.log(`Sisyphe-module-error: ${message.type}: `);
       return;

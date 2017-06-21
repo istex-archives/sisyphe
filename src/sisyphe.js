@@ -65,10 +65,14 @@ for(let i = 0; i < workers.length; i++){
 
 //Monitor completed job to remove them
 queue.on('job complete', function (id) {
-  // kue.Job.get(id, function (err, job) {
-  //   if (err) return;
-  //   job.remove(function(err){
-  //     if (err) throw err;
-  //   });
-  // });
+  kue.Job.get(id, function (err, job) {
+    if (err) {
+      process.send({ error: 'Error happend when trying to get jobs in redis' });
+    }
+    job.remove(function(err){
+      if (err) {
+        process.send({ error: 'Error happend when trying to delete jobs in redis' });
+      }
+    });
+  });
 });
