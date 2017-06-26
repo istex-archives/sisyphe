@@ -101,7 +101,7 @@ sisypheXpath.finalJob = function (options,done) {
       });
     });
     xpathsStream.on('close', () => {
-      redisClient.flushdb();
+      //redisClient.flushdb();
     });
   }).catch(err => {
     return done(err);
