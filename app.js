@@ -9,6 +9,7 @@ const kue = require('kue'),
   ms = require('pretty-ms'),
   colors = require('colors/safe'),
   bunyan = require('bunyan'),
+  mkdirp = require('mkdirp'),
   monitor = require('./src/monitor.js'),
   winston = require('winston'),
   Starter = require('./src/starter/walkfer-fs'),
@@ -226,7 +227,7 @@ walkInDisk.on('files', function (files) {
 });
 
 
-let sisypheCluster = recluster(path.join(__dirname, 'src', 'sisyphe.js'), {workers : clusterWorkerSize});
+let sisypheCluster = recluster(path.join(__dirname, 'src', 'chain-jobs.js'), {workers : clusterWorkerSize});
 // sisypheMonitor.list.add(`Working with ${clusterWorkerSize} CPU`);
 debugLog.info(`Cluster : Starting with ${clusterWorkerSize} CPU`);
 sisypheMonitor.log.log(`Cluster : Starting with ${clusterWorkerSize} CPU`);
