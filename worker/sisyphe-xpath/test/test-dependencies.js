@@ -112,8 +112,7 @@ describe('DoTheJob', () => {
 
 describe('FinalJob', () => {
   it('Final Job should not failed during work', (done) => {
-    sisypheXpath.init({corpusname : 'test'});
-    sisypheXpath.finalJob((err) => {
+    sisypheXpath.finalJob({corpusname : 'test'},(err) => {
       if (err) {
         return done(err)
       }
