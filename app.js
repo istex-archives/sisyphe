@@ -16,7 +16,7 @@ const kue = require('kue'),
   path = require('path');
 
 let clusterWorkerSize = require('os').cpus().length,
-  workers =  require('./src/workers.json');
+  workers =  require('./config/workers.json');
 
 // Uses to filter workers
 function appender(xs) {
@@ -94,7 +94,7 @@ let sisypheStartAt = new Date().getTime();
 
 // Defined number of Thread to use, default is cores
 clusterWorkerSize = program.thread || clusterWorkerSize;
-fs.writeFileSync('temp/workers.json', JSON.stringify(workers));
+fs.writeFileSync('config/temp/workers.json', JSON.stringify(workers));
 
 const pathInput = program.args[0],
   startAt = Date.now();
