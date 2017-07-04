@@ -3,7 +3,7 @@
 const path = require('path'),
   kue = require('kue'),
   winston = require('winston'),
-  workers = require(path.resolve(__dirname, '..', 'temp', 'workers.json'));
+  workers = require(path.resolve(__dirname, '..', 'config', 'temp', 'workers.json'));
 
 const debugLog = new (winston.Logger)({
   exitOnError: false,
