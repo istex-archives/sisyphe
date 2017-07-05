@@ -17,11 +17,9 @@ const debugLog = new (winston.Logger)({
 });
 
 const queue = kue.createQueue();
-
 queue.on( 'error', function( err ) {
   debugLog.info(`Sysiphe-core-error: kue: `, err);
 });
-
 
 // load tasks`
 let task = [];

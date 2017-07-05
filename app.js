@@ -7,10 +7,9 @@ const kue = require('kue'),
   program = require('commander'),
   fs = require('fs'),
   ms = require('pretty-ms'),
-  colors = require('colors/safe'),
+  cp = require('child_process'),
   bunyan = require('bunyan'),
   mkdirp = require('mkdirp'),
-  monitor = require('./src/monitor.js'),
   winston = require('winston'),
   Starter = require('./src/starter/walkfer-fs'),
   path = require('path');
@@ -68,11 +67,9 @@ let options = {
   isInspected
 };
 
-let monitorWorkers = workers,
-  workersListNames = [];
+let workersListNames = [];
 for(let id in workers){
-  monitorWorkers[id].processedFiles = 0;
-  monitorWorkers[id].color = workers[id].color;
+  workers[id].processedFiles = 0;
   workers[id].options = options;
   workers[id].options.name = workers[id].name;
   workers[id].options.id = id;
@@ -90,8 +87,6 @@ const debugLog = new (winston.Logger)({
   ]
 });
 
-let sisypheStartAt = new Date().getTime();
-
 // Defined number of Thread to use, default is cores
 clusterWorkerSize = program.thread || clusterWorkerSize;
 fs.writeFileSync('config/temp/workers.json', JSON.stringify(workers));
@@ -107,63 +102,34 @@ if(!pathInput){
 
 let walkInDisk = new Starter(pathInput);
 
-// Start monitor
-let sisypheMonitor = new monitor();
+let monitor = cp.fork('src/monitor.js');
 
-let updateMonitor = setInterval(function () {
-    let progress = totalFoundFiles ? (totalPerformedFiles / totalFoundFiles) : 0;
-    let color = "red";
-    if (progress >= 0.25) color = "orange";
-    if (progress >= 0.5) color = "yellow";
-    if (progress >= 0.75) color = "green";
-    sisypheMonitor.donut.setData([
-      {percent: progress.toFixed(2), label: 'Total progression', 'color': color}
-    ]);
-
-    // Set info for all modules
-    let data = [];
-    for(let j = 0; j < monitorWorkers.length; j++){
-      data[j] = [colors[monitorWorkers[j].color](workersListNames[j]),colors[monitorWorkers[j].color](monitorWorkers[j].processedFiles.toString())];
-    }
-    sisypheMonitor.tableModules.setData({headers: ['Type', 'Count'], data: data});
-    // Global progression
-    sisypheMonitor.tableProgress.setData({headers: ['Type', 'Count'], data: [
-      [colors.green('totalPerformedFiles'), colors.green(totalPerformedFiles)],
-      [colors.yellow('currentFoundFiles'), colors.yellow(currentFoundFiles)],
-      [colors.yellow('totalFoundFiles'), colors.yellow(totalFoundFiles)],
-      [colors.red('totalFailedTask'), colors.red(totalFailedTask)]
-    ]});
-    let currentime = new Date().getTime();
-    let duration = ms(currentime - sisypheStartAt);
-    sisypheMonitor.duration.setContent(duration);
-    sisypheMonitor.screen.render();
-  },3000);
+monitor.send({workers, startAt, workersListNames});
+monitor.on('exit', (code)=>{
+  console.log('Close main program');
+  process.exit(0);
+  return;
+});
 
 // Check at redis connection
 const clientRedis = redis.createClient();
 
 clientRedis.on('error', function(err){
-  sisypheMonitor.log.log(`Redis has a problem, is it started ? Check logs for informations`);
-  debugLog.info('Sisyphe-core-error: Redis: ', err);
+  updateLog('Redis has a problem, is it started ? Check logs for informations',err);
 });
 
 // Flush all redis database before start
 clientRedis.flushall();
 
-debugLog.info('Sisyphe-core : kue is connecting to redis ...');
-sisypheMonitor.log.log('Sisyphe-core : kue is connecting to redis ...');
-sisypheMonitor.screen.render();
-
 // Call kue queue
 const queue = kue.createQueue();
+updateLog('Sisyphe-core : kue is connecting to redis ...');
 queue.on('error', function( err ) {
-  debugLog.info(`Sisyphe-core-error: kue: ${err}`);
-  sisypheMonitor.log.log(`error: kue: ${err}`);
-  sisypheMonitor.screen.render();
+  updateLog('Sisyphe-core-error: kue ', err);
 });
 
 //Start walking folder
-let currentFoundFiles = 0, totalPerformedFiles= 0, totalFailedTask= 0, totalFoundFiles = 0;
+let currentFoundFiles = 0, totalPerformedFiles= 0, totalFailedTask= 0, totalFoundFiles = 0, totalPermormedTasks = 0;
 walkInDisk.getFiles();
 
 /*
@@ -176,86 +142,79 @@ walkInDisk.on('files', function (files) {
     files[i].info = { id: 0, type: workers[0].name};
     queue.create(`${workers[0].name}${randomProcessor}`, files[i]).removeOnComplete( true ).save();
   }
+  monitor.send({totalFoundFiles,totalPerformedFiles,totalFailedTask,currentFoundFiles, workers});
 })
 .on('end', function () {
   totalFoundFiles = currentFoundFiles;
   // We only start heartbeat at the end when all files are in redis
   let timer = setInterval(function () {
+    monitor.send({totalFoundFiles,totalPerformedFiles,totalFailedTask,currentFoundFiles, workers});
     // check nb of completed jobs
-    queue.completeCount( function( err, total ) {
-      if(err){
-        debugLog.info(`Sisyphe-core-error: Count-job: ${err}`);
-        sisypheMonitor.log.log(`Sisyphe-core-error: Cannot count jobs !`);
-      }
-      if( total ===  currentFoundFiles*workers.length) {
-        // Stop the interval listener
-        clearInterval(timer);
-        debugLog.info(`Sisyphe-core: All jobs proceded`);
-        sisypheMonitor.log.log(`Sisyphe-core: All jobs proceded`);
+    if( totalPermormedTasks <  currentFoundFiles*workers.length) {
+      // All jobs have not bee done, continue
+      return;
+    }
+    // Stop the interval listener
+    clearInterval(timer);
+    updateLog('Sisyphe-core: All files proceded');
 
-        // This should be wrote with async
-        for(let i = 0; i < workers.length; i++){
-          let fTaks = require(path.resolve(__dirname, 'worker', workers[i].module));
-          if(fTaks && fTaks.finalJob){
-            debugLog.info(`Sisyphe-module: final-job: Starting final job of ${workers[i].name} ...`);
-            sisypheMonitor.log.log(`Sisyphe-module: final-job: Starting final job of ${workers[i].name} ...`);
-            // Exec finalJob, must be a standAlone function
-            fTaks.finalJob(options,function (err) {
-              let sisypheEndAt = new Date().getTime();
-              let duration = ms(sisypheEndAt - sisypheStartAt);
-              debugLog.info(`Sisyphe-core: end after ${duration}`);
-              sisypheMonitor.log.log(`Sisyphe-core: end after ${duration}`);
-              clearInterval(updateMonitor);
-              if (err) {
-                debugLog.info(`Sisyphe-module-error: final-job: Error in final job of ${workers[i].name} ${err}`);
-                sisypheMonitor.log.log(`Error in final-job of ${workers[i].name} ...`);
-                return;
-              }
-              debugLog.info(`Sisyphe-module: final-job:All final-jobs executed`);
-              sisypheMonitor.log.log(`Sisyphe-module: final-job:All final-jobs executed`);
-            });
+    // This should be wrote with async to wait final jobs end
+    for(let i = 0; i < workers.length; i++){
+      let fTaks = require(path.resolve(__dirname, 'worker', workers[i].module));
+      if(fTaks && fTaks.finalJob){
+        updateLog(`Sisyphe-module: final-job: Starting final job of ${workers[i].name} ...`);
+        // Exec finalJob, must be a standAlone functions
+        fTaks.finalJob(options,function (err) {
+          let sisypheEndAt = new Date().getTime();
+          let duration = ms(sisypheEndAt - startAt);
+          updateLog(`Sisyphe-core: end after ${duration}`);
+          monitor.send({stop: true});
+          // clearInterval(updateMonitor);
+          if (err) {
+            updateLog(`Sisyphe-module-error: final-job: Error in final job of ${workers[i].name}`,err);
+            return;
           }
-        }
+          updateLog('Sisyphe-module: final-job:All final-jobs executed')
+        });
       }
-    });
+    }
   },500);
-  //console.log('All files has been walked');
 })
 .on('error', function (err, item) {
-  debugLog.info(`Sisyphe-core-error: walker: ${item} ${err}`);
-  sisypheMonitor.log.log(`Error in walker ...`);
+  updateLog('Sisyphe-core-error: walker: ', err);
 });
 
-
 let sisypheCluster = recluster(path.join(__dirname, 'src', 'chain-jobs.js'), {workers : clusterWorkerSize});
-// sisypheMonitor.list.add(`Working with ${clusterWorkerSize} CPU`);
-debugLog.info(`Cluster : Starting with ${clusterWorkerSize} CPU`);
-sisypheMonitor.log.log(`Cluster : Starting with ${clusterWorkerSize} CPU`);
+updateLog(`Cluster : Starting with ${clusterWorkerSize} CPU`);
 sisypheCluster.run();
-//Update Minitor when jobs are done
 let clusterList = sisypheCluster.workers();
 for(let i = 0; i < clusterList.length; i++){
   clusterList[i].on('message', function (message) {
     //if it's the lastest job
     if(message.error){
       totalFailedTask++;
-      debugLog.info(`Sisyphe-module-error: ${message.type}: `, message.error);
-      sisypheMonitor.log.log(`Sisyphe-module-error: ${message.type}: `);
+      updateLog(`Sisyphe-module-error: ${message.type}: `, message.error);
       return;
     }
     if(message.id === workers.length-1){
       totalPerformedFiles++;
     }
     if(message.processedFiles){
-      //console.log(message.processedFiles, message.type, message.id);
-      monitorWorkers[message.id].processedFiles++;
+      workers[message.id].processedFiles++;
+      totalPermormedTasks++;
     }
   });
 }
 
 
-// Continue sisyphe if an unknow error is happening
+// Continue sisyphe if an unknown error is happening
 process.on('uncaughtException', function(err) {
   debugLog.info(`Sisyphe-core-error: An uncaughtException happened : `, err);
   debugLog.info('Sisyphe-core-error: An uncaughtException happened, check logs');
+  updateLog('Sisyphe-core-error: An uncaughtException happened : ', err);
 });
+
+function updateLog(log,err) {
+  monitor.send({log});
+  debugLog.info(log,err);
+}
