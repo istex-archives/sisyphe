@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "ansicolors": "^0.3.2",
     "await-to-js": "^1.0.1",
     "bluebird": "^3.4.6",
     "get-doctype": "^1.0.0",

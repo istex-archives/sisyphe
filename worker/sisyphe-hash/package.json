@@ -8,6 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "ansicolors": "^0.3.2",
     "bluebird": "^3.5.0"
   },
   "devDependencies": {
