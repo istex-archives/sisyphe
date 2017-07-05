@@ -11,6 +11,7 @@ const sisypheOut = {},
   Promise = require('bluebird'),
   elasticsearch = require('elasticsearch'),
   winston = require('winston'),
+  colors = require('ansicolors'),
   redis = Promise.promisifyAll(require('redis')),
   Elasticsearch = require('winston-elasticsearch');
 
@@ -18,6 +19,7 @@ const sisypheOut = {},
 const template = require('./config/elasticsearch-template.json');
 
 sisypheOut.init = function (options) {
+  this.isInspected = options.isInspected || false;
   options.output = options.output || 'json';
   this.client = new elasticsearch.Client({
     host: ELASTIC_URL,
@@ -34,6 +36,8 @@ sisypheOut.init = function (options) {
     transports: [
       new (winston.transports.File)({
         filename: `logs/analyse-${options.corpusname}.json`,
+        highWaterMark: 24,
+        json: true,
         level: 'debug'
       })
     ]
@@ -63,6 +67,9 @@ sisypheOut.doTheJob = function (data, next) {
       // Path already exist, will skip it.
       next(null, data);
       return;
+    }
+    if(this.isInspected){
+      console.log(`${colors.cyan('out')}: ${data.name}`);
     }
     if (data.hasOwnProperty('updateEs')) {
       // Could be better if winston could do it .. to check

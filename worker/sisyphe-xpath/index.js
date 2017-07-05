@@ -6,6 +6,7 @@ const redisHost = process.env.REDIS_HOST || 'localhost',
 const config = require('./config.json'),
   FromXml = require('xpath-generator').FromXml,
   Promise = require('bluebird'),
+  colors = require('ansicolors'),
   redis = Promise.promisifyAll(require('redis')),
   fs = Promise.promisifyAll(require('fs')),
   path = require('path'),
@@ -22,6 +23,7 @@ var fullXpaths = new Set(),
 
 sisypheXpath.init = function(options){
 
+  this.isInspected = options.isInspected || false;
   config.xpathsOutput = config.xpathsOutput || '/applis/istex/xpaths/';
   config.debug = (config.hasOwnProperty('debug')) ? config.debug : false; 
   config.redisDB = config.redisDB || 1;
@@ -36,11 +38,14 @@ sisypheXpath.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml' || !data.isWellFormed) {
     return next(null, data);
   }
+  if(this.isInspected){
+    console.log(`${colors.green('xpath')}: ${data.name}`);
+  }
   xml.generate(data.path, true).then(result => {
     if(data.debug === true) data.xpath = result;
     let keys = Object.keys(result);
     for (let i = 0; i < keys.length; i++) {
-      redisClient.hincrby(keys[i], 'count' ,result[keys[i]].count);
+      redisClient.hincrby(keys[i], 'countElement' ,result[keys[i]].countElement);
       // Set attributes in hash key
       let attributesRedis = [];
       for(var attr in result[keys[i]].attributes){
@@ -71,7 +76,7 @@ sisypheXpath.finalJob = function (done) {
     });
     xpathsStream.on('open', () => {
       scanAsync(0, '*').map((result) => {
-        return xpathsStream.writeAsync(`${result.key};${result.count};${result.attributes.toString()}\n`);
+        return xpathsStream.writeAsync(`${result.key};${result.countElement};${result.attributes.toString()}\n`);
       }).then(() => {
         xpathsStream.close();
         done();
@@ -96,10 +101,10 @@ function scanAsync(cursor, pattern) {
     if (cursor !== 0) return scanAsync(cursor, '*');
     return Promise.map(fullXpaths, (key) => {
       return redisClient.hgetallAsync(key).then(value => {
-        let count  = value.count;
-        delete value.count;
+        let countElement  = value.countElement;
+        delete value.countElement;
         let attributes = Object.keys(value);
-        return {key: key, count: count, attributes: attributes}
+        return {key: key, countElement: countElement, attributes: attributes}
       });
     })
   });

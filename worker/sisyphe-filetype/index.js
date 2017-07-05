@@ -11,19 +11,25 @@ const os = require('os'),
   magic = Promise.promisifyAll(new Magic(mmm.MAGIC_MIME_TYPE)),
   magicEncoding = Promise.promisifyAll(new Magic(mmm.MAGIC_MIME_ENCODING)),
   magicComplete = Promise.promisifyAll(new Magic()),
+  colors = require('ansicolors'),
   path = require('path'),
   isXml = require('is-xml'),
   firstline = require('firstline');
 
-const sisypheXml = {};
+const sisypheFileType = {};
 
+sisypheFileType.init = function (options) {
+  this.isInspected = options.isInspected || false;
+};
 
-sisypheXml.doTheJob = function (data, next) {
+sisypheFileType.doTheJob = function (data, next) {
   if (data.mimetype) {
     return next(null, data);
   }
+  if(this.isInspected){
+    console.log(`${colors.yellow('filetype')}: ${data.name}`);
+  }
 
-  // .nxml (BMJ) & .Meta (Springer)
   mime.define({
     'application/xml': ["nxml", "meta", "xlink_v03", "prime_v03", "plusxml_v02", "plusprime_v02", "info_V03", "citation_v03", "aux_v03"]
   });
@@ -81,4 +87,4 @@ sisypheXml.doTheJob = function (data, next) {
   })
 };
 
-module.exports = sisypheXml;
+module.exports = sisypheFileType;

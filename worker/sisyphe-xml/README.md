@@ -50,7 +50,19 @@ Sisyphe xml will firstly check if XML is wellformed or not.
 If XML is wellformed, Sisyphe-xml is able to check XML against DTD, you just have to create a directory in `sisyphe-xml/conf/folderName`
 where "folderNamme" is the folderName you entered in sisyphe command.
 
-In the nearly created folder you have to create a "sisyphe-xml.json". You will enter XML configuration in it.
+In the nearly created folder you have to create a "sisyphe-xml.json" config file & put your dtd files ina dtd folder.
+
+In the config file you just have to put your relative mains entries dtd's path:
+
+eg
+
+```javascript
+{
+  dtd: ['folder/file1.dtd', 'folder/file2.dtd']
+}
+```
+
+Sisyphe will check dtd against file1 then file2 ...
 
 
 #### Info
@@ -69,5 +81,35 @@ There are 2 options you can use:
   - Text extraction
   - Count elements
 
-#### You can see exemples in config folder in this repo
+#### Config of extracted metadata
+
+You will have to create your own sisyphe-xml.json config files, you will have to writte an array of objects containing xpath name, path & type.
+
+eg
+
+```javascript
+{
+  medatada: [{name, type xpath},{name, type xpath, regex},{...}]
+}
+```
+
+NAME: An Id, must be present only one time [required]
+TYPE: String, Number, Boolean, Count, Attribute [required]
+XPATH: the path of the value you want to get [required]
+Regex: A javascript regex to check if the value returned is in a correct form. [optional]
+
+In the end you should have something like:
+
+eg
+
+```javascript
+{
+  medatada: [{"name": "publicationYear", "type": "Number", "xpath": "///article-meta/pub-date/year", "regex": "^([0-9]{4})$" },{...}]
+}
+```
+
+You can find a complete exemple [here](/worker/sisyphe-xml/conf/exemple)
+
+
+
 

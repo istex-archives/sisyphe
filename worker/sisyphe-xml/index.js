@@ -5,6 +5,7 @@ const assert = require('assert'),
   DOMParser = require('xmldom').DOMParser,
   xpath = require('xpath'),
   Promise = require('bluebird'),
+  colors = require('ansicolors'),
   fs = Promise.promisifyAll(require('fs')),
   exec = Promise.promisify(require('child_process').exec),
   getDoctype = require("get-doctype"),
@@ -24,6 +25,7 @@ function to(promise, errorExt) {
 const sisypheXml = {};
 
 sisypheXml.init = function (options) {
+  this.isInspected = options.isInspected || false;
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
   let confContents = fs.readdirSync(this.configDir);
   //We search the nearest config in configDir
@@ -43,56 +45,60 @@ sisypheXml.init = function (options) {
     }
   }
 
-  return this
+  return this;
 };
 
-sisypheXml.doTheJob = function (docObject, next) {
-  if (docObject.mimetype !== 'application/xml') return next(null, docObject);
+sisypheXml.doTheJob = function (data, next) {
+  if (data.mimetype !== 'application/xml') return next(null, data);
+
+  if(this.isInspected){
+    console.log(`${colors.red('xml')}: ${data.name}`);
+  }
 
   (async () => {
     let error, xmlDom, validationDTDResult;
 
-    [error, docObject.doctype] = await to(this.getDoctype(docObject.path));
+    [error, data.doctype] = await to(this.getDoctype(data.path));
 
-    [docObject.error, xmlDom] = await to(this.getXmlDom(docObject.path));
-    if (docObject.error) {
-      docObject.isWellFormed = false;
-      return docObject;
+    [data.error, xmlDom] = await to(this.getXmlDom(data.path));
+    if (data.error) {
+      data.isWellFormed = false;
+      return data;
     }
 
-    docObject.isWellFormed = true;
+    data.isWellFormed = true;
 
-    if (!this.isConfExist) return docObject;
+    if (!this.isConfExist) return data;
 
-    [error, validationDTDResult] = await to(this.validateAgainstDTD(docObject, this.dtdsPath));
-    if (docObject.error) {
-      docObject.isValidAgainstDTD = false;
-      return docObject;
+    [error, validationDTDResult] = await to(this.validateAgainstDTD(data, this.dtdsPath));
+    if (data.error) {
+      data.isValidAgainstDTD = false;
+      return data;
     }
 
-    docObject.isValidAgainstDTD = true;
-    docObject.validationDTDInfos = validationDTDResult;
+    data.isValidAgainstDTD = true;
+    data.validationDTDInfos = validationDTDResult;
     let metadatas;
     const conf = cloneDeep(this.conf);
-    [docObject.error, metadatas] = await to(this.getMetadataInfos(this.conf, xmlDom));
-    if (docObject.error) {
-      return docObject;
+    [data.error, metadatas] = await to(this.getMetadataInfos(conf, xmlDom));
+    if (data.error) {
+      return data;
     }
 
     metadatas.map((metadata) => {
       if (!metadata.hasOwnProperty('isValueValid')) {
         // no isValueValid , we stop here
-        docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+        data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
         return;
       }
-      docObject[metadata.name + 'IsValid'] = metadata.isValueValid;
+      data[metadata.name + 'IsValid'] = metadata.isValueValid;
       if (metadata.isValueValid) {
-        docObject[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+        data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
       } else {
-        docObject[metadata.name + 'Error'] = metadata.value;
+        data[metadata.name + 'Error'] = metadata.value;
       }
     });
-    return docObject;
+    return data;
   })().then((docObject) => {
     if (docObject.error) docObject.error = JSON.stringify(docObject.error);
     next(null, docObject)
@@ -153,6 +159,10 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
     // Select the first XPATH possibility
     if (Array.isArray(metadata.xpath)) {
       for (let i = 0; i < metadata.xpath.length; i++) {
+        //string is special because we need all text in its child too
+        if(metadata.type === 'String') {
+          metadata.xpath[i] = `string(${metadata.xpath[i]})`;
+        }
         const itemElement = xpathSelect(metadata.xpath[i], xmlDom);
         if (itemElement.length) {
           metadata.element = itemElement;
@@ -161,11 +171,14 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
       }
       metadata.element = metadata.element || [];
     } else {
+      //string is special because we need all text in its child too
+      if(metadata.type === 'string') {
+        metadata.xpath[i] = `string(${metadata.xpath})`;
+      }
       metadata.element = xpathSelect(metadata.xpath, xmlDom);
     }
-
     if (metadata.hasOwnProperty('element')) {
-      metadata.element.isEmpty = metadata.element.length;
+      if(metadata.type !== 'String') metadata.element.isEmpty = metadata.element.length;
       if (metadata.element.isEmpty) {
         metadata.element.hasFirstChild = metadata.element[0].hasOwnProperty('firstChild');
       }
@@ -175,9 +188,13 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
 
       switch (metadata.type) {
         case "String":
-          if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
-            metadata.value = metadata.element[0].firstChild.data;
+          if((metadata.element.length && (typeof metadata.element === 'string'))){
+            metadata.value =  metadata.element;
           }
+          else if ((typeof metadata.element === 'object') &&
+            metadata.element[0] && metadata.element[0].firstChild && metadata.element[0].firstChild.data) {
+              metadata.value = metadata.element[0].firstChild.data;
+            }
           break;
         case "Number":
           if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
@@ -195,6 +212,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
           break;
       }
     }
+
     return metadata;
   }).map((metadata) => {
     if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {

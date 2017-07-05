@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-hash",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Sisyphe module to add an hash for every file",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "ansicolors": "^0.3.2",
     "bluebird": "^3.5.0"
   },
   "devDependencies": {

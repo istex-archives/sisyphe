@@ -22,6 +22,7 @@ program
   .option('-n, --corpusname <name>', 'Choose an identifier \'s Name', 'default')
   .option('-c, --config-dir <path>', 'Config folder path')
   .option('-o, --output <all/json>', 'Output destination')
+  .option('-t, --thread <number>', 'Number of fork to create via Node cluster')
   .option('-r, --remove-module <name>', 'Remove module name from the workflow', appender(), [])
   .parse(process.argv);
 
@@ -54,12 +55,14 @@ let starter = {
 let options = {
   corpusname: program.corpusname,
   configDir: program.configDir,
-  output: program.output
+  output: program.output,
+  isInspected
 };
 
 let workers = [{
   name: "filetype",
-  module: "sisyphe-filetype"
+  module: "sisyphe-filetype",
+  options
 }, {
   name: "xml",
   module: "sisyphe-xml",
@@ -99,23 +102,8 @@ if (!pathInput && program.corpusname) {
       corpusname: program.corpusname
     }
   };
-  workers = [{
-    name: "Sisyphe XML",
-    module: "sisyphe-xml",
-    options: {
-      corpusname: program.corpusname,
-      configDir: program.configDir
-    }
-  }, {
-    name: "Sisyphe Output",
-    module: "sisyphe-out",
-    options: {
-      corpusname: program.corpusname,
-      output: program.output
-    }
-  }];
-  let sisyphe = new Sisyphe(starter, workers, isInspected);
-  sisyphe.start();
+  let sisyphe = new Sisyphe(starter, workers, isInspected, program.thread);
+  sisyphe.start(program.thread);
   return;
 }
 
@@ -125,7 +113,7 @@ fs.statAsync(pathInput).catch((error) => {
 }).then(() => {
   return new Sisyphe(starter, workers, isInspected);
 }).then((sisyphe) => {
-  sisyphe.start();
+  sisyphe.start(program.thread);
 });
 
 

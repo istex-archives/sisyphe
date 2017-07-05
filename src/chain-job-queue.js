@@ -1,13 +1,11 @@
 'use strict';
 
 const Queue = require('bull'),
-  bluebird = require('bluebird'),
-  redis = require('redis'),
+  Promise = require('bluebird'),
   kuler = require('kuler'),
   winston = require('winston'),
   debounce = require('lodash/debounce'),
-  throttle = require('lodash/throttle'),
-  clientRedis = redis.createClient();
+  throttle = require('lodash/throttle');
 
 const logger = new (winston.Logger)({
   exitOnError: false,
@@ -21,14 +19,24 @@ const logger = new (winston.Logger)({
   ]
 });
 
-bluebird.promisifyAll(redis.RedisClient.prototype);
-bluebird.promisifyAll(redis.Multi.prototype);
+// Check redis connection
+const redis = require('redis'),
+clientRedis = redis.createClient();
+
+clientRedis.on('error', err=>{
+  console.error(`Redis does not appears to be started`);
+  logger.error(err);
+});
+
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
 
 class ChainJobQueue {
-  constructor(redisPort, redisHost) {
+  constructor(redisPort, redisHost, isInspected) {
     this.listWorker = [];
     this.redisPort = redisPort || 6379;
     this.redisHost = redisHost || '127.0.0.1';
+    this.isInspected = isInspected || false;
   }
 
   addWorker(name, worker, options) {
@@ -69,7 +77,9 @@ class ChainJobQueue {
     }).map((worker, index, listWorker) => {
       worker.queue.on('failed', (job, error) => {
         logger.error({errorFailed: error.toString(), data: job.data});
-        process.stdout.write(kuler('|', 'red'));
+        if(this.isInspected){
+          console.error(error);
+        }
         worker.totalFailedTask++;
         clientRedis.hincrby('sisyphe', job.queue.name + ':totalFailedTask', 1);
         clientRedis.hincrby('sisyphe', 'totalFailedTask', 1);

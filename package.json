@@ -1,6 +1,6 @@
 {
   "name": "sisyphe",
-  "version": "0.6.0",
+  "version": "0.8.5",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "ansicolors": "^0.3.2",
     "blessed": "^0.1.81",
     "bluebird": "^3.4.1",
     "bull": "https://github.com/MatthD/bull.git",
@@ -30,7 +31,9 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-events": "0.0.1",
     "lerna": "2.0.0-beta.36",
-    "mocha": "^3.1.2"
+    "mocha": "^3.1.2",
+    "node-inspector": "^1.1.1"
   }
 }

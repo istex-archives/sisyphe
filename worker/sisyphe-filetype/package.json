@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-filetype",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Sisyphe module to detect file type",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/istex/sisyphe-filetype#readme",
   "dependencies": {
+    "ansicolors": "^0.3.2",
     "bluebird": "^3.4.6",
     "file-type": "^3.9.0",
     "firstline": "^1.2.0",

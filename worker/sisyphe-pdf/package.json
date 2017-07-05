@@ -1,6 +1,6 @@
 {
   "name": "sisyphe-pdf",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Get the PDF informations",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "ansicolors": "^0.3.2",
     "bluebird": "^3.4.6",
     "pdfjs-dist": "~1.6.297",
     "xmldom": "^0.1.22"

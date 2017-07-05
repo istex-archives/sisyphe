@@ -1,16 +1,13 @@
 'use strict';
 
-const ChainJobQueue = require('./chain-job-queue'),
-  path = require('path'),
-  bluebird = require('bluebird'),
+const path = require('path'),
+  Promise = require('bluebird'),
   winston = require('winston'),
-  fs = bluebird.promisifyAll(require('fs')),
+  fs = Promise.promisifyAll(require('fs')),
   blessed = require('blessed'),
-  redis = require('redis'),
-  clientRedis = redis.createClient(),
   cluster = require('cluster'),
   ms = require('pretty-ms'),
-  numberFork = Math.floor(require('os').cpus().length * 3 / 4);
+  nbOfCpus = require('os').cpus().length;
 
 const loggerInfo = new (winston.Logger)({
   exitOnError: false,
@@ -33,8 +30,20 @@ const loggerError = new (winston.Logger)({
     })
   ]
 });
-bluebird.promisifyAll(redis.RedisClient.prototype);
-bluebird.promisifyAll(redis.Multi.prototype);
+
+// Check at redis connection
+const  redis = require('redis'),
+clientRedis = redis.createClient();
+
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
+
+clientRedis.on('error', err=>{
+  console.error(`Redis does not seems launched`);
+  loggerError.error(err);
+});
+
+const ChainJobQueue = require('./chain-job-queue');
 
 class Sisyphe {
   constructor(starter, workers, isInspected) {
@@ -47,17 +56,23 @@ class Sisyphe {
     this.starter = starter || defaultStarter;
     this.isInspected = isInspected || false;
     const defaultWorkers = [{
-      name: "SisypheFileType",
+      name: "hash",
+      module: "sisyphe-hash"
+    },{
+      name: "filetype",
       module: "sisyphe-filetype"
     }, {
-      name: "SisypheXML",
+      name: "xml",
       module: "sisyphe-xml"
     }, {
-      name: "SisyphePDF",
+      name: "pdf",
       module: "sisyphe-pdf"
     }, {
-      name: "SisypheXPATH",
+      name: "xpath",
       module: "sisyphe-xpath"
+    },{
+      name: "out",
+      module: "sisyphe-out"
     }];
     this.workers = workers || defaultWorkers;
     if (cluster.isMaster  && !this.isInspected) {
@@ -115,7 +130,7 @@ class Sisyphe {
             fg: 'blue'
           }
         }
-      })
+      });
 
       this.tableProgress = blessed.table({
         top: 20,
@@ -155,10 +170,10 @@ class Sisyphe {
 
   heartbeat() {
     const callFinishers = () => {
-      return bluebird.filter(this.workflow.listWorker, (worker) => {
+      return Promise.filter(this.workflow.listWorker, (worker) => {
         return worker.features.finalJob !== undefined
       }).map((worker) => {
-        return bluebird.promisify(worker.features.finalJob)();
+        return Promise.promisify(worker.features.finalJob)();
       })
     };
 
@@ -222,20 +237,24 @@ class Sisyphe {
     }, 2000);
   }
 
-  start() {
+  start(numberFork=(Math.floor(nbOfCpus * 3 / 4))) {
     this.initializeWorker().then(() => {
       if (cluster.isMaster) {
         for (let i = 0; i < numberFork; i++) {
           const fork = cluster.fork();
           fork.on('online', () => {
             loggerInfo.info('fork created');
-            this.list.add(`fork created`);
-            if (!this.isInspected) this.screen.render();
+            if (!this.isInspected) {
+              this.list.add(`fork created`);
+              this.screen.render()
+            };
           });
           fork.on('exit', () => {
             cluster.fork();
             loggerInfo.info('fork exit');
-            this.list.add(`fork exit`)
+            if (!this.isInspected) {
+              this.list.add(`fork exit`)
+            }
           });
         }
         this.initializeStarter()
@@ -249,9 +268,9 @@ class Sisyphe {
 
   initializeWorker() {
     const workerDirectory = path.resolve(__dirname + "/../worker");
-    this.workflow = new ChainJobQueue();
+    this.workflow = new ChainJobQueue(null,null,this.isInspected);
 
-    return bluebird.map(this.workers, (worker) => {
+    return Promise.map(this.workers, (worker) => {
       return fs.accessAsync(workerDirectory + "/" + worker.module)
     }).then(() => {
       return this.workers.map((worker) => {
