@@ -3,7 +3,8 @@ logs/*
 *.log
 npm-debug.log*
 job/
-temp/
+temp/*
+config/temp/*
 xpaths
 checksum
 
