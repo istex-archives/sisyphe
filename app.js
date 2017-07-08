@@ -1,6 +1,9 @@
 #!/usr/bin/env node --max_old_space_size=4096
 'use strict';
 
+const v8 = require('v8');
+v8.setFlagsFromString('--max_old_space_size=4096');
+
 const kue = require('kue'),
   redis = require('redis'),
   recluster = require('recluster'),
@@ -124,7 +127,7 @@ clientRedis.flushall();
 /***********/
 let monitor = cp.fork('src/monitor.js');
 monitor.send({workers, startAt, workersListNames});
-monitor.on('exit', (code)=>{
+monitor.on('exit', function(code){
   console.log('Close main program');
   process.exit(0);
 });
@@ -146,7 +149,7 @@ fs.readdir(pathInput, function (err, elements) {
     splitedArray.push(elements.slice(i,i+lot));
   }
   // Start Walker cluster
-  let walkerCluster = recluster(path.join(__dirname, 'src', 'starter', 'walker-fs.js'), {workers : walkerCPUS});
+  let walkerCluster = recluster(path.join(__dirname, 'src', 'starter', 'walker-fs.js'), {workers : walkerCPUS, log: {respawns: true}});
   updateLog(`Sisyphe-core: start cluster of ${walkerCPUS} walkers`);
   walkerCluster.run();
   let walkerList = walkerCluster.workers();

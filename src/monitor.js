@@ -3,13 +3,16 @@
  */
 'use strict';
 
+const v8 = require('v8');
+v8.setFlagsFromString('--max_old_space_size=4096');
+
 const blessed = require('blessed'),
   contrib = require('blessed-contrib'),
   colors = require('colors/safe'),
   ms = require('pretty-ms');
 
 let processingMonitor = new Monitor();
-processingMonitor.interval = setInterval(processingMonitor.update,2000);
+processingMonitor.interval = setInterval(processingMonitor.update,180000);
 
 function Monitor () {
   let self = this;
@@ -32,7 +35,7 @@ function Monitor () {
         setTimeout(function () {
           //stop monitor
           clearInterval(self.interval);
-        },2100);
+        },181000);
       }
     }
   });

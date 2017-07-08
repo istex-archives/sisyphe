@@ -1,5 +1,8 @@
 'use strict';
 
+const v8 = require('v8');
+v8.setFlagsFromString('--max_old_space_size=4096');
+
 const walk = require('walk'),
   util = require('util'),
   through2 = require('through2'),
@@ -35,7 +38,7 @@ function walkOnInput(queue,element,options,cb) {
       name: stats.name,
       size: stats.size
     });
-    if (items.length === 100) {
+    if (items.length === 500) {
       createQueueFiles(items,queue,options);
     }
     next();
