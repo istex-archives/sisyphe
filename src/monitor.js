@@ -12,7 +12,7 @@ const blessed = require('blessed'),
   ms = require('pretty-ms');
 
 let processingMonitor = new Monitor();
-processingMonitor.interval = setInterval(processingMonitor.update,180000);
+processingMonitor.interval = setInterval(processingMonitor.update,50);
 
 function Monitor () {
   let self = this;
@@ -35,7 +35,7 @@ function Monitor () {
         setTimeout(function () {
           //stop monitor
           clearInterval(self.interval);
-        },181000);
+        },2100);
       }
     }
   });

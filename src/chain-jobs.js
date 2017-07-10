@@ -3,6 +3,7 @@
 const path = require('path'),
   kue = require('kue'),
   winston = require('winston'),
+  _ = require('lodash'),
   workers = require(path.resolve(__dirname, '..', 'config', 'temp', 'workers.json'));
 
 const debugLog = new (winston.Logger)({
@@ -29,17 +30,13 @@ function doTasks(taskNb,cb){
   queue.process(`${workers[taskNb].name}${process.env.WORKER_ID}`, 1, function (job, done) {
     job.data.info.processorNumber = process.env.WORKER_ID;
     task[taskNb].doTheJob(job.data, function (err, data) {
-      // job.remove(function(err){
-      //   if (err) {
-      //     process.send({ error: `Error happend when trying to delete jobs in redis ${err}` });
-      //   }
-      // });
       if(err){
         process.send({id: data.info.id, type: data.info.type, processedFiles: true, error: true});
         return;
       }
       // Send info to master to increment data
-      process.send({id: data.info.id, type: data.info.type, processedFiles: true});
+      workers[data.info.id].processedFiles++;
+      sendInfo();
       // There are more worker to do with this job process
       if(data.info.id < workers.length-1){
         data.info.id++;
@@ -64,3 +61,11 @@ for(let i = 0; i < workers.length; i++){
   }
   doTasks(i);
 }
+
+let sendInfo = _.debounce(function () {
+  for(var i = 0; i< workers.length; i++){
+    // console.log('DEBOUNCE', workers[i].processedFiles, ' id ', );
+    process.send({id: i, type: workers[i].module, processedFiles: workers[i].processedFiles});
+    workers[i].processedFiles = 0;
+  }
+}, 2000, {maxWait: 3000});

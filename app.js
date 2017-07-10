@@ -202,11 +202,11 @@ for(let i = 0; i < clusterList.length; i++){
       updateLog(`Sisyphe-module-error: ${message.type}: `, message.error);
     }
     if(message.id === workers.length-1){
-      totalPerformedFiles++;
+      totalPerformedFiles+= message.processedFiles;
     }
     if(message.processedFiles){
-      workers[message.id].processedFiles++;
-      totalPermormedTasks++;
+      workers[message.id].processedFiles+= message.processedFiles;
+      totalPermormedTasks+= message.processedFiles;
     }
     monitor.send({totalFailedTask,totalPerformedFiles,currentFoundFiles,workers});
   });
