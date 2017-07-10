@@ -1,8 +1,5 @@
 'use strict';
 
-const v8 = require('v8');
-v8.setFlagsFromString('--max_old_space_size=4096');
-
 const path = require('path'),
   kue = require('kue'),
   winston = require('winston'),

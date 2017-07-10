@@ -1,9 +1,6 @@
 #!/usr/bin/env node --max_old_space_size=4096
 'use strict';
 
-const v8 = require('v8');
-v8.setFlagsFromString('--max_old_space_size=4096');
-
 const kue = require('kue'),
   redis = require('redis'),
   recluster = require('recluster'),
