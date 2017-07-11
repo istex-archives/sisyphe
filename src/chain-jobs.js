@@ -6,23 +6,12 @@ const path = require('path'),
   _ = require('lodash'),
   workers = require(path.resolve(__dirname, '..', 'config', 'temp', 'workers.json'));
 
-const debugLog = new (winston.Logger)({
-  exitOnError: false,
-  transports: [
-    new (winston.transports.File)({
-      name: 'sisyphe-info',
-      filename: 'logs/sisyphe.json',
-      level: 'info'
-    })
-  ]
-});
-
 const queue = kue.createQueue();
 queue.on( 'error', function( err ) {
-  debugLog.info(`Sysiphe-core-error: kue: `, err);
+  process.send({error: err});
 });
 
-// load tasks`
+// load tasks
 let task = [];
 
 function doTasks(taskNb,cb){
@@ -31,7 +20,7 @@ function doTasks(taskNb,cb){
     job.data.info.processorNumber = process.env.WORKER_ID;
     task[taskNb].doTheJob(job.data, function (err, data) {
       if(err){
-        process.send({id: data.info.id, type: data.info.type, processedFiles: true, error: true});
+        process.send({id: data.info.id, type: data.info.type, processedFiles: true, error: err});
         return;
       }
       // Send info to master to increment data
@@ -64,7 +53,6 @@ for(let i = 0; i < workers.length; i++){
 
 let sendInfo = _.debounce(function () {
   for(var i = 0; i< workers.length; i++){
-    // console.log('DEBOUNCE', workers[i].processedFiles, ' id ', );
     process.send({id: i, type: workers[i].module, processedFiles: workers[i].processedFiles});
     workers[i].processedFiles = 0;
   }

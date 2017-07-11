@@ -156,6 +156,7 @@ fs.readdir(pathInput, function (err, elements) {
     walkerList[i].on('message', function (message) {
       if(message.currentFoundFiles){
         currentFoundFiles+= message.currentFoundFiles;
+        monitor.send({currentFoundFiles});
       }
       // A walker has finished its tasks
       if(message.end){
@@ -205,8 +206,8 @@ for(let i = 0; i < clusterList.length; i++){
       totalPerformedFiles+= message.processedFiles;
     }
     if(message.processedFiles){
-      workers[message.id].processedFiles+= message.processedFiles;
-      totalPermormedTasks+= message.processedFiles;
+      workers[message.id].processedFiles += message.processedFiles;
+      totalPermormedTasks += message.processedFiles;
     }
     monitor.send({totalFailedTask,totalPerformedFiles,currentFoundFiles,workers});
   });
