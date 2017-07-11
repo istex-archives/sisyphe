@@ -4,6 +4,8 @@
 'use strict';
 
 const v8 = require('v8');
+const cpuStat = require('cpu-stat')
+const os = require('os')
 v8.setFlagsFromString('--max_old_space_size=4096');
 
 const blessed = require('blessed'),
@@ -130,11 +132,18 @@ function Monitor () {
        inverse: true
     }
   });
+  this.htop = this.grid.set(0, 8, 2, 4, contrib.bar,{
+    label: 'Usage',
+    barWidth: 4,
+    barSpacing: 6,
+    xOffset: 0,
+    maxHeight: 9})
 
   this.screen.append(this.tableProgress);
   this.screen.append(this.tableModules);
   this.screen.append(this.log);
   this.screen.append(this.donut);
+  this.screen.append(this.htop);
   this.screen.render();
   self.log.focus()
   this.screen.on('resize', _=> {
@@ -142,7 +151,6 @@ function Monitor () {
     this.log.emit('attach');
     this.tableProgress.emit('attach');
   });
-
   this.update = function () {
     let progress = self.totalFoundFiles ? (self.totalPerformedFiles / self.totalFoundFiles) : 0;
     let color = "red";
@@ -152,7 +160,11 @@ function Monitor () {
     self.donut.setData([
       {percent: progress.toFixed(2), label: 'Total progression', 'color': color}
     ]);
-
+    cpuStat.usagePercent((err, percent, seconds) => {
+      self.htop.setData({
+          titles:['CPUs', "RAM"],
+          data:[~~percent, 100 - ~~((os.freemem() * 100) / os.totalmem())]
+        })})
     // Set info for all modules
     let data = [];
     for(let j = 0; j < self.workers.length; j++){
