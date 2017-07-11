@@ -50,9 +50,32 @@ function Monitor () {
   this.screen = blessed.screen({
     smartCSR: true
   });
+
+  this.question = blessed.question({
+    parent: this.screen,
+    border: 'line',
+    height: 'shrink',
+    width: 'half',
+    top: 'center',
+    left: 'center',
+    label: ' {red-fg}Question{/red-fg} ',
+    tags: true,
+    keys: true,
+    vi: true,
+    style: {
+      border: {
+        fg: 'red'
+      }
+    }
+  });
   // exit the program by using esc q or ctl-c
   this.screen.key(['C-c'], (ch, key) => {
-    process.exit(0);
+    this.question.setIndex(999999);
+    this.question.ask('Do you want to quit Sisyphe ?', function (err,res) {
+      if(res === true){
+        process.exit(0);
+      }
+    });
   });
   this.grid = new contrib.grid({rows: 12, cols: 12, screen: this.screen});
   this.duration = this.grid.set(8, 4, 4, 4, blessed.box,

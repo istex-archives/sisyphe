@@ -125,7 +125,7 @@ clientRedis.flushall();
 let monitor = cp.fork('src/monitor.js');
 monitor.send({workers, startAt, workersListNames});
 monitor.on('exit', function(code){
-  console.log('Close main program');
+  console.log('Close sisyphe');
   process.exit(0);
 });
 
