@@ -124,11 +124,11 @@ function Monitor () {
     fg: "green",
     selectedFg: "green",
     label: 'Sisyphe Log',
-    scrollable: true
-    // enableMouse: true,
-    // mouse: true,
-    // input: true,
-    // focused: true
+    keys:true,
+    scrollbar: {
+       ch: ' ',
+       inverse: true
+    }
   });
 
   this.screen.append(this.tableProgress);
@@ -136,6 +136,7 @@ function Monitor () {
   this.screen.append(this.log);
   this.screen.append(this.donut);
   this.screen.render();
+  self.log.focus()
   this.screen.on('resize', _=> {
     this.donut.emit('attach');
     this.log.emit('attach');
