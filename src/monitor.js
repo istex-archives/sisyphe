@@ -115,8 +115,8 @@ function Monitor () {
   this.update = function () {
     let progress = self.totalFoundFiles ? (self.totalPerformedFiles / self.totalFoundFiles) : 0;
     let color = "red";
-    if (progress >= 0.25) color = "orange";
-    if (progress >= 0.5) color = "yellow";
+    if (progress >= 0.25) color = "yellow";
+    if (progress >= 0.5) color = "cyan";
     if (progress >= 0.75) color = "green";
     self.donut.setData([
       {percent: progress.toFixed(2), label: 'Total progression', 'color': color}
