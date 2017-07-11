@@ -3,6 +3,7 @@
 
 const kue = require('kue'),
   redis = require('redis'),
+  async = require('async'),
   recluster = require('recluster'),
   program = require('commander'),
   fs = require('fs'),
@@ -27,7 +28,6 @@ program
 /************/
 /*  ARGVS  */
 /***********/
-
 // Corpusname is default, we stop here
 if (program.corpusname === 'default') {
   program.outputHelp();
@@ -110,7 +110,7 @@ const debugLog = new (winston.Logger)({
 // Check at redis connection
 const clientRedis = redis.createClient();
 clientRedis.on('error', function(err){
-  updateLog('Redis has a problem, is it started ? Check logs for informations',err);
+  updateLog('Redis has a problem, is it started ? Check logs for informations',err,'error');
 });
 // Flush all redis database before start
 clientRedis.flushall();
@@ -132,7 +132,7 @@ monitor.on('exit', function(code){
 let currentFoundFiles = 0, totalPerformedFiles= 0, totalFailedTask= 0, totalFoundFiles = 0, totalPermormedTasks = 0;
 fs.readdir(pathInput, function (err, elements) {
   if(err){
-    updateLog('Sisyphe-core: Cannot read Input: ', err);
+    updateLog('Sisyphe-core: Cannot read Input: ', err, 'error');
     monitor.send({stop: true});
     return;
   }
@@ -144,7 +144,7 @@ fs.readdir(pathInput, function (err, elements) {
   }
   // Start Walker cluster
   let walkerCluster = recluster(path.join(__dirname, 'src', 'starter', 'walker-fs.js'), {workers : walkerCPUS, log: {respawns: true}});
-  updateLog(`Sisyphe-core: start cluster of ${walkerCPUS} walkers`);
+  updateLog(`Sisyphe-core: start cluster of ${walkerCPUS} walkers`,null,'walker');
   walkerCluster.run();
   let walkerList = walkerCluster.workers();
   let finishedWalker = 0;
@@ -159,10 +159,10 @@ fs.readdir(pathInput, function (err, elements) {
       if(message.end){
         finishedWalker++;
         // All walker have finished their tasks
-        updateLog(`Sisyphe-core: walker N°${finishedWalker} has finished`);
+        updateLog(`Sisyphe-core: walker N°${finishedWalker} has finished`,null,'walker');
         if(finishedWalker === walkerList.length){
           totalFoundFiles = currentFoundFiles;
-          updateLog('Sisyphe-core: Walker: All files found');
+          updateLog('Sisyphe-core: Walker: All files found',null,'walker');
           // We only start heartbeat at the end when all files are in redis
           let timer = setInterval(function () {
             monitor.send({totalFoundFiles, totalPerformedFiles, totalFailedTask, currentFoundFiles, workers});
@@ -175,8 +175,15 @@ fs.readdir(pathInput, function (err, elements) {
             clearInterval(timer);
             updateLog('Sisyphe-core: All files proceded');
             // Stop the monitor but do not quit it
-            monitor.send({stop: true});
-            execFinaljobs();
+            execFinaljobs(function (err) {
+              if(err){
+                updateLog(`Sisyphe-Core: final-jobs-errors: ${err}`, err);
+              }
+              let sisypheEndAt = new Date().getTime();
+              let duration = ms(sisypheEndAt - startAt);
+              updateLog(`Sisyphe-core: end after ${duration}`);
+              monitor.send({stop: true});
+            });
           },3000);
         }
       }
@@ -199,7 +206,7 @@ for(let i = 0; i < clusterList.length; i++){
     //if it's the lastest job
     if(message.error){
       totalFailedTask++;
-      updateLog(`Sisyphe-module-error: ${message.type}: `, message.error);
+      updateLog(`Sisyphe-module-error: ${message.type}: `, message.error, 'error');
     }
     if(message.id === workers.length-1){
       totalPerformedFiles+= message.processedFiles;
@@ -215,14 +222,33 @@ for(let i = 0; i < clusterList.length; i++){
 
 // Continue sisyphe if an unknown error is happening
 process.on('uncaughtException', function(err) {
-  debugLog.info(`Sisyphe-core-error: An uncaughtException happened : `, err);
-  debugLog.info('Sisyphe-core-error: An uncaughtException happened, check logs');
-  updateLog('Sisyphe-core-error: An uncaughtException happened : ', err);
+  updateLog('Sisyphe-core-error: An uncaughtException happened : ', err, 'error');
 });
 
+// Executes all finaljobs
+function execFinaljobs(done) {
+  async.forEachOf(workers, function (val,i,next) {
+    let fTaks = require(path.resolve(__dirname, 'worker', val.module));
+    if(fTaks && fTaks.finalJob){
+      updateLog(`Sisyphe-module: final-job: Starting final job of ${val.name} ...`);
+      // Exec finalJob, must be a standAlone functions
+      fTaks.finalJob(options,function (err) {
+        if (err) {
+          updateLog(`Sisyphe-module-error: final-job: Error in final job of ${val.name}`,err);
+          return next(err);
+        }
+        updateLog(`Sisyphe-module: final-job:${val.name} executed`);
+        next();
+      });
+    }else{
+      next();
+    }
+  },done);
+}
+
 // Uses to update Monitor & debug File
-function updateLog(log,err) {
-  monitor.send({log});
+function updateLog(log,err,type) {
+  monitor.send({log,type});
   debugLog.info(log,err);
 }
 
@@ -233,26 +259,4 @@ function appender(xs) {
     xs.push(x);
     return xs;
   };
-}
-
-// Executes all finaljobs
-function execFinaljobs() {
-  for(let i = 0; i < workers.length; i++){
-    let fTaks = require(path.resolve(__dirname, 'worker', workers[i].module));
-    if(fTaks && fTaks.finalJob){
-      updateLog(`Sisyphe-module: final-job: Starting final job of ${workers[i].name} ...`);
-      // Exec finalJob, must be a standAlone functions
-      fTaks.finalJob(options,function (err) {
-        let sisypheEndAt = new Date().getTime();
-        let duration = ms(sisypheEndAt - startAt);
-        updateLog(`Sisyphe-core: end after ${duration}`);
-        monitor.send({stop: true});
-        if (err) {
-          updateLog(`Sisyphe-module-error: final-job: Error in final job of ${workers[i].name}`,err);
-          return;
-        }
-        updateLog(`Sisyphe-module: final-job:${workers[i].name} executed`);
-      });
-    }
-  }
 }

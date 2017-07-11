@@ -26,12 +26,15 @@ function Monitor () {
     self.totalFoundFiles = options.totalFoundFiles ? options.totalFoundFiles : self.totalFoundFiles;
     self.totalPerformedFiles = options.totalPerformedFiles ? options.totalPerformedFiles : self.totalPerformedFiles;
     self.currentFoundFiles = options.currentFoundFiles ? options.currentFoundFiles : self.currentFoundFiles;
+    let logsColors = {error: 'red', walker: 'yellow', default: 'green'};
     if(options){
       if(options.hasOwnProperty('log')){
-        self.log.log(options.log);
+        options.type = options.type || 'default';
+        self.log.log(colors[logsColors[options.type]](options.log));
       }
       if(options.hasOwnProperty('stop') && options.stop){
         // SetTimeOut to be sure to show the lastest value
+        self.log.log(colors.cyan('Stopping Sisyphe monitor'));
         setTimeout(function () {
           //stop monitor
           clearInterval(self.interval);
@@ -117,10 +120,15 @@ function Monitor () {
     yPadding: 2,
     data: [{label: 'Progress %', percent: 0}]
   });
-  this.log = this.grid.set(0, 4, 4, 4, contrib.log, {
+  this.log = this.grid.set(0, 4, 4, 4, blessed.log, {
     fg: "green",
     selectedFg: "green",
-    label: 'Sisyphe Log'
+    label: 'Sisyphe Log',
+    scrollable: true
+    // enableMouse: true,
+    // mouse: true,
+    // input: true,
+    // focused: true
   });
 
   this.screen.append(this.tableProgress);
@@ -128,7 +136,6 @@ function Monitor () {
   this.screen.append(this.log);
   this.screen.append(this.donut);
   this.screen.render();
-  this.tableProgress.focus();
   this.screen.on('resize', _=> {
     this.donut.emit('attach');
     this.log.emit('attach');
