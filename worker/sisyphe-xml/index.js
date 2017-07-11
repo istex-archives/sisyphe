@@ -70,7 +70,7 @@ sisypheXml.doTheJob = function (data, next) {
 
     if (!this.isConfExist) return data;
 
-    [error, validationDTDResult] = await to(this.validateAgainstDTD(data, this.dtdsPath));
+    [data.error, validationDTDResult] = await to(this.validateAgainstDTD(data, this.dtdsPath));
     if (data.error) {
       data.isValidAgainstDTD = false;
       return data;
@@ -99,11 +99,11 @@ sisypheXml.doTheJob = function (data, next) {
       }
     });
     return data;
-  })().then((docObject) => {
-    if (docObject.error) docObject.error = JSON.stringify(docObject.error);
-    next(null, docObject)
+  })().then((data) => {
+    if (data.error) data.error = JSON.stringify(data.error);
+    next(null, data);
   }).catch((error) => {
-    next(error)
+    next(error);
   });
 };
 
