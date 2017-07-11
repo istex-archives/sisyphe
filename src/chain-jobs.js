@@ -23,7 +23,7 @@ for(let i = 0; i < workers.length; i++){
 }
 
 // Create process queue listener (1 worker-type max per thread !!)
-queue.process(`${workers[0].name}${process.env.WORKER_ID}`, 1, function (job, done) {
+queue.process(`${workers[0].name}${process.env.WORKER_ID}`, 8, function (job, done) {
   let taskNb = 0;
   job.data.info.processorNumber = process.env.WORKER_ID;
   launchJob(job.data,taskNb,done);
