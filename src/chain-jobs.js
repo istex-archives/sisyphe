@@ -3,8 +3,7 @@
 const path = require('path'),
   kue = require('kue'),
   winston = require('winston'),
-  _ = require('lodash'),
-  workers = require(path.resolve(__dirname, '..', 'config', 'temp', 'workers.json'));
+  _ = require('lodash');
 
 const queue = kue.createQueue();
 queue.on( 'error', function( err ) {
@@ -12,22 +11,29 @@ queue.on( 'error', function( err ) {
 });
 
 // load tasks
-let task = [];
+let task = [],
+  workers = [];
 
-//create task listener
-for(let i = 0; i < workers.length; i++){
-  task[i] = require(path.resolve(__dirname, '../', 'worker', workers[i].module));
-  if(task[i].init){
-    task[i].init(workers[i].options);
+process.on('message', function (options) {
+
+  workers = (options && options.workers) ? options.workers : workers;
+
+  //create task listener
+  for(let i = 0; i < workers.length; i++){
+    task[i] = require(path.resolve(__dirname, '../', 'worker', workers[i].module));
+    if(task[i].init){
+      task[i].init(workers[i].options);
+    }
   }
-}
 
-// Create process queue listener (1 worker-type max per thread !!)
-queue.process(`${workers[0].name}${process.env.WORKER_ID}`, 8, function (job, done) {
-  let taskNb = 0;
-  job.data.info.processorNumber = process.env.WORKER_ID;
-  launchJob(job.data,taskNb,done);
-});
+  // Create process queue listener (1 worker-type max per thread !!)
+  queue.process(`${workers[0].name}${process.env.WORKER_ID}`, 8, function (job, done) {
+    let taskNb = 0;
+    job.data.info.processorNumber = process.env.WORKER_ID;
+    launchJob(job.data,taskNb,done);
+  });
+})
+
 
 function launchJob(data,taskNb,done) {
   task[taskNb].doTheJob(data, function (err, data) {

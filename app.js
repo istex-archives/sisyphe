@@ -73,9 +73,6 @@ for(let id in workers){
   workersListNames.push(workers[id].name);
 }
 
-// Write filtered workers to temp folder
-fs.writeFileSync('config/temp/workers.json', JSON.stringify(workers));
-
 /************/
 /*   CPUS  */
 /***********/
@@ -196,6 +193,8 @@ updateLog(`Cluster : Starting with ${chainJobsCPUS} CPU`);
 sisypheCluster.run();
 let clusterList = sisypheCluster.workers();
 for(let i = 0; i < clusterList.length; i++){
+  // Send workers to cluster
+  clusterList[i].send({workers});
   clusterList[i].on('message', function (message) {
     //if it's the lastest job
     if(message.error){
