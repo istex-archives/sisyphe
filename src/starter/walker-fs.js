@@ -52,11 +52,12 @@ function walkOnInput(queue,element,options,cb) {
 }
 
 function createQueueFiles(items,queue,options) {
+  let cpu = 0
   for(var i = 0; i < items.length; i++){
     currentFoundFiles++;
-    let randomProcessor = Math.floor(Math.random() * options.chainJobsCPUS);
+    cpu = (cpu< options.chainJobsCPUS) ? ++cpu : 0
     items[i].info = { id: 0, type: options.workers[0].name};
-    queue.create(`${options.workers[0].name}${randomProcessor}`, items[i]).removeOnComplete( true ).save();
+    queue.create(`${options.workers[0].name}${cpu}`, items[i]).removeOnComplete( true ).save();
   }
   process.send({currentFoundFiles});
   currentFoundFiles = 0;
