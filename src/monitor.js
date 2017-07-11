@@ -14,7 +14,7 @@ const blessed = require('blessed'),
   ms = require('pretty-ms');
 
 let processingMonitor = new Monitor();
-processingMonitor.interval = setInterval(processingMonitor.update,50);
+let refreshRate = 10000
 
 function Monitor () {
   let self = this;
@@ -28,8 +28,15 @@ function Monitor () {
     self.totalFoundFiles = options.totalFoundFiles ? options.totalFoundFiles : self.totalFoundFiles;
     self.totalPerformedFiles = options.totalPerformedFiles ? options.totalPerformedFiles : self.totalPerformedFiles;
     self.currentFoundFiles = options.currentFoundFiles ? options.currentFoundFiles : self.currentFoundFiles;
+
+
     let logsColors = {error: 'red', walker: 'yellow', default: 'green'};
     if(options){
+      if(options.hasOwnProperty('refresh')){
+        let refresh = options.refresh ? options.refresh : 3000
+        console.log(options.refresh);
+        self.interval = setInterval(processingMonitor.update, refresh);
+      }
       if(options.hasOwnProperty('log')){
         options.type = options.type || 'default';
         self.log.log(colors[logsColors[options.type]](options.log));
@@ -40,7 +47,7 @@ function Monitor () {
         setTimeout(function () {
           //stop monitor
           clearInterval(self.interval);
-        },2100);
+        },this.refreshRate + 1000);
       }
     }
   });
@@ -183,4 +190,8 @@ function Monitor () {
     self.duration.setContent(duration);
     self.screen.render();
   };
+
+  this.setRefresh = function (refreshRate_p) {
+    refreshRate = refreshRate_p
+  }
 }

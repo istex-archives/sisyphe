@@ -22,6 +22,7 @@ program
 .option('-o, --output <all/json>', 'Output destination')
 .option('-t, --thread <number>', 'Number of fork to create via Node cluster')
 .option('-r, --remove-module <name>', 'Remove module name from the workflow', appender(), [])
+.option('-m, --monitor-refresh <number>', 'Set refresh rate of monitor', appender(), [])
 .parse(process.argv);
 
 
@@ -120,7 +121,9 @@ clientRedis.flushall();
 /* Monitor */
 /***********/
 let monitor = cp.fork('src/monitor.js');
-monitor.send({workers, startAt, workersListNames});
+console.log(program.monitorRefresh);
+let refresh = program.monitorRefresh.length ? program.monitorRefresh : 3000
+monitor.send({workers, startAt, workersListNames, refresh});
 monitor.on('exit', function(code){
   console.log('Close sisyphe');
   process.exit(0);
