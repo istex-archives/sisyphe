@@ -121,7 +121,6 @@ clientRedis.flushall();
 /* Monitor */
 /***********/
 let monitor = cp.fork('src/monitor.js');
-console.log(program.monitorRefresh);
 let refresh = program.monitorRefresh.length ? program.monitorRefresh : 3000
 monitor.send({workers, startAt, workersListNames, refresh});
 monitor.on('exit', function(code){
