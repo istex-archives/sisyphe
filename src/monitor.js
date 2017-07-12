@@ -34,7 +34,6 @@ function Monitor () {
     if(options){
       if(options.hasOwnProperty('refresh')){
         let refresh = options.refresh ? options.refresh : 3000
-        console.log(options.refresh);
         self.interval = setInterval(processingMonitor.update, refresh);
       }
       if(options.hasOwnProperty('log')){
