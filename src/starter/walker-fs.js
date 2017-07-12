@@ -55,7 +55,7 @@ function createQueueFiles(items,queue,options) {
   let cpu = 0
   for(var i = 0; i < items.length; i++){
     currentFoundFiles++;
-    cpu = (cpu< options.chainJobsCPUS) ? ++cpu : 0
+    cpu = (cpu < options.chainJobsCPUS-1) ? ++cpu : 0;
     items[i].info = { id: 0, type: options.workers[0].name};
     queue.create(`${options.workers[0].name}${cpu}`, items[i]).removeOnComplete( true ).save();
   }
