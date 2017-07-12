@@ -132,6 +132,7 @@ monitor.on('exit', function(code){
 /* WALKER  */
 /***********/
 let currentFoundFiles = 0, totalPerformedFiles= 0, totalFailedTask= 0, totalFoundFiles = 0, totalPermormedTasks = 0;
+let walkerList = [];
 fs.readdir(pathInput, function (err, elements) {
   if(err){
     updateLog('Sisyphe-core: Cannot read Input: ', err, 'error');
@@ -145,14 +146,13 @@ fs.readdir(pathInput, function (err, elements) {
     splitedArray.push(elements.slice(i,i+lot));
   }
   // Start Walker cluster
-  let walkerCluster = recluster(path.join(__dirname, 'src', 'starter', 'walker-fs.js'), {workers : walkerCPUS, log: {respawns: true}});
-  updateLog(`Sisyphe-core: start cluster of ${walkerCPUS} walkers`,null,'walker');
-  walkerCluster.run();
-  let walkerList = walkerCluster.workers();
   let finishedWalker = 0;
-  for(let i = 0; i < walkerList.length; i++){
-    walkerList[i].send({pathInput, input: splitedArray[i], chainJobsCPUS, workers});
-    walkerList[i].on('message', function (message) {
+  for (var i = 0; i < walkerCPUS; i++) {
+    const walkerFork = cp.fork(path.join(__dirname, 'src', 'starter', 'walker-fs.js'));
+    walkerList.push(walkerFork);
+    walkerFork.send({pathInput, input: splitedArray[i], chainJobsCPUS, workers});
+    walkerFork.on('message', function (message) {
+      let iAmAWalker = this
       if(message.currentFoundFiles){
         currentFoundFiles+= message.currentFoundFiles;
         monitor.send({currentFoundFiles});
@@ -188,11 +188,14 @@ fs.readdir(pathInput, function (err, elements) {
             });
           },3000);
         }
+        setTimeout(function () {
+          iAmAWalker.kill('SIGKILL')
+        }, 100);
+
       }
     });
   }
 });
-
 
 /************/
 /* CLUSTER */
