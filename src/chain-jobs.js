@@ -19,17 +19,18 @@ process.on('message', function(message) {
     task = []
     workers = (message && message.workers) ? message.workers : workers;
     for (let i = 0; i < workers.length; i++) {
-      console.log(workers.length, workers[i].module);
       task[i] = require(path.resolve(__dirname, '../', 'worker', workers[i].module));
       if (task[i].init) {
         task[i].init(workers[i].options);
       }
     }
   }
-  if (message.hasOwnProperty('data')) {
-    message.data.info.processorNumber = process.env.WORKER_ID;
-    // console.log(workers);
-    launchJob(message.data, 0);
+  if (message.hasOwnProperty('push')) {
+    message.job.data.info.processorNumber = process.env.WORKER_ID;
+    launchJob(message.job.data, 0);
+  }
+  if (message.hasOwnProperty('exec')) {
+    process.send({pull:true})
   }
 })
 
@@ -56,7 +57,7 @@ function launchJob(data, taskNb) {
       launchJob(data, ++taskNb);
       return;
     }
-    process.send({end:true})
+    process.send({pull:true})
   });
 }
 

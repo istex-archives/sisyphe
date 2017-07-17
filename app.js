@@ -204,14 +204,11 @@ fs.readdir(pathInput, function (err, elements) {
 /************/
 /*DISPATCHER*/
 /************/
-// const dispatcherFork = cp.fork(path.join(__dirname, 'src', 'dispatcher.js'));
-// console.log('workers',workers);
-dispatcher.init({firstTask: workers[0].name})
-for (var i = 0; i < 1; i++) {
+dispatcher.init({pathTasks: path.join(__dirname, 'src', 'taskRedis'), redisKey: workers[0].name})
+for (var i = 0; i < chainJobsCPUS; i++) {
   const chainJob = cp.fork('./src/chain-jobs')
-  chainJob.send({workers})
-  chainJob.on('message',message=>{
-    // if it's the lastest job
+  chainJob.send({exec:true, workers}) // say to fork to exec when up with chain of workers
+  chainJob.on('message',message=>{ // attach all out event
        if(message.error){
          totalFailedTask++;
          updateLog(`Sisyphe-module-error: ${message.type}: `, message.error, 'error');
@@ -225,41 +222,9 @@ for (var i = 0; i < 1; i++) {
        }
        monitor.send({totalFailedTask,totalPerformedFiles,currentFoundFiles,workers});
   })
-  dispatcher.subscribe(chainJob)
+  dispatcher.subscribe(chainJob) // dispatcher need to know each fork
 }
-//
-// dispatcherFork.send({exec: true})
-// dispatcherFork.on('message', function (message) {
-  // console.log(message);
-// })
 
-
-/************/
-/* CLUSTER */
-/***********/
-// let sisypheCluster = recluster(path.join(__dirname, 'src', 'chain-jobs.js'), {workers : chainJobsCPUS});
-// updateLog(`Cluster : Starting with ${chainJobsCPUS} CPU`);
-// // sisypheCluster.run();
-// let clusterList = sisypheCluster.workers();
-// for(let i = 0; i < clusterList.length; i++){
-//   // Send workers to cluster
-//   clusterList[i].send({workers});
-//   clusterList[i].on('message', function (message) {
-//     //if it's the lastest job
-//     if(message.error){
-//       totalFailedTask++;
-//       updateLog(`Sisyphe-module-error: ${message.type}: `, message.error, 'error');
-//     }
-//     if(message.id === workers.length-1){
-//       totalPerformedFiles+= message.processedFiles;
-//     }
-//     if(message.processedFiles){
-//       workers[message.id].processedFiles += message.processedFiles;
-//       totalPermormedTasks += message.processedFiles;
-//     }
-//     monitor.send({totalFailedTask,totalPerformedFiles,currentFoundFiles,workers});
-//   });
-// }
 
 
 // Continue sisyphe if an unknown error is happening
