@@ -57,7 +57,10 @@ function createQueueFiles(items,queue,options) {
     currentFoundFiles++;
     cpu = (cpu < options.chainJobsCPUS-1) ? ++cpu : 0;
     items[i].info = { id: 0, type: options.workers[0].name};
-    queue.create(`${options.workers[0].name}${cpu}`, items[i]).removeOnComplete( true ).save();
+    if (options.workers[0].name !== undefined) {
+      queue.create(`${options.workers[0].name}`, items[i]).removeOnComplete( true ).save();
+
+    }
   }
   process.send({currentFoundFiles});
   currentFoundFiles = 0;

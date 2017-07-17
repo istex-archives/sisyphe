@@ -12,7 +12,8 @@ const kue = require('kue'),
   pm2 = require('pm2'),
   mkdirp = require('mkdirp'),
   winston = require('winston'),
-  path = require('path');
+  path = require('path'),
+  dispatcher = require('./src/dispatcher');
 
 program
 .version('0.0.1')
@@ -128,6 +129,8 @@ monitor.on('exit', function(code){
   process.exit(0);
 });
 
+
+
 /************/
 /* WALKER  */
 /***********/
@@ -197,32 +200,51 @@ fs.readdir(pathInput, function (err, elements) {
   }
 });
 
+
+/************/
+/*DISPATCHER*/
+/************/
+// const dispatcherFork = cp.fork(path.join(__dirname, 'src', 'dispatcher.js'));
+// console.log('workers',workers);
+dispatcher.init({firstTask: workers[0].name})
+for (var i = 0; i < 1; i++) {
+  const chainJob = cp.fork('./src/chain-jobs')
+  chainJob.send({workers})
+  dispatcher.subscribe(chainJob)
+}
+//
+// dispatcherFork.send({exec: true})
+// dispatcherFork.on('message', function (message) {
+  // console.log(message);
+// })
+
+
 /************/
 /* CLUSTER */
 /***********/
-let sisypheCluster = recluster(path.join(__dirname, 'src', 'chain-jobs.js'), {workers : chainJobsCPUS});
-updateLog(`Cluster : Starting with ${chainJobsCPUS} CPU`);
-sisypheCluster.run();
-let clusterList = sisypheCluster.workers();
-for(let i = 0; i < clusterList.length; i++){
-  // Send workers to cluster
-  clusterList[i].send({workers});
-  clusterList[i].on('message', function (message) {
-    //if it's the lastest job
-    if(message.error){
-      totalFailedTask++;
-      updateLog(`Sisyphe-module-error: ${message.type}: `, message.error, 'error');
-    }
-    if(message.id === workers.length-1){
-      totalPerformedFiles+= message.processedFiles;
-    }
-    if(message.processedFiles){
-      workers[message.id].processedFiles += message.processedFiles;
-      totalPermormedTasks += message.processedFiles;
-    }
-    monitor.send({totalFailedTask,totalPerformedFiles,currentFoundFiles,workers});
-  });
-}
+// let sisypheCluster = recluster(path.join(__dirname, 'src', 'chain-jobs.js'), {workers : chainJobsCPUS});
+// updateLog(`Cluster : Starting with ${chainJobsCPUS} CPU`);
+// // sisypheCluster.run();
+// let clusterList = sisypheCluster.workers();
+// for(let i = 0; i < clusterList.length; i++){
+//   // Send workers to cluster
+//   clusterList[i].send({workers});
+//   clusterList[i].on('message', function (message) {
+//     //if it's the lastest job
+//     if(message.error){
+//       totalFailedTask++;
+//       updateLog(`Sisyphe-module-error: ${message.type}: `, message.error, 'error');
+//     }
+//     if(message.id === workers.length-1){
+//       totalPerformedFiles+= message.processedFiles;
+//     }
+//     if(message.processedFiles){
+//       workers[message.id].processedFiles += message.processedFiles;
+//       totalPermormedTasks += message.processedFiles;
+//     }
+//     monitor.send({totalFailedTask,totalPerformedFiles,currentFoundFiles,workers});
+//   });
+// }
 
 
 // Continue sisyphe if an unknown error is happening

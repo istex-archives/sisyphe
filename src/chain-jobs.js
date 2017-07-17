@@ -1,63 +1,75 @@
 'use strict';
 
 const path = require('path'),
-  kue = require('kue'),
   winston = require('winston'),
-  _ = require('lodash');
+  _ = require('lodash'),
+  fs = require('fs');
 
-const queue = kue.createQueue();
-queue.on( 'error', function( err ) {
-  process.send({error: err});
-});
+
+const chainJobs = {}
+
+
 
 // load tasks
 let task = [],
   workers = [];
 
-process.on('message', function (options) {
-
-  workers = (options && options.workers) ? options.workers : workers;
-
-  //create task listener
-  for(let i = 0; i < workers.length; i++){
-    task[i] = require(path.resolve(__dirname, '../', 'worker', workers[i].module));
-    if(task[i].init){
-      task[i].init(workers[i].options);
+process.on('message', function(message) {
+  if (message.hasOwnProperty('workers')) {
+    task = []
+    workers = (message && message.workers) ? message.workers : workers;
+    for (let i = 0; i < workers.length; i++) {
+      console.log(workers.length, workers[i].module);
+      task[i] = require(path.resolve(__dirname, '../', 'worker', workers[i].module));
+      if (task[i].init) {
+        task[i].init(workers[i].options);
+      }
     }
   }
-
-  // Create process queue listener (1 worker-type max per thread !!)
-  queue.process(`${workers[0].name}${process.env.WORKER_ID}`, 8, function (job, done) {
-    let taskNb = 0;
-    job.data.info.processorNumber = process.env.WORKER_ID;
-    launchJob(job.data,taskNb,done);
-  });
+  if (message.hasOwnProperty('data')) {
+    message.data.info.processorNumber = process.env.WORKER_ID;
+    // console.log(workers);
+    launchJob(message.data, 0);
+  }
 })
 
 
-function launchJob(data,taskNb,done) {
-  task[taskNb].doTheJob(data, function (err, data) {
-    if(err){
-      process.send({id: data.info.id, type: data.info.type, processedFiles: true, error: err});
+function launchJob(data, taskNb) {
+  task[taskNb].doTheJob(data, function(err, data) {
+    fs.appendFile('a.txt', require('util').inspect(taskNb, { depth: null }))
+    if (err) {
+      console.log('err',err);
+      process.send({
+        id: data.info.id,
+        type: data.info.type,
+        processedFiles: true,
+        error: err
+      });
       return;
     }
     // Send info to master to increment data
     workers[data.info.id].processedFiles++;
     sendInfo();
     // There are more worker to do with this job process
-    if(data.info.id < workers.length-1){
+    if (data.info.id < workers.length -1 ) {
       data.info.id++;
       data.info.type = workers[data.info.id].name;
-      launchJob(data,++taskNb,done);
+      launchJob(data, ++taskNb);
       return;
     }
-    done();
+    // process.send({end:true})
   });
 }
 
-let sendInfo = _.debounce(function () {
-  for(var i = 0; i< workers.length; i++){
-    process.send({id: i, type: workers[i].module, processedFiles: workers[i].processedFiles});
+let sendInfo = _.debounce(function() {
+  for (var i = 0; i < workers.length; i++) {
+    process.send({
+      id: i,
+      type: workers[i].module,
+      processedFiles: workers[i].processedFiles
+    });
     workers[i].processedFiles = 0;
   }
-}, 2000, {maxWait: 3000});
+}, 2000, {
+  maxWait: 3000
+});
