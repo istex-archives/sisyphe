@@ -210,6 +210,21 @@ dispatcher.init({firstTask: workers[0].name})
 for (var i = 0; i < 1; i++) {
   const chainJob = cp.fork('./src/chain-jobs')
   chainJob.send({workers})
+  chainJob.on('message',message=>{
+    // if it's the lastest job
+       if(message.error){
+         totalFailedTask++;
+         updateLog(`Sisyphe-module-error: ${message.type}: `, message.error, 'error');
+       }
+       if(message.id === workers.length-1){
+         totalPerformedFiles+= message.processedFiles;
+       }
+       if(message.processedFiles){
+         workers[message.id].processedFiles += message.processedFiles;
+         totalPermormedTasks += message.processedFiles;
+       }
+       monitor.send({totalFailedTask,totalPerformedFiles,currentFoundFiles,workers});
+  })
   dispatcher.subscribe(chainJob)
 }
 //

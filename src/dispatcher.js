@@ -20,6 +20,13 @@ Dispatcher.subscribe = function (worker) {
   listWorkers.push(worker)
   tasks.get(this.firstTask, 1).then((jobs,done)=>{
     worker.send(jobs[0])
+    worker.on('message',message=>{
+      if (message.hasOwnProperty('end')) {
+        tasks.get(this.firstTask, 1).then((jobs,done)=>{
+          worker.send(jobs[0])
+        })
+      }
+    })
   })
 }
 

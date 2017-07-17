@@ -36,7 +36,6 @@ process.on('message', function(message) {
 
 function launchJob(data, taskNb) {
   task[taskNb].doTheJob(data, function(err, data) {
-    fs.appendFile('a.txt', require('util').inspect(taskNb, { depth: null }))
     if (err) {
       console.log('err',err);
       process.send({
@@ -57,16 +56,18 @@ function launchJob(data, taskNb) {
       launchJob(data, ++taskNb);
       return;
     }
-    // process.send({end:true})
+    process.send({end:true})
   });
 }
 
 let sendInfo = _.debounce(function() {
+
   for (var i = 0; i < workers.length; i++) {
     process.send({
       id: i,
       type: workers[i].module,
-      processedFiles: workers[i].processedFiles
+      processedFiles: workers[i].processedFiles,
+      destination:'monitor'
     });
     workers[i].processedFiles = 0;
   }
