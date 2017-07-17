@@ -34,4 +34,10 @@ Dispatcher.pull = function (worker) {
   })
 }
 
+Dispatcher.finish = function () {
+  for (var i = 0; i < listWorkers.length; i++) {
+    listWorkers[i].kill('SIGTERM')
+  }
+}
+
 module.exports = Dispatcher

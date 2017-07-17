@@ -176,6 +176,7 @@ fs.readdir(pathInput, function (err, elements) {
               // All jobs have not been done, continue
               return;
             }
+            dispatcher.finish()
             // Stop the interval listener
             clearInterval(timer);
             updateLog('Sisyphe-core: All files proceded');
