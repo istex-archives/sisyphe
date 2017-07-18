@@ -11,10 +11,14 @@ Task.process = function (funProcessing) {
 };
 
 Task.add = function (obj, done) {
+  let funError = null;
+  if (arguments.length > 1) {
+    funError = (error) => {
+      error ? done(error) : done();
+    }
+  } 
   this.queue.create(this.name, obj)
     .removeOnComplete(true)
-    .save((error) => {
-      error ? done(error) : done();
-    })
+    .save(funError)
 }
 module.exports = Task

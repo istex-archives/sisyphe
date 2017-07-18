@@ -44,6 +44,8 @@ jspm_packages
 # Webstorm
 .idea
 
+# Visual Studio Code
+.vscode
 
 # Created by https://www.gitignore.io/api/macos,linux,webstorm,node,java,osx,sublimetext
 
