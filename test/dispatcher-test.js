@@ -3,15 +3,15 @@
 const pkg = require('../package.json');
 const chai = require('chai');
 const expect = chai.expect;
-const dispatcher = require('../src/dispatcher');
-const kue = require('kue');
+const Dispatcher = require('../src/dispatcher');
+const Task = require('../src/task');
 
-describe(`${pkg.name}/src/dispatcher.js`, function () {
+describe(`${pkg.name}/src/Dispatcher.js`, function () {
   describe("#init", function () {
     it("should be initialized successfully", function () {
-      const ventilator = Object.create(dispatcher);
-      const queue = kue.createQueue();
-      ventilator.init(queue, {
+      const ventilator = Object.create(Dispatcher);
+      const task = Object.create(Task);
+      ventilator.init(task, {
         name: "test"
       })
       expect(ventilator.tasks).to.be.an("object");
@@ -22,9 +22,9 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
 
   describe("#getWorker", function () {
     it("should return a worker when it's ready", function (done) {
-      const ventilator = Object.create(dispatcher);
-      const queue = kue.createQueue();
-      ventilator.init(queue, {
+      const ventilator = Object.create(Dispatcher);
+      const task = Object.create(Task);
+      ventilator.init(task, {
         name: "test"
       });
       ventilator.addWorker("worker1");
