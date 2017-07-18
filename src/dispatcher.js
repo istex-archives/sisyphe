@@ -1,43 +1,35 @@
-const path = require('path'),
-  winston = require('winston'),
-  _ = require('lodash'),
-  cp = require('child_process'),
-  recluster = require('recluster'),
-  async = require('async'),
-  Promise = require('bluebird');
-
 const Dispatcher = {}
 
-const listWorkers = []
-
-Dispatcher.init = function (options) {
-  this.tasks = require(options.pathTasks) // load queue file
-  this.tasks.init(options) // pass options to queue file
+Dispatcher.init = function (queue, options) {
+  this.waitingQueue = [];
+  this.tasks = queue;
+  this.options = options;
 }
 
-Dispatcher.subscribe = function (worker) {
-  listWorkers.push(worker)
-  worker.on('message', function(message){
-    // if worker ask a task
-    if (message.hasOwnProperty('pull')) Dispatcher.pull(this)
+Dispatcher.addWorker = function(worker) {
+  this.waitingQueue.push(worker);
+}
+Dispatcher.getWorker = function (done) {
+  if (this.waitingQueue.length !== 0) return done(this.waitingQueue.shift());
+
+  const checkWorkerIsAvailable = setInterval(() => {
+    if (this.waitingQueue.length !== 0) {
+      clearInterval(checkWorkerIsAvailable);
+      done(this.waitingQueue.shift());
+    }
+  }, 10);
+}
+
+Dispatcher.start = function () {
+  this.tasks.process((job, done) => {
+    this.getWorker((worker) => {
+      worker.send({
+        push: true,
+        job: data
+      });
+      done();
+    })
   })
-}
-
-Dispatcher.push = function (worker,data) {
-  worker.send({push:true, job:data})
-}
-
-
-Dispatcher.pull = function (worker) {
-  this.tasks.get(1).then((jobs,done)=>{
-    this.push(worker, jobs[0])
-  })
-}
-
-Dispatcher.finish = function () {
-  for (var i = 0; i < listWorkers.length; i++) {
-    listWorkers[i].kill('SIGTERM')
-  }
 }
 
 module.exports = Dispatcher
