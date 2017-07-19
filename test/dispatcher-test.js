@@ -69,7 +69,9 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       });
       ventilator.addOverseer(bobTheOverseer);
       ventilator.addOverseer(johnTheOverseer);
-      ventilator.start();
+      ventilator.start(() => {
+        done();
+      });
     });
   })
 });
