@@ -50,25 +50,23 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       doc.init({
         name: "test"
       });
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 32; i++) {
         doc.add({
           id: i,
           type: "pdf"
         });
       }
 
-      const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer.init(`${__dirname}/dumbWorker.js`);
-
-      const johnTheOverseer = Object.create(Overseer);
-      johnTheOverseer.init(`${__dirname}/dumbWorker.js`);
-
       const ventilator = Object.create(Dispatcher);
       ventilator.init(doc, {
         name: "test"
       });
-      ventilator.addOverseer(bobTheOverseer);
-      ventilator.addOverseer(johnTheOverseer);
+      for (var i = 0; i < 4; i++) {
+        const overseer = Object.create(Overseer);
+        overseer.init(`${__dirname}/dumbWorker.js`);
+        ventilator.addOverseer(overseer);  
+      }
+
       ventilator.start(() => {
         done();
       });
