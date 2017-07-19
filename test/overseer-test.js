@@ -27,7 +27,7 @@ describe(`${pkg.name}/src/overseer.js`, function () {
       bobTheOverseer.send(data, (error) => {
         expect(error).to.be.null;
       });
-      bobTheOverseer.on("message", (msg) => {
+      bobTheOverseer.once("message", (msg) => {
         expect(msg).to.be.an("object");
         expect(msg.isDone).to.be.true;
         done();

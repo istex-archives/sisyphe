@@ -23,14 +23,13 @@ Dispatcher.getOverseer = function (done) {
 Dispatcher.start = function () {
   this.tasks.process((job, done) => {
     this.getOverseer((overseer) => {
-      overseer.send({
-        push: true,
-        job: data
-      });
-      overseer.on("message", (msg) => {
-
+      overseer.send(job.data);
+      overseer.once("message", (msg) => {
+        if (msg.isDone) {
+          this.addOverseer(overseer);
+          done()
+        }
       })
-      done();
     })
   })
 }

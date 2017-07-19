@@ -4,9 +4,10 @@ const pkg = require('../package.json');
 const chai = require('chai');
 const expect = chai.expect;
 const Dispatcher = require('../src/dispatcher');
+const Overseer = require('../src/overseer');
 const Task = require('../src/task');
 
-describe(`${pkg.name}/src/Dispatcher.js`, function () {
+describe(`${pkg.name}/src/dispatcher.js`, function () {
   describe("#init", function () {
     it("should be initialized successfully", function () {
       const ventilator = Object.create(Dispatcher);
@@ -40,6 +41,35 @@ describe(`${pkg.name}/src/Dispatcher.js`, function () {
       setTimeout(() => {
         ventilator.addOverseer("overseer2");
       }, 200)
+    });
+  })
+
+  describe("#start", function () {
+    it("should start and dispatch tasks", function (done) {
+      const doc = Object.create(Task);
+      doc.init({
+        name: "test"
+      });
+      for (let i = 0; i < 8; i++) {
+        doc.add({
+          id: i,
+          type: "pdf"
+        });
+      }
+
+      const bobTheOverseer = Object.create(Overseer);
+      bobTheOverseer.init(`${__dirname}/dumbWorker.js`);
+
+      const johnTheOverseer = Object.create(Overseer);
+      johnTheOverseer.init(`${__dirname}/dumbWorker.js`);
+
+      const ventilator = Object.create(Dispatcher);
+      ventilator.init(doc, {
+        name: "test"
+      });
+      ventilator.addOverseer(bobTheOverseer);
+      ventilator.addOverseer(johnTheOverseer);
+      ventilator.start();
     });
   })
 });
