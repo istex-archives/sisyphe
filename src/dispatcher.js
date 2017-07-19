@@ -6,27 +6,30 @@ Dispatcher.init = function (task, options) {
   this.options = options;
 }
 
-Dispatcher.addWorker = function(worker) {
-  this.waitingQueue.push(worker);
+Dispatcher.addOverseer = function(overseer) {
+  this.waitingQueue.push(overseer);
 }
-Dispatcher.getWorker = function (done) {
+Dispatcher.getOverseer = function (done) {
   if (this.waitingQueue.length !== 0) return done(this.waitingQueue.shift());
 
-  const checkWorkerIsAvailable = setInterval(() => {
+  const checkOverseerIsAvailable = setInterval(() => {
     if (this.waitingQueue.length !== 0) {
-      clearInterval(checkWorkerIsAvailable);
+      clearInterval(checkOverseerIsAvailable);
       done(this.waitingQueue.shift());
     }
   }, 10);
 }
 
 Dispatcher.start = function () {
-  this.tasks.process("which key ?", (job, done) => {
-    this.getWorker((worker) => {
-      worker.send({
+  this.tasks.process((job, done) => {
+    this.getOverseer((overseer) => {
+      overseer.send({
         push: true,
         job: data
       });
+      overseer.on("message", (msg) => {
+
+      })
       done();
     })
   })

@@ -20,25 +20,25 @@ describe(`${pkg.name}/src/Dispatcher.js`, function () {
     });
   })
 
-  describe("#getWorker", function () {
-    it("should return a worker when it's ready", function (done) {
+  describe("#getOverseer", function () {
+    it("should return a overseer when it's ready", function (done) {
       const ventilator = Object.create(Dispatcher);
       const task = Object.create(Task);
       ventilator.init(task, {
         name: "test"
       });
-      ventilator.addWorker("worker1");
-      ventilator.getWorker((worker) => {
-        expect(worker).to.be.a("string");
-        expect(worker).to.be.equal("worker1")
+      ventilator.addOverseer("overseer1");
+      ventilator.getOverseer((overseer) => {
+        expect(overseer).to.be.a("string");
+        expect(overseer).to.be.equal("overseer1")
       });
-      ventilator.getWorker((worker) => {
-        expect(worker).to.be.a("string");
-        expect(worker).to.be.equal("worker2")
+      ventilator.getOverseer((overseer) => {
+        expect(overseer).to.be.a("string");
+        expect(overseer).to.be.equal("overseer2")
         done();
       });
       setTimeout(() => {
-        ventilator.addWorker("worker2");
+        ventilator.addOverseer("overseer2");
       }, 200)
     });
   })
