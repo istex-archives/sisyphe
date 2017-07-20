@@ -21,13 +21,13 @@ describe(`${pkg.name}/src/overseer.js`, function () {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init(`${__dirname}/dumbWorker.js`);
       const data = {
-        id: 123,
+        id: 159,
         type: "pdf"
       };
       bobTheOverseer.send(data, (error) => {
         expect(error).to.be.null;
       });
-      bobTheOverseer.once("message", (msg) => {
+      bobTheOverseer.on("message", (msg) => {
         expect(msg).to.be.an("object");
         expect(msg.isDone).to.be.true;
         done();

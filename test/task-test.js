@@ -11,7 +11,7 @@ describe(`${pkg.name}/src/task.js`, function () {
     it("should be initialized successfully", function () {
       const doc = Object.create(Task);
       doc.init({
-        name: "test"
+        name: "test-task-init"
       });
       expect(doc.name).to.be.an("string");
       expect(doc.queue).to.be.an("object");
@@ -23,10 +23,10 @@ describe(`${pkg.name}/src/task.js`, function () {
     it("should add some task", function (done) {
       const doc = Object.create(Task);
       doc.init({
-        name: "test"
+        name: "test-task-add"
       });
       doc.add({
-        id: 123,
+        id: 161,
         type: "pdf"
       }, (error) => {
         expect(error).to.be.undefined;
@@ -39,17 +39,17 @@ describe(`${pkg.name}/src/task.js`, function () {
     it("should process the tasks", function() {
       const doc = Object.create(Task);
       doc.init({
-        name: "test"
+        name: "test-task-process"
       });
       doc.add({
-        id: 123,
+        id: 172,
         type: "pdf"
       });
     })
     it("should process the tasks with callback", function(done) {
       const doc = Object.create(Task);
       doc.init({
-        name: "test"
+        name: "test-task-process2"
       });
       doc.add({
         id: 123,

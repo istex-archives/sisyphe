@@ -24,23 +24,27 @@ Dispatcher.getOverseer = function (done) {
 
 Dispatcher.start = function (end) {
   const debouncedCount = debounce(() => {
+    // TODO handle error with the Promise magic
     this.tasks.queue.inactiveCount((error, totalInactive) => {
       this.tasks.queue.activeCount((error, totalActive) => {
-        if (totalActive + totalInactive === 0) end();
+        (totalActive + totalInactive === 0) ? end() : debouncedCount();
       });
     });
   }, 500);
 
+  this.waitingQueue.map((overseer) => {
+    overseer.on('message', (msg) => {
+      if (msg.isDone) {
+        this.addOverseer(overseer);
+        debouncedCount();
+      }
+    });
+  });
+
   this.tasks.process((job, done) => {
     this.getOverseer((overseer) => {
       overseer.send(job.data);
-      overseer.once("message", (msg) => {
-        if (msg.isDone) {
-          this.addOverseer(overseer);
-          debouncedCount();
-          done();
-        }
-      });
+      done();
     });
   });
 };
