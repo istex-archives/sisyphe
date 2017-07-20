@@ -1,16 +1,16 @@
 const debounce = require('lodash').debounce;
 
-const Dispatcher = {}
+const Dispatcher = {};
 
 Dispatcher.init = function (task, options) {
   this.waitingQueue = [];
   this.tasks = task;
   this.options = options;
-}
+};
 
 Dispatcher.addOverseer = function (overseer) {
   this.waitingQueue.push(overseer);
-}
+};
 Dispatcher.getOverseer = function (done) {
   if (this.waitingQueue.length !== 0) return done(this.waitingQueue.shift());
 
@@ -20,7 +20,7 @@ Dispatcher.getOverseer = function (done) {
       done(this.waitingQueue.shift());
     }
   }, 10);
-}
+};
 
 Dispatcher.start = function (end) {
   const debouncedCount = debounce(() => {
@@ -40,9 +40,9 @@ Dispatcher.start = function (end) {
           debouncedCount();
           done();
         }
-      })
-    })
-  })
-}
+      });
+    });
+  });
+};
 
-module.exports = Dispatcher
+module.exports = Dispatcher;
