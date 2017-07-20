@@ -13,7 +13,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       const ventilator = Object.create(Dispatcher);
       const task = Object.create(Task);
       ventilator.init(task, {
-        name: "test"
+        name: "test-dispatcher-init"
       })
       expect(ventilator.tasks).to.be.an("object");
       expect(ventilator.options).to.be.an("object");
@@ -26,7 +26,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       const ventilator = Object.create(Dispatcher);
       const task = Object.create(Task);
       ventilator.init(task, {
-        name: "test"
+        name: "test-dispatcher-getOverseer"
       });
       const overseer1 = Object.create(Overseer);
       overseer1.init(`${__dirname}/dumbWorker.js`);
@@ -50,10 +50,11 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
   })
 
   describe("#start", function () {
+    this.timeout(0);
     it("should start and dispatch tasks", function (done) {
       const doc = Object.create(Task);
       doc.init({
-        name: "test"
+        name: "test-dispatcher-start"
       });
       for (let i = 0; i < 32; i++) {
         doc.add({
@@ -64,7 +65,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
 
       const ventilator = Object.create(Dispatcher);
       ventilator.init(doc, {
-        name: "test"
+        name: "test-dispatcher-init"
       });
       for (var i = 0; i < 4; i++) {
         const overseer = Object.create(Overseer);
