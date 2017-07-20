@@ -28,18 +28,23 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       ventilator.init(task, {
         name: "test"
       });
-      ventilator.addOverseer("overseer1");
+      const overseer1 = Object.create(Overseer);
+      overseer1.init(`${__dirname}/dumbWorker.js`);
+      const overseer2 = Object.create(Overseer);
+      overseer2.init(`${__dirname}/dumbWorker.js`);
+
+      ventilator.addOverseer(overseer1);
       ventilator.getOverseer((overseer) => {
-        expect(overseer).to.be.a("string");
-        expect(overseer).to.be.equal("overseer1")
+        expect(overseer).to.be.an("object");
+        expect(overseer).to.have.property("send");
       });
       ventilator.getOverseer((overseer) => {
-        expect(overseer).to.be.a("string");
-        expect(overseer).to.be.equal("overseer2")
+        expect(overseer).to.be.an("object");
+        expect(overseer).to.have.property("send");
         done();
       });
       setTimeout(() => {
-        ventilator.addOverseer("overseer2");
+        ventilator.addOverseer(overseer2);
       }, 200)
     });
   })
@@ -64,7 +69,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       for (var i = 0; i < 4; i++) {
         const overseer = Object.create(Overseer);
         overseer.init(`${__dirname}/dumbWorker.js`);
-        ventilator.addOverseer(overseer);  
+        ventilator.addOverseer(overseer);
       }
 
       ventilator.start(() => {
