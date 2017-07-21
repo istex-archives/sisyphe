@@ -50,7 +50,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
   })
 
   describe("#start", function () {
-    this.timeout(0);
+    this.timeout(5000);
     it("should start and dispatch tasks", function (done) {
       const doc = Object.create(Task);
       doc.init({

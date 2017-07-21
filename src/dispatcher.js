@@ -24,11 +24,8 @@ Dispatcher.getOverseer = function (done) {
 
 Dispatcher.start = function (end) {
   const debouncedCount = debounce(() => {
-    // TODO handle error with the Promise magic
-    this.tasks.queue.inactiveCount((error, totalInactive) => {
-      this.tasks.queue.activeCount((error, totalActive) => {
-        (totalActive + totalInactive === 0) ? end() : debouncedCount();
-      });
+    this.tasks.getJobCounts().then((jobCounts) => {
+      (jobCounts.active + jobCounts.waiting === 0) ? end(): debouncedCount();
     });
   }, 500);
 
