@@ -17,6 +17,7 @@ ventilator.init(doc, {
 for (var i = 0; i < 8; i++) {
   const overseer = Object.create(Overseer);
   overseer.init(`${__dirname}/test/walker-test.js`);
+  // TODO : ajouter un event "results" sur le dispatcher
   overseer.on('message', function(msg) {
     msg.directories.map((directory) => {
       ventilator.tasks.add({directory})
