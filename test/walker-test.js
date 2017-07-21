@@ -3,14 +3,15 @@ const path = require("path");
 
 process.on('message', (msg) => {
   fs.readdir(msg.directory, (error, contents) => {
-    msg.directories = contents.map((content) => {
+    msg.directories = [];
+    msg.files = [];
+    contents.map((content) => {
       return path.join(msg.directory, content);
-    }).filter((content) => {
-      return fs.statSync(content).isDirectory();
+    }).map((content) => {
+      if (fs.statSync(content).isDirectory()) msg.directories.push(content);
+      if (fs.statSync(content).isFile()) msg.files.push(content);
     });
-    process.stdout.write('.');
     msg.isDone = true;
-    // console.log(msg);
     process.send(msg);
   });
 });

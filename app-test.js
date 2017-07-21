@@ -22,6 +22,7 @@ for (var i = 0; i < 8; i++) {
 
 ventilator.on('result', function (msg) {
   msg.directories.map((directory) => ventilator.tasks.add({directory}));
+  process.stdout.write(msg.files.length+'.')
 })
 
 ventilator.tasks.on('failed', (job, err) => {
