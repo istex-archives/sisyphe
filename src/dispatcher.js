@@ -1,6 +1,7 @@
 const debounce = require('lodash').debounce;
+const EventEmitter = require('events');
 
-const Dispatcher = {};
+const Dispatcher = Object.create(new EventEmitter());
 
 Dispatcher.init = function (task, options) {
   this.waitingQueue = [];
@@ -32,6 +33,7 @@ Dispatcher.start = function (end) {
   this.waitingQueue.map((overseer) => {
     overseer.on('message', (msg) => {
       if (msg.isDone) {
+        this.emit('result', msg);
         this.addOverseer(overseer);
         this.stop(end);
       }

@@ -87,6 +87,11 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
         ventilator.addOverseer(overseer);
       }
 
+      ventilator.on('result', (data) => {
+        expect(data).to.be.an('object');
+        expect(data.isDone).to.be.true;
+      })
+
       ventilator.start(() => {
         done();
       });
