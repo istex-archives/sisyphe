@@ -21,6 +21,20 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
     });
   })
 
+  describe("#stop", function () {
+    it("should stop dispatcher", function (done) {
+      const ventilator = Object.create(Dispatcher);
+      const task = Object.create(Task);
+      task.init({
+        name: "test-dispatcher-stop"
+      });
+      ventilator.init(task, {
+        name: "test-dispatcher-stop"
+      })
+      ventilator.stop(done);
+    });
+  })
+
   describe("#getOverseer", function () {
     it("should return a overseer when it's ready", function (done) {
       const ventilator = Object.create(Dispatcher);

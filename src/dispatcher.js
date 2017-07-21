@@ -22,18 +22,18 @@ Dispatcher.getOverseer = function (done) {
   }, 10);
 };
 
-Dispatcher.start = function (end) {
-  const debouncedCount = debounce(() => {
-    this.tasks.getJobCounts().then((jobCounts) => {
-      (jobCounts.active + jobCounts.waiting === 0) ? end(): debouncedCount();
-    });
-  }, 500);
+Dispatcher.stop = debounce(function (callback) {
+  this.tasks.getJobCounts().then((jobCounts) => {
+    (jobCounts.active + jobCounts.waiting === 0) ? callback(): this.stop();
+  });
+}, 500);
 
+Dispatcher.start = function (end) {
   this.waitingQueue.map((overseer) => {
     overseer.on('message', (msg) => {
       if (msg.isDone) {
         this.addOverseer(overseer);
-        debouncedCount();
+        this.stop(end);
       }
     });
   });
