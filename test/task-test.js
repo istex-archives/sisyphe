@@ -43,30 +43,30 @@ describe(`${pkg.name}/src/task.js`, function () {
         id: 172,
         type: "pdf"
       });
-      docs.process((doc, end) => {
-        end();
+      docs.process((doc, next) => {
+        next();
         done();
       })
     })
   })
 
-  describe("#getJobCounts", function () {
-    it("should get job counts", function () {
+  describe("#on", function () {
+    it("should listen to some events", function (done) {
       const docs = Object.create(Task);
       docs.init({
-        name: "test-task-getJobCounts"
+        name: "test-task-on"
       });
       docs.add({
         id: 212,
         type: "pdf"
       });
-      return docs.getJobCounts().then((jobCounts) => {
-        expect(jobCounts).to.be.an('object');
-        expect(jobCounts.waiting).to.equal(0);
-        expect(jobCounts.active).to.equal(0);
-        expect(jobCounts.completed).to.equal(0);
-        expect(jobCounts.failed).to.equal(0);
-        expect(jobCounts.delayed).to.equal(0);
+      docs.process((doc, next) => {
+        doc.data.id++;
+        next(null, doc.data);
+      })
+      docs.on('completed', (job, result) => {
+        expect(result.id).to.equal(213);
+        done();
       })
     })
   })
