@@ -19,6 +19,7 @@
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.7.5",
     "bluebird": "^3.4.1",
+    "bull": "^3.0.0-rc.4",
     "bunyan": "^1.8.10",
     "colors": "^1.1.2",
     "commander": "^2.11.0",
