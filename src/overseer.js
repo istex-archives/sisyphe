@@ -11,17 +11,13 @@ const Overseer = {};
  * @returns Promise
  */
 Overseer.init = function (WorkerType) {
+  this.fork = fork(path.join(__dirname, 'worker.js'));
+  this.on = this.fork.on.bind(this.fork);
+  const initObj = {
+    type: 'initialize',
+    worker: WorkerType
+  };
   return new Promise((resolve, reject) => {
-    try {
-      this.fork = fork(path.join(__dirname, 'worker.js'));
-    } catch (error) {
-      reject(error);
-    }
-    this.on = this.fork.on.bind(this.fork);
-    const initObj = {
-      type: 'initialize',
-      worker: WorkerType
-    };
     this.fork.send(initObj, null, {}, (error) => {
       (error) ? reject(error) : resolve();
     });
