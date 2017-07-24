@@ -1,5 +1,5 @@
 {
-  "name": "sisyphe-hash",
+  "name": "hash",
   "version": "0.0.2",
   "description": "Sisyphe module to add an hash for every file",
   "main": "index.js",

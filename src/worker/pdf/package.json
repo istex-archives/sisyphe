@@ -1,5 +1,5 @@
 {
-  "name": "sisyphe-pdf",
+  "name": "pdf",
   "version": "0.0.7",
   "description": "Get the PDF informations",
   "main": "index.js",
