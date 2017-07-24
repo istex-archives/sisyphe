@@ -4,7 +4,7 @@ const Task = require('./src/task');
 
 const doc = Object.create(Task);
 doc.init({
-  name: "test-app"
+  name: 'test-app'
 });
 doc.add({
   directory: '/home/meja/Data/dataset-xsmall'
@@ -12,22 +12,24 @@ doc.add({
 
 const ventilator = Object.create(Dispatcher);
 ventilator.init(doc, {
-  name: "test-app"
+  name: 'test-app'
 });
 for (var i = 0; i < 8; i++) {
   const overseer = Object.create(Overseer);
-  overseer.init(`${__dirname}/test/walker-test.js`);
+  overseer.init('walker-fs', error => {
+    if (error) console.log(error);
+  });
   ventilator.addOverseer(overseer);
 }
 
 ventilator.on('result', function (msg) {
-  msg.directories.map((directory) => ventilator.tasks.add({directory}));
-  process.stdout.write(msg.files.length+'.')
-})
+  msg.data.directories.map(directory => ventilator.tasks.add({ directory }));
+  process.stdout.write(msg.data.files.length + '.');
+});
 
 ventilator.tasks.on('failed', (job, err) => {
   console.log(err);
-})
+});
 
 console.time('bench');
 console.log('start');
