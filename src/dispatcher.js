@@ -7,7 +7,7 @@ Dispatcher.init = function (task, options) {
   this.waitingQueue = [];
   this.tasks = task;
   this.options = options;
-  this.overSeers = []
+  this.overSeers = [];
 };
 
 Dispatcher.addOverseer = function (overseer) {
