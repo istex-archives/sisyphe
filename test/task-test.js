@@ -18,6 +18,18 @@ describe(`${pkg.name}/src/task.js`, function () {
       expect(docs.queue).to.be.an('object');
       expect(docs.queue).to.be.an.instanceof(Queue);
     });
+
+    it('should be initialized successfully whith a string redis connection', function () {
+      const docs = Object.create(Task);
+      const returnDocs = docs.init({
+        name: 'test-task-init2',
+        stringRedisConnection: 'redis://127.0.0.1:6739'
+      });
+      expect(returnDocs).to.be.equal(docs);
+      expect(docs.name).to.be.an('string');
+      expect(docs.queue).to.be.an('object');
+      expect(docs.queue).to.be.an.instanceof(Queue);
+    });
   });
 
   describe('#add', function () {
