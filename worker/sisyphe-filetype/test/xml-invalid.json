@@ -1,6 +1,0 @@
-[
-  {"path": "test/samples/xml/invalid/badEncoding with spaces.xmlv2"},
-  {"path": "test/samples/xml/invalid/badEncoding.xmlv2"},
-  {"path": "test/samples/xml/invalid/badEncoding.xml"},
-  {"path": "test/samples/xml/invalid/notwellformedbalises.xml"}
-]

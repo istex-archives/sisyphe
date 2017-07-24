@@ -1,6 +1,7 @@
 const debounce = require('lodash').debounce;
+const EventEmitter = require('events');
 
-const Dispatcher = {};
+const Dispatcher = Object.create(new EventEmitter());
 
 Dispatcher.init = function (task, options) {
   this.waitingQueue = [];
@@ -23,27 +24,25 @@ Dispatcher.getOverseer = function (done) {
   }, 10);
 };
 
-Dispatcher.start = function (end) {
-  const debouncedCount = debounce(() => {
-    // TODO handle error with the Promise magic
-    this.tasks.queue.inactiveCount((error, totalInactive) => {
-      this.tasks.queue.activeCount((error, totalActive) => {
-        (totalActive + totalInactive === 0) ? end() : debouncedCount();
-      });
-    });
-  }, 500);
+Dispatcher.stop = debounce(function (callback) {
+  this.tasks.getJobCounts().then(jobCounts => {
+    jobCounts.active + jobCounts.waiting === 0 ? callback() : this.stop();
+  });
+}, 500);
 
-  this.waitingQueue.map((overseer) => {
-    overseer.on('message', (msg) => {
-      if (msg.isDone) {
+Dispatcher.start = function (end) {
+  this.waitingQueue.map(overseer => {
+    overseer.on('message', msg => {
+      if (msg.hasOwnProperty('type') && msg.type === 'job') {
+        this.emit('result', msg);
         this.addOverseer(overseer);
-        debouncedCount();
+        this.stop(end);
       }
     });
   });
 
   this.tasks.process((job, done) => {
-    this.getOverseer((overseer) => {
+    this.getOverseer(overseer => {
       overseer.send(job.data);
       done();
     });

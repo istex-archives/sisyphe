@@ -1,25 +1,25 @@
-const kue = require('kue');
+const Queue = require('bull');
 const Task = {};
 
 Task.init = function (options) {
   this.name = options.name;
-  this.queue = kue.createQueue();
+  this.queue = new Queue(options.name);
 };
 
-Task.process = function (funProcessing) {
-  this.queue.process(this.name, funProcessing);
+Task.process = function (functionProcess) {
+  this.queue.process(functionProcess);
 };
 
-Task.add = function (obj, done) {
-  let funError = null;
-  if (arguments.length > 1) {
-    funError = (error) => {
-      error ? done(error) : done();
-    };
-  }
-  this.queue.create(this.name, obj)
-    .removeOnComplete(true)
-    .save(funError);
+Task.add = function (obj) {
+  return this.queue.add(obj);
+};
+
+Task.getJobCounts = function () {
+  return this.queue.getJobCounts();
+};
+
+Task.on = function () {
+  return this.queue.on.call(this.queue, ...arguments);
 };
 
 module.exports = Task;

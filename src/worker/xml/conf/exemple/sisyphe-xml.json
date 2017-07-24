@@ -1,0 +1,45 @@
+{
+  "metadata": [
+    {
+      "name": "articleCategory",
+      "type": "String",
+      "xpath": "/article/front/article-meta/article-categories/subj-group/subject"
+    },
+    {
+      "name": "articlePubYear",
+      "regex": "^([0-9]{4})$",
+      "type": "Number",
+      "xpath": "/article/front/article-meta/pub-date/year"
+    },
+    {
+      "name": "doi",
+      "regex": "(10[.][0-9]{4,}[^\\s\"/<>]*/[^\\s\"<>]+)",
+      "type": "String",
+      "xpath": "/article/front/article-meta/article-id[@pub-id-type=\"doi\"]"
+    },
+    {
+      "name": "hasAbstract",
+      "type": "Boolean",
+      "xpath": "/article/front/article-meta/abstract"
+    },
+    {
+      "name": "nbKeywords",
+      "type": "Count",
+      "xpath": "/article/front/article-meta/kwd-group/kwd"
+    },
+    {
+      "name": "nbRefBibs",
+      "type": "Count",
+      "xpath": "/article/back/ref-list/ref"
+    },
+    {
+      "name": "lang",
+      "type": "Attribute",
+      "xpath": "/book/book-meta/abstract/p/@xml:lang"
+    }
+  ],
+  "dtd": [
+    "journal-publishing-dtd-2.3/journalpublishing.dtd",
+    "journal-publishing-dtd-2.4/journalpublishing.dtd"
+  ]
+}

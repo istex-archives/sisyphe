@@ -5,33 +5,47 @@ const chai = require('chai');
 const expect = chai.expect;
 const Overseer = require('../src/overseer');
 
-describe(`${pkg.name}/src/overseer.js`, function () {
-  describe("#init", function () {
-    it("should be initialized successfully", function () {
+describe(`${pkg.name}/src/overseer.js`, function() {
+  describe('#init', function() {
+    it('should be initialized successfully', function(done) {
       const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer.init(`${__dirname}/dumbWorker.js`);
-      expect(bobTheOverseer.fork).to.be.an("object");
-      expect(bobTheOverseer.fork).to.have.property("send");
-      expect(bobTheOverseer.fork).to.have.property("kill");
+      bobTheOverseer.init('dumbWorker', error => {
+        expect(error).to.be.null;
+      });
+      bobTheOverseer.on('message', msg => {
+        if (msg.hasOwnProperty('type') && msg.type === 'initialize') {
+          expect(msg.type).to.equal('initialize');
+          expect(msg.worker).to.equal('dumbWorker');
+          expect(msg.isInitialized).to.be.true;
+          done();
+        }
+      });
     });
   });
 
-  describe("#send", function () {
-    it("should send some data", function (done) {
-      const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer.init(`${__dirname}/dumbWorker.js`);
+  describe('#send', function() {
+    this.timeout(5000);
+    it('should send some data', function(done) {
       const data = {
         id: 159,
-        type: "pdf"
+        type: 'pdf'
       };
-      bobTheOverseer.send(data, (error) => {
+      const bobTheOverseer = Object.create(Overseer);
+      bobTheOverseer.init('dumbWorker', error => {
         expect(error).to.be.null;
       });
-      bobTheOverseer.on("message", (msg) => {
-        expect(msg).to.be.an("object");
-        expect(msg.isDone).to.be.true;
-        done();
-      })
+
+      bobTheOverseer.send(data, error => {
+        expect(error).to.be.null;
+      });
+
+      bobTheOverseer.on('message', msg => {
+        if (msg.hasOwnProperty('type') && msg.type === 'job') {
+          expect(msg.type).to.equal('job');
+          expect(msg.data).to.deep.equal(data);
+          done();
+        }
+      });
     });
   });
 });

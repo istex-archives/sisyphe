@@ -3,61 +3,71 @@
 const pkg = require('../package.json');
 const chai = require('chai');
 const expect = chai.expect;
-const kue = require('kue')
+// const kue = require('kue');
+const Queue = require('bull');
 const Task = require('../src/task');
 
 describe(`${pkg.name}/src/task.js`, function () {
   describe("#init", function () {
     it("should be initialized successfully", function () {
-      const doc = Object.create(Task);
-      doc.init({
+      const docs = Object.create(Task);
+      docs.init({
         name: "test-task-init"
       });
-      expect(doc.name).to.be.an("string");
-      expect(doc.queue).to.be.an("object");
-      expect(doc.queue).to.be.an.instanceof(kue);
+      expect(docs.name).to.be.an("string");
+      expect(docs.queue).to.be.an("object");
+      expect(docs.queue).to.be.an.instanceof(Queue);
     });
   })
 
   describe("#add", function () {
-    it("should add some task", function (done) {
-      const doc = Object.create(Task);
-      doc.init({
+    it("should add some task", function () {
+      const docs = Object.create(Task);
+      docs.init({
         name: "test-task-add"
       });
-      doc.add({
+      return docs.add({
         id: 161,
         type: "pdf"
-      }, (error) => {
-        expect(error).to.be.undefined;
-        done();
       });
     });
   })
 
   describe("#process", function () {
-    it("should process the tasks", function() {
-      const doc = Object.create(Task);
-      doc.init({
+    it("should process the tasks", function (done) {
+      const docs = Object.create(Task);
+      docs.init({
         name: "test-task-process"
       });
-      doc.add({
+      docs.add({
         id: 172,
         type: "pdf"
       });
-    })
-    it("should process the tasks with callback", function(done) {
-      const doc = Object.create(Task);
-      doc.init({
-        name: "test-task-process2"
-      });
-      doc.add({
-        id: 123,
-        type: "pdf"
-      }, (error) => {
-        expect(error).to.be.undefined;
+      docs.process((doc, next) => {
+        next();
         done();
+      })
+    })
+  })
+
+  describe("#on", function () {
+    it("should listen to some events", function (done) {
+      const docs = Object.create(Task);
+      docs.init({
+        name: "test-task-on"
       });
+      docs.add({
+        id: 212,
+        type: "pdf"
+      });
+      docs.process((doc, next) => {
+        doc.data.id++;
+        next(null, doc.data);
+      })
+      docs.on('completed', (job, result) => {
+        expect(result.id).to.equal(213);
+        done();
+      })
     })
   })
 });

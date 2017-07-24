@@ -1,4 +1,0 @@
-<!ELEMENT xpath (to,my,infos)>
-<!ELEMENT to (my)>
-<!ELEMENT my (infos)>
-<!ELEMENT infos (#PCDATA)>
