@@ -24,15 +24,15 @@ Dispatcher.getOverseer = function (done) {
 };
 
 Dispatcher.stop = debounce(function (callback) {
-  this.tasks.getJobCounts().then((jobCounts) => {
-    (jobCounts.active + jobCounts.waiting === 0) ? callback(): this.stop();
+  this.tasks.getJobCounts().then(jobCounts => {
+    jobCounts.active + jobCounts.waiting === 0 ? callback() : this.stop();
   });
 }, 500);
 
 Dispatcher.start = function (end) {
-  this.waitingQueue.map((overseer) => {
-    overseer.on('message', (msg) => {
-      if (msg.isDone) {
+  this.waitingQueue.map(overseer => {
+    overseer.on('message', msg => {
+      if (msg.hasOwnProperty('type') && msg.type === 'job') {
         this.emit('result', msg);
         this.addOverseer(overseer);
         this.stop(end);
@@ -41,7 +41,7 @@ Dispatcher.start = function (end) {
   });
 
   this.tasks.process((job, done) => {
-    this.getOverseer((overseer) => {
+    this.getOverseer(overseer => {
       overseer.send(job.data);
       done();
     });

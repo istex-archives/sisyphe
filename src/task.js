@@ -15,11 +15,11 @@ Task.add = function (obj) {
 };
 
 Task.getJobCounts = function () {
-  return this.queue.getJobCounts()
-}
+  return this.queue.getJobCounts();
+};
 
-Task.on = function() {
+Task.on = function () {
   return this.queue.on.call(this.queue, ...arguments);
-}
+};
 
 module.exports = Task;
