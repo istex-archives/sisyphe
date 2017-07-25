@@ -5,17 +5,24 @@ let isInitialized = false;
 
 process.on('message', msg => {
   if (!isInitialized && msg.hasOwnProperty('type') && msg.type === 'initialize') {
-    performer = require(path.join(__dirname, 'worker', msg.worker));
-    if (performer.hasOwnProperty('init')) performer.init();
-    isInitialized = true;
-    msg.isInitialized = true;
-    process.send(msg);
+    try {
+      performer = require(path.join(__dirname, 'worker', msg.worker));
+      if (performer.hasOwnProperty('init')) performer.init();
+      isInitialized = true;
+      msg.isInitialized = true;
+      process.send(msg);
+    } catch (error) {
+      process.send({
+        type: 'error',
+        message: error.message,
+        code: error.code
+      });
+    }
   }
 
   if (isInitialized && msg.hasOwnProperty('type') && msg.type === 'job') {
     performer.doTheJob(msg.data, (error, data) => {
-      if (error) return process.send(error);
-      process.send(msg);
+      (error) ? process.send(error) : process.send(msg);
     });
   }
 });

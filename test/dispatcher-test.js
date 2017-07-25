@@ -35,12 +35,12 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
     });
   });
 
-  describe('#getOverseer', function () {
+  describe('#getPatient', function () {
     it("should return a overseer when it's ready", function (done) {
       const ventilator = Object.create(Dispatcher);
       const task = Object.create(Task);
       ventilator.init(task, {
-        name: 'test-dispatcher-getOverseer'
+        name: 'test-dispatcher-getPatient'
       });
       const overseer1 = Object.create(Overseer);
       overseer1.init('dumbWorker', error => {
@@ -51,25 +51,25 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
         expect(error).to.be.null;
       });
 
-      ventilator.addOverseer(overseer1);
-      ventilator.getOverseer(overseer => {
+      ventilator.addToWaitingQueue(overseer1);
+      ventilator.getPatient().then(overseer => {
         expect(overseer).to.be.an('object');
         expect(overseer).to.have.property('send');
       });
-      ventilator.getOverseer(overseer => {
+      ventilator.getPatient().then(overseer => {
         expect(overseer).to.be.an('object');
         expect(overseer).to.have.property('send');
         done();
       });
       setTimeout(() => {
-        ventilator.addOverseer(overseer2);
+        ventilator.addToWaitingQueue(overseer2);
       }, 200);
     });
   });
 
   describe('#start', function () {
     this.timeout(5000);
-    it('should start and dispatch tasks', function (done) {
+    it('should start and dispatch tasks', function () {
       const doc = Object.create(Task);
       doc.init({
         name: 'test-dispatcher-start'
@@ -83,14 +83,14 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
 
       const ventilator = Object.create(Dispatcher);
       ventilator.init(doc, {
-        name: 'test-dispatcher-init'
+        name: 'test-dispatcher-start'
       });
       for (var i = 0; i < 4; i++) {
         const overseer = Object.create(Overseer);
         overseer.init('dumbWorker', error => {
           expect(error).to.be.null;
         });
-        ventilator.addOverseer(overseer);
+        ventilator.addToWaitingQueue(overseer);
       }
 
       ventilator.on('result', data => {
@@ -98,9 +98,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
         expect(data.type).to.equal('job');
       });
 
-      ventilator.start(() => {
-        done();
-      });
+      return ventilator.start();
     });
   });
 });
