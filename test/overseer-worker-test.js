@@ -9,13 +9,14 @@ describe(`${pkg.name}/src/overseer.js`, function () {
   describe('#init', function () {
     it('should be initialized successfully', function (done) {
       const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer.init('dumbWorker').catch(error => {
+      bobTheOverseer.init('dumbWorker', {id: 123}).catch(error => {
         expect(error).to.be.null;
       });
       bobTheOverseer.on('message', msg => {
         expect(msg.type).to.equal('initialize');
         expect(msg.worker).to.equal('dumbWorker');
         expect(msg.isInitialized).to.be.true;
+        expect(msg.options.id).to.equal(123);
         done();
       });
     });
@@ -37,7 +38,7 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     this.timeout(10000);
     it('should send some data', function (done) {
       const data = {
-        id: 159,
+        number: 159,
         type: 'pdf'
       };
       const bobTheOverseer = Object.create(Overseer);
@@ -53,7 +54,9 @@ describe(`${pkg.name}/src/overseer.js`, function () {
       bobTheOverseer.on('message', msg => {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
           expect(msg.type).to.equal('job');
-          expect(msg.data).to.deep.equal(data);
+          expect(msg.data.number).to.equal(159);
+          expect(msg.data.id).to.equal(123456);
+          expect(msg.data.type).to.equal('pdf');
           done();
         }
       });
