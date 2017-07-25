@@ -1,20 +1,40 @@
-const fs = require('fs');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
 const path = require('path');
 
 const walkerFs = {};
 
-walkerFs.doTheJob = function(data, done) {
-  fs.readdir(data.directory, (error, contents) => {
-    if (error) return done(error);
-    data.directories = [];
-    data.files = [];
-    contents.map((content) => {
-      return path.join(data.directory, content);
-    }).map((content) => {
-      if (fs.statSync(content).isDirectory()) data.directories.push(content);
-      if (fs.statSync(content).isFile()) data.files.push(content);
-    });
+walkerFs.init = function (options = {corpusname: 'default'}) {
+  this.now = Date.now();
+  this.corpusname = options.corpusname;
+};
+walkerFs.doTheJob = function (data, done) {
+  data.directories = [];
+  data.files = [];
+  fs.readdirAsync(data.directory).map((content) => {
+    return path.join(data.directory, content);
+  }).map((content) => {
+    return Promise.join(
+      fs.statAsync(content),
+      content,
+      (contentStat, contentPath) => {
+        if (contentStat.isDirectory()) data.directories.push(content);
+        if (contentStat.isFile()) {
+          const fileInfo = {
+            corpusname: this.corpusname,
+            startAt: this.now,
+            extension: path.extname(contentPath),
+            path: contentPath,
+            name: path.basename(contentPath),
+            size: contentStat.size
+          };
+          data.files.push(fileInfo);
+        }
+      });
+  }).then(() => {
     done(null, data);
+  }).catch((error) => {
+    done(error);
   });
 };
 
