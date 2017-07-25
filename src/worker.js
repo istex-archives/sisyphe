@@ -22,8 +22,7 @@ process.on('message', msg => {
 
   if (isInitialized && msg.hasOwnProperty('type') && msg.type === 'job') {
     performer.doTheJob(msg.data, (error, data) => {
-      if (error) return process.send(error);
-      process.send(msg);
+      (error) ? process.send(error) : process.send(msg);
     });
   }
 });
