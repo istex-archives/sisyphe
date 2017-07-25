@@ -19,8 +19,11 @@ Overseer.init = function (WorkerType, options) {
     options
   };
   return new Promise((resolve, reject) => {
-    this.fork.send(initObj, null, {}, (error) => {
-      (error) ? reject(error) : resolve();
+    this.fork.send(initObj, null, {}, error => {
+      if (error) reject(error);
+    });
+    this.fork.once('message', msg => {
+      if (msg.isInitialized) resolve(this);
     });
   });
 };
@@ -35,8 +38,8 @@ Overseer.send = function (obj) {
     data: obj
   };
   return new Promise((resolve, reject) => {
-    this.fork.send(msg, null, {}, (error) => {
-      (error) ? reject(error) : resolve();
+    this.fork.send(msg, null, {}, error => {
+      error ? reject(error) : resolve();
     });
   });
 };
