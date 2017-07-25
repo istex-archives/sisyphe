@@ -5,8 +5,7 @@ const Task = require('./src/task');
 const doc = Object.create(Task);
 doc.init({
   name: 'test-app'
-});
-doc.add({
+}).add({
   directory: '/home/meja/Data/dataset-xsmall'
 });
 
@@ -16,10 +15,10 @@ ventilator.init(doc, {
 });
 for (var i = 0; i < 8; i++) {
   const overseer = Object.create(Overseer);
-  overseer.init('walker-fs', error => {
+  overseer.init('walker-fs').catch(error => {
     if (error) console.log(error);
   });
-  ventilator.addOverseer(overseer);
+  ventilator.addToWaitingQueue(overseer);
 }
 
 ventilator.on('result', function (msg) {
@@ -33,7 +32,7 @@ ventilator.tasks.on('failed', (job, err) => {
 
 console.time('bench');
 console.log('start');
-ventilator.start(() => {
+ventilator.start().then(() => {
   // console.log('done');
   console.timeEnd('bench');
   process.exit(0);
