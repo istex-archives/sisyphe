@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const program = require('commander');
 const pkg = require('./package.json');
 const path = require('path');
@@ -16,9 +17,10 @@ if (program.corpusname === 'default') {
   process.exit(0);
 }
 
-const inputPath = (program.args[0].charAt(0) === '/') ? program.args[0] : path.join(__dirname, program.args[0]);
+const argPath = program.args[0];
+const inputPath = (argPath.charAt(0) === '/') ? argPath : path.join(__dirname, argPath);
 
-const workers = ['walker-fs', 'filetype'];
+const workers = ['walker-fs', 'filetype', 'pdf'];
 const enterprise = Object.create(Manufactory);
 enterprise.init({ inputPath, numCPUs });
 workers.map(worker => {
@@ -27,8 +29,9 @@ workers.map(worker => {
 enterprise
   .initializeWorkers()
   .then((result) => {
-    enterprise.dispatchers[1].on('result', msg => {
+    enterprise.dispatchers[2].on('result', msg => {
       console.log(msg);
+      // process.stdout.write('.');
     });
     return enterprise.start();
   })
