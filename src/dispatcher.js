@@ -9,6 +9,7 @@ const Dispatcher = Object.create(EventEmitter.prototype);
  * @returns {Dispatcher}
  */
 Dispatcher.init = function (task, options) {
+  EventEmitter.call(this);
   this.waitingQueue = [];
   this.tasks = task;
   this.options = options;
