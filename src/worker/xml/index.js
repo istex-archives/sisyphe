@@ -26,7 +26,6 @@ function to (promise, errorExt) {
 const sisypheXml = {};
 
 sisypheXml.init = function (options) {
-  this.isInspected = options.isInspected || false;
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
   let confContents = fs.readdirSync(this.configDir);
   // We search the nearest config in configDir
@@ -42,12 +41,9 @@ sisypheXml.init = function (options) {
     const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
     this.conf = JSON.parse(dataConf);
     if (this.conf.hasOwnProperty('dtd') && Array.isArray(this.conf.dtd)) {
-      this.dtdsPath = this.conf.dtd.map(dtd =>
-        path.resolve(this.configDir, options.corpusname, 'dtd', dtd)
-      );
+      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(this.configDir, options.corpusname, 'dtd', dtd));
     }
   }
-
   return this;
 };
 
@@ -69,9 +65,7 @@ sisypheXml.doTheJob = function (data, next) {
 
     if (!this.isConfExist) return data;
 
-    [data.error, validationDTDResult] = await to(
-      this.validateAgainstDTD(data, this.dtdsPath)
-    );
+    [data.error, validationDTDResult] = await to(this.validateAgainstDTD(data, this.dtdsPath));
     if (data.error) {
       data.isValidAgainstDTD = false;
       return data;
@@ -89,14 +83,12 @@ sisypheXml.doTheJob = function (data, next) {
     metadatas.map(metadata => {
       if (!metadata.hasOwnProperty('isValueValid')) {
         // no isValueValid , we stop here
-        data[metadata.name] =
-          metadata.type === 'Number' ? parseInt(metadata.value, 10) : metadata.value;
+        data[metadata.name] = metadata.type === 'Number' ? parseInt(metadata.value, 10) : metadata.value;
         return;
       }
       data[metadata.name + 'IsValid'] = metadata.isValueValid;
       if (metadata.isValueValid) {
-        data[metadata.name] =
-          metadata.type === 'Number' ? parseInt(metadata.value, 10) : metadata.value;
+        data[metadata.name] = metadata.type === 'Number' ? parseInt(metadata.value, 10) : metadata.value;
       } else {
         data[metadata.name + 'Error'] = metadata.value;
       }
@@ -188,9 +180,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
         metadata.element.hasFirstChild = metadata.element[0].hasOwnProperty('firstChild');
       }
       if (metadata.element.isEmpty && metadata.element.hasFirstChild) {
-        metadata.element.hasDataInFirstChild = metadata.element[0].firstChild.hasOwnProperty(
-          'data'
-        );
+        metadata.element.hasDataInFirstChild = metadata.element[0].firstChild.hasOwnProperty('data');
       }
 
       switch (metadata.type) {
@@ -248,9 +238,7 @@ sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
   return new Promise((resolve, reject) => {
     if (docObj.hasOwnProperty('doctype')) {
       const dtdToValidateFirst = docObj.doctype.sysid;
-      const indexDtdToValidateFirst = DTDs.map(pathDtd => path.basename(pathDtd)).indexOf(
-        dtdToValidateFirst
-      );
+      const indexDtdToValidateFirst = DTDs.map(pathDtd => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
       if (indexDtdToValidateFirst !== -1) moveTo(DTDs, indexDtdToValidateFirst, 0);
     }
 
