@@ -21,6 +21,19 @@ describe(`${pkg.name}/src/overseer.js`, function () {
       });
     });
 
+    it('should be initialized successfully with default options', function (done) {
+      const bobTheOverseer = Object.create(Overseer);
+      bobTheOverseer.init('dumbWorker').catch(error => {
+        expect(error).to.be.null;
+      });
+      bobTheOverseer.on('message', msg => {
+        expect(msg.type).to.equal('initialize');
+        expect(msg.worker).to.equal('dumbWorker');
+        expect(msg.isInitialized).to.be.true;
+        done();
+      });
+    });
+
     it("shouldn't be initialized and return an error", function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('veryDumbWorker').catch(error => {
