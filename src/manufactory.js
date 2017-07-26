@@ -12,6 +12,7 @@ const Manufactory = {};
  */
 Manufactory.init = function (options = { inputPath: '.', numCPUs: os.cpus().length }) {
   this.workers = [];
+  this.options = options;
   this.pathToAnalyze = options.inputPath;
   this.numCPUs = options.numCPUs;
   return this;
@@ -67,7 +68,7 @@ Manufactory.createOverseersForDispatchers = function () {
   return Promise.map(this.dispatchers, dispatcher => {
     return Promise.map(Array.from(Array(this.numCPUs).keys()), numero => {
       const overseer = Object.create(Overseer);
-      return overseer.init(dispatcher.options.name).then(overseer => {
+      return overseer.init(dispatcher.options.name, this.options).then(overseer => {
         dispatcher.addToWaitingQueue(overseer);
         return overseer;
       });
