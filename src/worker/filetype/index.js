@@ -18,8 +18,8 @@ const os = require('os'),
 
 const sisypheFileType = {};
 
-sisypheFileType.init = function (options) {
-  this.isInspected = options.isInspected || false;
+sisypheFileType.init = function (options = {isInspected: false}) {
+  this.isInspected = options.isInspected;
 };
 
 sisypheFileType.doTheJob = function (data, next) {
