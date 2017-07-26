@@ -8,7 +8,7 @@ process.on('message', msg => {
     try {
       const Performer = require(path.join(__dirname, 'worker', msg.worker));
       performer = Object.create(Performer);
-      if (performer.hasOwnProperty('init')) performer.init(msg.options);
+      if ('init' in performer) performer.init(msg.options);
       isInitialized = true;
       msg.isInitialized = true;
       process.send(msg);
