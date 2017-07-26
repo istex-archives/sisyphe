@@ -1,0 +1,25 @@
+<TEI 
+  xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Lorem ipsum dolor sit amet</title>
+      </titleStmt>
+      <publicationStmt>
+        <p>Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression</p>
+      </publicationStmt>
+      <sourceDesc>
+        <p>L'extrait standard de Lorem Ipsum utilisé depuis le XVIè siècle est reproduit ci-dessous pour les curieux. Les sections 1.10.32 et 1.10.33 du "De Finibus Bonorum et Malorum" de Cicéron sont aussi reproduites dans leur version originale, accompagnée de la traduction anglaise de H. Rackham (1914).</p>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent molestie, dui tempor dictum malesuada, mi arcu lacinia ipsum, eget lacinia massa nulla quis ex. Aliquam cursus libero ligula, in venenatis est imperdiet ac. Vivamus mollis augue nec blandit porttitor. Duis finibus diam vitae elementum viverra. Suspendisse potenti. Ut gravida mauris eget mauris lobortis, eu lobortis tellus tincidunt. In porttitor efficitur dui a suscipit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam turpis ex, finibus et interdum ut, malesuada nec elit. Praesent dapibus, dolor quis molestie ultrices, mauris lorem convallis tellus, ac vestibulum nisi massa eu odio. Aliquam erat volutpat.</p>
+      <p>Ut euismod nunc eget sapien porta pulvinar. Nunc at gravida erat. Donec quam quam, feugiat id quam vitae, interdum tincidunt odio. Praesent interdum sapien quam, sed tristique ipsum pulvinar non. In hac habitasse platea dictumst. Duis nulla erat, convallis et mi et, convallis porta turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas quis mauris elementum velit vehicula ultricies. Vestibulum at vulputate diam, nec ullamcorper tellus. Nulla facilisi. Donec ac augue sem.</p>
+      <p>Nam ligula nibh, varius nec arcu sed, commodo imperdiet tortor. Integer varius maximus lectus et gravida. Proin at ipsum vitae libero porttitor elementum. In non dapibus dolor. Proin sit amet placerat erat. Nulla quis elit vitae tellus sagittis iaculis. Vestibulum volutpat ultricies posuere. Sed enim ante, tincidunt vitae porta quis, porta eget arcu. Sed sit amet commodo eros.</p>
+      <p>Proin pharetra accumsan purus, a porttitor metus faucibus a. Vivamus et nunc vitae tortor hendrerit vestibulum. In imperdiet volutpat lectus a dignissim. Nam nunc quam, consequat a est nec, condimentum imperdiet nibh. Donec sem arcu, maximus vel convallis a, dapibus vitae quam. Sed nec lobortis sem, ut ultricies odio. Aliquam accumsan lorem nec gravida feugiat.</p>
+      <p>Praesent massa ante, vestibulum vel egestas ac, euismod ut nibh. Praesent quis leo cursus ex fermentum blandit ultrices at diam. Quisque laoreet dolor vel vestibulum pretium. Suspendisse quis lacus sagittis mauris pulvinar ultricies id id augue. Sed ac bibendum neque. Suspendisse porttitor consectetur nisl, ut facilisis magna finibus sit amet. Curabitur dignissim elementum elit, a volutpat felis interdum ac. Cras fermentum erat et nisi semper, eget vehicula elit auctor. Suspendisse bibendum elit a sapien tempus euismod. Duis quis elit a tellus sagittis malesuada eget vitae eros. Ut imperdiet hendrerit mauris, ut convallis est iaculis vel. Curabitur venenatis, nibh non consequat pharetra, nunc nunc ultricies felis, id hendrerit dolor mauris vel nulla.</p>
+    </body>
+  </text>
+</TEI>

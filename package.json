@@ -1,11 +1,12 @@
 {
   "name": "sisyphe",
-  "version": "0.6.0",
+  "version": "3.5.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "postinstall": "lerna bootstrap",
-    "test": "mocha && lerna run --ignore *-worker test",
+    "test": "nyc mocha && lerna run --ignore *-worker test",
+    "test-core": "nyc mocha",
     "test-worker": "lerna run --ignore *-worker test",
     "updated": "lerna updated",
     "publish": "lerna publish --skip-npm && git push --follow-tags"
@@ -13,24 +14,37 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "ansicolors": "^0.3.2",
+    "async": "^2.5.0",
     "blessed": "^0.1.81",
+    "blessed-contrib": "^4.7.5",
     "bluebird": "^3.4.1",
-    "bull": "https://github.com/MatthD/bull.git",
-    "commander": "^2.9.0",
+    "bull": "^3.0.0-rc.4",
+    "bunyan": "^1.8.10",
+    "colors": "^1.1.2",
+    "commander": "^2.11.0",
+    "cpu-stat": "^2.0.1",
     "debug": "^2.2.0",
     "elasticsearch": "^12.1.3",
+    "klaw": "^1.3.1",
+    "kue": "^0.11.6",
     "kuler": "0.0.0",
     "lodash": "^4.16.4",
     "mime": "^1.3.4",
     "mkdirp": "^0.5.1",
+    "pm2": "^2.5.0",
     "pretty-ms": "^2.1.0",
+    "recluster": "^0.4.5",
     "redis": "^2.6.2",
+    "through2": "^2.0.3",
     "walk": "^2.3.9",
     "winston": "^2.2.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "lerna": "2.0.0-beta.36",
-    "mocha": "^3.1.2"
+    "chai": "^4.1.0",
+    "chai-events": "0.0.1",
+    "lerna": "2.0.0",
+    "mocha": "^3.1.2",
+    "nyc": "^11.0.3"
   }
 }
