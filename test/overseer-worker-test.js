@@ -64,7 +64,7 @@ describe(`${pkg.name}/src/overseer.js`, function () {
 
     it('should failed to send some data', function (done) {
       const data = {
-        id: 159,
+        id: 951,
         type: 'pdf'
       };
       const bobTheOverseer = Object.create(Overseer);
