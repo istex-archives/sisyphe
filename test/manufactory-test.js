@@ -80,7 +80,16 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
         .init()
         .addWorker('walker-fs')
         .addWorker('dumbWorker')
-        .initializeWorkers();
+        .initializeWorkers().then(() => {
+          enterprise.dispatchers.map((dispatcher, index, array) => {
+            const isLastDispatcher = array.length === index + 1;
+            if (isLastDispatcher) {
+              expect(dispatcher.listenerCount('result')).to.equal(0);
+            } else {
+              expect(dispatcher.listenerCount('result')).to.equal(1);
+            }
+          });
+        });
     });
   });
 
@@ -95,6 +104,11 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
         .addWorker('dumbWorker')
         .initializeWorkers()
         .then(() => {
+          enterprise.dispatchers[1].on('result', (msg) => {
+            expect(msg).to.have.property('type');
+            expect(msg).to.have.property('data');
+            expect(msg.data).to.be.an('object');
+          });
           return enterprise.start();
         });
     });
