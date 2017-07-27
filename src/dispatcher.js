@@ -1,4 +1,5 @@
 const debounce = require('lodash').debounce;
+const Promise = require('bluebird');
 const EventEmitter = require('events');
 
 const Dispatcher = Object.create(EventEmitter.prototype);
@@ -10,9 +11,20 @@ const Dispatcher = Object.create(EventEmitter.prototype);
  */
 Dispatcher.init = function (task, options) {
   EventEmitter.call(this);
+  this.patients = [];
   this.waitingQueue = [];
   this.tasks = task;
   this.options = options;
+  return this;
+};
+
+/**
+ * @param {Overseer} overseer
+ * @returns {Dispatcher}
+ */
+Dispatcher.addPatient = function (overseer) {
+  this.patients.push(overseer);
+  this.waitingQueue.push(overseer);
   return this;
 };
 
@@ -41,16 +53,16 @@ Dispatcher.getPatient = function () {
   });
 };
 
-Dispatcher.stop = debounce(function (stop) {
+Dispatcher.stop = debounce(function (callback) {
   this.tasks.getJobCounts().then(jobCounts => {
-    if (jobCounts.active + jobCounts.waiting === 0) return stop();
+    if (jobCounts.active + jobCounts.waiting === 0) return callback();
     this.stop();
   });
 }, 500);
 
 Dispatcher.start = function () {
   return new Promise(resolve => {
-    this.waitingQueue.map(overseer => {
+    this.patients.map(overseer => {
       overseer.on('message', msg => {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
           this.emit('result', msg);
