@@ -5,33 +5,33 @@ const assert = require('assert'),
   DOMParser = require('xmldom').DOMParser,
   xpath = require('xpath'),
   Promise = require('bluebird'),
-  colors = require('ansicolors'),
   fs = Promise.promisifyAll(require('fs')),
   exec = Promise.promisify(require('child_process').exec),
-  getDoctype = require("get-doctype"),
+  getDoctype = require('get-doctype'),
   cloneDeep = require('lodash.clonedeep');
 
-const xpathSelect = xpath.useNamespaces({"xml": "http://www.w3.org/XML/1998/namespace"});
+const xpathSelect = xpath.useNamespaces({ xml: 'http://www.w3.org/XML/1998/namespace' });
 
-function to(promise, errorExt) {
-  return promise.then(function (data) {
-    return [null, data];
-  }).catch(function (err) {
-    if (errorExt) err = Object.assign(err, errorExt);
-    return [err];
-  });
+function to (promise, errorExt) {
+  return promise
+    .then(function (data) {
+      return [null, data];
+    })
+    .catch(function (err) {
+      if (errorExt) err = Object.assign(err, errorExt);
+      return [err];
+    });
 }
 
 const sisypheXml = {};
 
 sisypheXml.init = function (options) {
-  this.isInspected = options.isInspected || false;
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
   let confContents = fs.readdirSync(this.configDir);
-  //We search the nearest config in configDir
-  for(var folder of confContents){
-    let currPath = path.join(this.configDir,folder)
-    if(fs.lstatSync(currPath).isDirectory() && options.corpusname.includes(folder)){  
+  // We search the nearest config in configDir
+  for (var folder of confContents) {
+    let currPath = path.join(this.configDir, folder);
+    if (fs.lstatSync(currPath).isDirectory() && options.corpusname.includes(folder)) {
       this.pathToConf = path.resolve(this.configDir, folder, 'sisyphe-xml' + '.json');
       break;
     }
@@ -41,19 +41,14 @@ sisypheXml.init = function (options) {
     const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
     this.conf = JSON.parse(dataConf);
     if (this.conf.hasOwnProperty('dtd') && Array.isArray(this.conf.dtd)) {
-      this.dtdsPath = this.conf.dtd.map((dtd) => path.resolve(this.configDir, options.corpusname, 'dtd', dtd));
+      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(this.configDir, options.corpusname, 'dtd', dtd));
     }
   }
-
   return this;
 };
 
 sisypheXml.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml') return next(null, data);
-
-  if(this.isInspected){
-    console.log(`${colors.red('xml')}: ${data.name}`);
-  }
 
   (async () => {
     let error, xmlDom, validationDTDResult;
@@ -85,26 +80,28 @@ sisypheXml.doTheJob = function (data, next) {
       return data;
     }
 
-    metadatas.map((metadata) => {
+    metadatas.map(metadata => {
       if (!metadata.hasOwnProperty('isValueValid')) {
         // no isValueValid , we stop here
-        data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+        data[metadata.name] = metadata.type === 'Number' ? parseInt(metadata.value, 10) : metadata.value;
         return;
       }
       data[metadata.name + 'IsValid'] = metadata.isValueValid;
       if (metadata.isValueValid) {
-        data[metadata.name] = (metadata.type === 'Number') ? parseInt(metadata.value, 10) : metadata.value;
+        data[metadata.name] = metadata.type === 'Number' ? parseInt(metadata.value, 10) : metadata.value;
       } else {
         data[metadata.name + 'Error'] = metadata.value;
       }
     });
     return data;
-  })().then((data) => {
-    if (data.error) data.error = JSON.stringify(data.error);
-    next(null, data);
-  }).catch((error) => {
-    next(error);
-  });
+  })()
+    .then(data => {
+      if (data.error) data.error = JSON.stringify(data.error);
+      next(null, data);
+    })
+    .catch(error => {
+      next(error);
+    });
 };
 
 sisypheXml.getXmlDom = function (xmlFilePath) {
@@ -116,8 +113,8 @@ sisypheXml.getXmlDom = function (xmlFilePath) {
       wellFormedErrorObj[level] = {
         message: msg,
         locator
-      }
-    }
+      };
+    };
   };
 
   const parser = new DOMParser({
@@ -130,15 +127,15 @@ sisypheXml.getXmlDom = function (xmlFilePath) {
   });
 
   return new Promise((resolve, reject) => {
-    fs.readFileAsync(xmlFilePath, 'utf8').then((xmlContent) => {
+    fs.readFileAsync(xmlFilePath, 'utf8').then(xmlContent => {
       const xmlDom = parser.parseFromString(xmlContent, 'application/xml');
       if (Object.keys(error.list).length === 0) {
-        resolve(xmlDom)
+        resolve(xmlDom);
       } else {
-        reject(error)
+        reject(error);
       }
-    })
-  })
+    });
+  });
 };
 
 sisypheXml.getDoctype = function (xmlFilePath) {
@@ -150,17 +147,17 @@ sisypheXml.getDoctype = function (xmlFilePath) {
       } else {
         resolve(doctype);
       }
-    })
-  })
+    });
+  });
 };
 
 sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
-  return Promise.map(confObj.metadata, (metadata) => {
+  return Promise.map(confObj.metadata, metadata => {
     // Select the first XPATH possibility
     if (Array.isArray(metadata.xpath)) {
       for (let i = 0; i < metadata.xpath.length; i++) {
-        //string is special because we need all text in its child too
-        if(metadata.type === 'String') {
+        // string is special because we need all text in its child too
+        if (metadata.type === 'String') {
           metadata.xpath[i] = `string(${metadata.xpath[i]})`;
         }
         const itemElement = xpathSelect(metadata.xpath[i], xmlDom);
@@ -171,14 +168,14 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
       }
       metadata.element = metadata.element || [];
     } else {
-      //string is special because we need all text in its child too
-      if(metadata.type === 'string') {
+      // string is special because we need all text in its child too
+      if (metadata.type === 'string') {
         metadata.xpath[i] = `string(${metadata.xpath})`;
       }
       metadata.element = xpathSelect(metadata.xpath, xmlDom);
     }
     if (metadata.hasOwnProperty('element')) {
-      if(metadata.type !== 'String') metadata.element.isEmpty = metadata.element.length;
+      if (metadata.type !== 'String') metadata.element.isEmpty = metadata.element.length;
       if (metadata.element.isEmpty) {
         metadata.element.hasFirstChild = metadata.element[0].hasOwnProperty('firstChild');
       }
@@ -187,34 +184,41 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
       }
 
       switch (metadata.type) {
-        case "String":
-          if((metadata.element.length && (typeof metadata.element === 'string'))){
-            metadata.value =  metadata.element;
-          }
-          else if ((typeof metadata.element === 'object') &&
-            metadata.element[0] && metadata.element[0].firstChild && metadata.element[0].firstChild.data) {
-              metadata.value = metadata.element[0].firstChild.data;
-            }
-          break;
-        case "Number":
-          if (metadata.element.isEmpty && metadata.element.hasFirstChild && metadata.element.hasDataInFirstChild) {
+        case 'String':
+          if (metadata.element.length && typeof metadata.element === 'string') {
+            metadata.value = metadata.element;
+          } else if (
+            typeof metadata.element === 'object' &&
+            metadata.element[0] &&
+            metadata.element[0].firstChild &&
+            metadata.element[0].firstChild.data
+          ) {
             metadata.value = metadata.element[0].firstChild.data;
           }
           break;
-        case "Boolean":
+        case 'Number':
+          if (
+            metadata.element.isEmpty &&
+            metadata.element.hasFirstChild &&
+            metadata.element.hasDataInFirstChild
+          ) {
+            metadata.value = metadata.element[0].firstChild.data;
+          }
+          break;
+        case 'Boolean':
           metadata.value = !!metadata.element.length;
           break;
-        case "Count":
+        case 'Count':
           metadata.value = metadata.element.length;
           break;
-        case "Attribute":
+        case 'Attribute':
           if (metadata.element.length) metadata.value = metadata.element[0].value;
           break;
       }
     }
 
     return metadata;
-  }).map((metadata) => {
+  }).map(metadata => {
     if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {
       const regex = new RegExp(metadata.regex);
       metadata.isValueValid = regex.test(metadata.value);
@@ -226,7 +230,7 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
 sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
   const DTDs = arrayPathDTD.slice();
 
-  function moveTo(array, old_index, new_index) {
+  function moveTo (array, old_index, new_index) {
     array.splice(new_index, 0, array.splice(old_index, 1)[0]);
     return array;
   }
@@ -234,26 +238,28 @@ sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
   return new Promise((resolve, reject) => {
     if (docObj.hasOwnProperty('doctype')) {
       const dtdToValidateFirst = docObj.doctype.sysid;
-      const indexDtdToValidateFirst = DTDs.map((pathDtd) => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
+      const indexDtdToValidateFirst = DTDs.map(pathDtd => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
       if (indexDtdToValidateFirst !== -1) moveTo(DTDs, indexDtdToValidateFirst, 0);
     }
 
-    (function loop(arrayDTD) {
+    (function loop (arrayDTD) {
       if (arrayDTD.length) {
         const dtd = arrayDTD.shift();
-        exec('xmlstarlet val -e -d ' + dtd + ' ' + docObj.path).then((stdout) => {
-          resolve({dtd, stdout})
-        }).catch(() => {
-          loop(arrayDTD)
-        })
+        exec('xmlstarlet val -e -d ' + dtd + ' ' + docObj.path)
+          .then(stdout => {
+            resolve({ dtd, stdout });
+          })
+          .catch(() => {
+            loop(arrayDTD);
+          });
       } else {
         const error = new Error();
         error.message = 'No DTD validate the xml file';
-        error.type = "validation-dtd";
-        reject(error)
+        error.type = 'validation-dtd';
+        reject(error);
       }
-    })(DTDs)
-  })
+    })(DTDs);
+  });
 };
 
 module.exports = sisypheXml;

@@ -18,16 +18,9 @@ const os = require('os'),
 
 const sisypheFileType = {};
 
-sisypheFileType.init = function (options = {isInspected: false}) {
-  this.isInspected = options.isInspected;
-};
-
 sisypheFileType.doTheJob = function (data, next) {
   if (data.mimetype) {
     return next(null, data);
-  }
-  if(this.isInspected){
-    console.log(`${colors.yellow('filetype')}: ${data.name}`);
   }
 
   mime.define({

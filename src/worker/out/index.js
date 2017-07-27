@@ -10,9 +10,7 @@ const sisypheOut = {},
   path = require('path'),
   Promise = require('bluebird'),
   winston = require('winston'),
-  colors = require('ansicolors'),
   Elasticsearch = require('winston-elasticsearch');
-
 
 const template = require('./config/elasticsearch-template.json');
 
@@ -23,7 +21,7 @@ sisypheOut.init = function (options) {
   this.logger.configure({
     exitOnError: false,
     transports: [
-      new (winston.transports.File)({
+      new winston.transports.File({
         filename: `logs/analyse-${options.corpusname}.json`,
         highWaterMark: 24,
         json: true,
