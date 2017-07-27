@@ -9,7 +9,7 @@ describe(`${pkg.name}/src/overseer.js`, function () {
   describe('#init', function () {
     it('should be initialized successfully', function (done) {
       const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer.init('dumbWorker', {id: 123}).catch(error => {
+      bobTheOverseer.init('dumbWorker', { id: 123 }).catch(error => {
         done(error);
       });
       bobTheOverseer.on('message', msg => {
@@ -47,14 +47,11 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     });
   });
 
-  describe('#stop', function () {
-    it('should stop and kill worker', function () {
+  describe('#final', function () {
+    it('should fire the finalJob in worker', function () {
       const bobTheOverseer = Object.create(Overseer);
-      return bobTheOverseer.init('dumbWorker', {id: 123}).then(() => {
-        return bobTheOverseer.stop().then((overseer) => {
-          expect(overseer.fork.connected).to.be.false;
-          expect(overseer.fork.signalCode).to.be.equal('SIGTERM');
-        });
+      return bobTheOverseer.init('dumbWorker', { id: 123 }).then(() => {
+        return bobTheOverseer.final();
       });
     });
   });
@@ -93,14 +90,12 @@ describe(`${pkg.name}/src/overseer.js`, function () {
         type: 'pdf'
       };
       const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer
-        .init('dumbWorker')
-        .then(() => {
-          bobTheOverseer.fork.kill();
-        });
+      bobTheOverseer.init('dumbWorker').then(() => {
+        bobTheOverseer.fork.kill();
+      });
 
       bobTheOverseer.on('exit', (code, signal) => {
-        bobTheOverseer.send(data).catch((error) => {
+        bobTheOverseer.send(data).catch(error => {
           expect(error).to.be.an('Error');
           done();
         });

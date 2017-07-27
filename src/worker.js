@@ -23,14 +23,25 @@ process.on('message', msg => {
 
   if (isInitialized && msg.hasOwnProperty('type') && msg.type === 'job') {
     performer.doTheJob(msg.data, (error, data) => {
-      (error) ? process.send(error) : process.send(msg);
+      error ? process.send(error) : process.send(msg);
     });
   }
 
-  if (isInitialized && msg.hasOwnProperty('type') && msg.type === 'stop') {
-    performer.finalJob(msg.options, (error) => {
-      if (error) return process.send(error);
-      process.kill(process.pid);
-    });
+  if (isInitialized && msg.hasOwnProperty('type') && msg.type === 'final') {
+    if ('finalJob' in performer) {
+      performer.finalJob(error => {
+        if (error) {
+          process.send({
+            type: 'error',
+            message: error.message,
+            code: error.code
+          });
+        } else {
+          process.send(msg);
+        }
+      });
+    } else {
+      process.send(msg);
+    }
   }
 });
