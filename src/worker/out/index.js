@@ -21,7 +21,7 @@ sisypheOut.init = function (options) {
   this.logger.configure({
     exitOnError: false,
     transports: [
-      new (winston.transports.File)({
+      new winston.transports.File({
         filename: `logs/analyse-${options.corpusname}.json`,
         highWaterMark: 24,
         json: true,
