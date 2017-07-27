@@ -28,6 +28,21 @@ Overseer.init = function (WorkerType, options) {
   });
 };
 
+Overseer.stop = function (options) {
+  const stopObj = {
+    type: 'stop',
+    options
+  };
+  return new Promise((resolve, reject) => {
+    this.fork.send(stopObj, null, {}, error => {
+      if (error) reject(error);
+    });
+    this.fork.once('exit', () => {
+      resolve(this);
+    });
+  });
+};
+
 /**
  * @param {any} obj
  * @returns Promise

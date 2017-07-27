@@ -10,7 +10,7 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     it('should be initialized successfully', function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('dumbWorker', {id: 123}).catch(error => {
-        expect(error).to.be.null;
+        done(error);
       });
       bobTheOverseer.on('message', msg => {
         expect(msg.type).to.equal('initialize');
@@ -24,7 +24,7 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     it('should be initialized successfully with default options', function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('dumbWorker').catch(error => {
-        expect(error).to.be.null;
+        done(error);
       });
       bobTheOverseer.on('message', msg => {
         expect(msg.type).to.equal('initialize');
@@ -37,12 +37,24 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     it("shouldn't be initialized and return an error", function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('veryDumbWorker').catch(error => {
-        expect(error).to.be.null;
+        done(error);
       });
       bobTheOverseer.on('message', msg => {
         expect(msg.type).to.equal('error');
         expect(msg.code).to.equal('MODULE_NOT_FOUND');
         done();
+      });
+    });
+  });
+
+  describe('#stop', function () {
+    it('should stop and kill worker', function () {
+      const bobTheOverseer = Object.create(Overseer);
+      return bobTheOverseer.init('dumbWorker', {id: 123}).then(() => {
+        return bobTheOverseer.stop().then((overseer) => {
+          expect(overseer.fork.connected).to.be.false;
+          expect(overseer.fork.signalCode).to.be.equal('SIGTERM');
+        });
       });
     });
   });
