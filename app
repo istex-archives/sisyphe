@@ -23,7 +23,7 @@ const inputPath = argPath.charAt(0) === '/' ? argPath : path.join(__dirname, arg
 const configDirOpt = program.configDir;
 const configDir = configDirOpt.charAt(0) === '/' ? configDirOpt : path.join(__dirname, configDirOpt);
 
-const workers = ['walker-fs', 'filetype', 'pdf', 'xml', 'xpath'];
+const workers = ['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out'];
 const options = {
   corpusname: program.corpusname,
   configDir,
@@ -40,7 +40,7 @@ enterprise
   .initializeWorkers()
   .then(result => {
     console.log('init: ok !');
-    enterprise.dispatchers[4].on('result', msg => {
+    enterprise.dispatchers[5].on('result', msg => {
       console.log(msg);
       // process.stdout.write('.');
     });
