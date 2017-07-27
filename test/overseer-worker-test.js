@@ -9,8 +9,8 @@ describe(`${pkg.name}/src/overseer.js`, function () {
   describe('#init', function () {
     it('should be initialized successfully', function (done) {
       const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer.init('dumbWorker', {id: 123}).catch(error => {
-        expect(error).to.be.null;
+      bobTheOverseer.init('dumbWorker', { id: 123 }).catch(error => {
+        done(error);
       });
       bobTheOverseer.on('message', msg => {
         expect(msg.type).to.equal('initialize');
@@ -24,7 +24,7 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     it('should be initialized successfully with default options', function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('dumbWorker').catch(error => {
-        expect(error).to.be.null;
+        done(error);
       });
       bobTheOverseer.on('message', msg => {
         expect(msg.type).to.equal('initialize');
@@ -37,12 +37,21 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     it("shouldn't be initialized and return an error", function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('veryDumbWorker').catch(error => {
-        expect(error).to.be.null;
+        done(error);
       });
       bobTheOverseer.on('message', msg => {
         expect(msg.type).to.equal('error');
         expect(msg.code).to.equal('MODULE_NOT_FOUND');
         done();
+      });
+    });
+  });
+
+  describe('#final', function () {
+    it('should fire the finalJob in worker', function () {
+      const bobTheOverseer = Object.create(Overseer);
+      return bobTheOverseer.init('dumbWorker', { id: 123 }).then(() => {
+        return bobTheOverseer.final();
       });
     });
   });
@@ -81,14 +90,12 @@ describe(`${pkg.name}/src/overseer.js`, function () {
         type: 'pdf'
       };
       const bobTheOverseer = Object.create(Overseer);
-      bobTheOverseer
-        .init('dumbWorker')
-        .then(() => {
-          bobTheOverseer.fork.kill();
-        });
+      bobTheOverseer.init('dumbWorker').then(() => {
+        bobTheOverseer.fork.kill();
+      });
 
       bobTheOverseer.on('exit', (code, signal) => {
-        bobTheOverseer.send(data).catch((error) => {
+        bobTheOverseer.send(data).catch(error => {
           expect(error).to.be.an('Error');
           done();
         });

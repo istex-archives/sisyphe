@@ -13,4 +13,8 @@ dumbWorker.doTheJob = function (data, done) {
   }, this.time);
 };
 
+dumbWorker.finalJob = function (done) {
+  setTimeout(done, this.time);
+};
+
 module.exports = dumbWorker;

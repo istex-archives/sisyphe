@@ -27,11 +27,17 @@ Manufactory.addWorker = function (worker) {
  * @returns {Promise}
  */
 Manufactory.initializeWorkers = function () {
-  return this.createDispatchers()
-    .createOverseersForDispatchers()
-    .then(() => {
-      return this.bindDispatchers();
+  return this.createDispatchers().createOverseersForDispatchers().then(() => {
+    return this.bindDispatchers();
+  });
+};
+
+Manufactory.final = function () {
+  return Promise.map(this.dispatchers, dispatcher => {
+    return Promise.map(dispatcher.patients, overseer => {
+      return overseer.final();
     });
+  });
 };
 
 /**
@@ -69,7 +75,7 @@ Manufactory.createOverseersForDispatchers = function () {
     return Promise.map(Array.from(Array(this.numCPUs).keys()), numero => {
       const overseer = Object.create(Overseer);
       return overseer.init(dispatcher.options.name, this.options).then(overseer => {
-        dispatcher.addToWaitingQueue(overseer);
+        dispatcher.addPatient(overseer);
         return overseer;
       });
     });
@@ -87,7 +93,7 @@ Manufactory.bindDispatchers = function () {
 
     const isLastDispatcher = array.length === index + 1;
     if (isLastDispatcher) return;
-    dispatcher.on('result', (msg) => {
+    dispatcher.on('result', msg => {
       if (msg.data.hasOwnProperty('directory') && msg.data.hasOwnProperty('files')) {
         msg.data.directories.map(directory => dispatcher.tasks.add({ directory }));
         msg.data.files.map(file => this.dispatchers[index + 1].tasks.add(file));

@@ -18,6 +18,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       expect(ventilator.tasks).to.be.an('object');
       expect(ventilator.options).to.be.an('object');
       expect(ventilator.waitingQueue).to.be.an('array');
+      expect(ventilator.patients).to.be.an('array');
     });
   });
 
@@ -51,7 +52,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
         expect(error).to.be.null;
       });
 
-      ventilator.addToWaitingQueue(overseer1);
+      ventilator.addPatient(overseer1);
       ventilator.getPatient().then(overseer => {
         expect(overseer).to.be.an('object');
         expect(overseer).to.have.property('send');
@@ -62,7 +63,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
         done();
       });
       setTimeout(() => {
-        ventilator.addToWaitingQueue(overseer2);
+        ventilator.addPatient(overseer2);
       }, 200);
     });
   });
@@ -90,7 +91,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
         overseer.init('dumbWorker', error => {
           expect(error).to.be.null;
         });
-        ventilator.addToWaitingQueue(overseer);
+        ventilator.addPatient(overseer);
       }
 
       ventilator.on('result', data => {

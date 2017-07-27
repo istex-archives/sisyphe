@@ -76,20 +76,16 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
   describe('#initializeWorkers', function () {
     it('should initialize workers', function () {
       const enterprise = Object.create(Manufactory);
-      return enterprise
-        .init()
-        .addWorker('walker-fs')
-        .addWorker('dumbWorker')
-        .initializeWorkers().then(() => {
-          enterprise.dispatchers.map((dispatcher, index, array) => {
-            const isLastDispatcher = array.length === index + 1;
-            if (isLastDispatcher) {
-              expect(dispatcher.listenerCount('result')).to.equal(0);
-            } else {
-              expect(dispatcher.listenerCount('result')).to.equal(1);
-            }
-          });
+      return enterprise.init().addWorker('walker-fs').addWorker('dumbWorker').initializeWorkers().then(() => {
+        enterprise.dispatchers.map((dispatcher, index, array) => {
+          const isLastDispatcher = array.length === index + 1;
+          if (isLastDispatcher) {
+            expect(dispatcher.listenerCount('result')).to.equal(0);
+          } else {
+            expect(dispatcher.listenerCount('result')).to.equal(1);
+          }
         });
+      });
     });
   });
 
@@ -98,18 +94,36 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
     it('should start manufactory', function () {
       const enterprise = Object.create(Manufactory);
       const inputPath = path.join(__dirname, '/data');
+      const numCPUs = 2;
       return enterprise
-        .init({inputPath})
+        .init({ inputPath, numCPUs })
         .addWorker('walker-fs')
         .addWorker('dumbWorker')
         .initializeWorkers()
         .then(() => {
-          enterprise.dispatchers[1].on('result', (msg) => {
+          enterprise.dispatchers[1].on('result', msg => {
             expect(msg).to.have.property('type');
             expect(msg).to.have.property('data');
             expect(msg.data).to.be.an('object');
           });
           return enterprise.start();
+        });
+    });
+  });
+
+  describe('#final', function () {
+    this.timeout(5000);
+    it('should fire finalJobs', function () {
+      const enterprise = Object.create(Manufactory);
+      const inputPath = path.join(__dirname, '/data');
+      const numCPUs = 2;
+      return enterprise
+        .init({ inputPath, numCPUs })
+        .addWorker('walker-fs')
+        .addWorker('dumbWorker')
+        .initializeWorkers()
+        .then(() => {
+          return enterprise.final();
         });
     });
   });
