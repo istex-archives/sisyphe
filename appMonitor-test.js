@@ -1,9 +1,6 @@
 const monitor = require('./src/monitor')
 const Queue = require('bull');
 
-var redis = require("redis"),
-  client = redis.createClient();
-
 async function launchMonitor() {
   const prefix = 'sisyphe'
   const filetype = new Queue("filetype", {prefix});
@@ -11,7 +8,7 @@ async function launchMonitor() {
   const walker = new Queue("walker", {prefix});
 
 
-  const nbDocs = 80
+  const nbDocs = 800
   for (var i = 0; i < nbDocs; i++) {
     await walker.add({
       id: ~~(Math.random() * 100)
@@ -28,20 +25,6 @@ async function launchMonitor() {
       id: ~~(Math.random() * 100)
     });
   }
-
-  client.keys("*"+prefix+":*:id", function(err, obj) {
-    const keys = []
-    for (var i = 0; i < obj.length; i++) {
-      keys.push(obj[i].split(':')[1]);
-    }
-    monitor.init({
-      refresh: 20,
-      prefix,
-      keys
-    })
-    monitor.launch()
-  });
-
 
   xml.process((docs, next) => {
     const xmlTimeout = setTimeout(async function() {

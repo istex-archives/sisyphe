@@ -46,11 +46,11 @@ monitorController.updateData = function(data) {
     doneModules: {},
     currentModule: {}
   }
-  for (var i = 0; i < data.length; i++) {
+  for (var i = 0; i < data.length; i++) { // dispatch worker by status
     const module = data[i]
     if (module.name === 'walker') {
       this.maxFile = module.waiting
-      break
+      continue
     }
     if ((module.completed + module.failed) > 0 && module.waiting > 0) {
       // current module
