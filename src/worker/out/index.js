@@ -10,9 +10,7 @@ const sisypheOut = {},
   path = require('path'),
   Promise = require('bluebird'),
   winston = require('winston'),
-  colors = require('ansicolors'),
   Elasticsearch = require('winston-elasticsearch');
-
 
 const template = require('./config/elasticsearch-template.json');
 

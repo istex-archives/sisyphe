@@ -1,0 +1,14 @@
+{
+  "name": "walker-fs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.0"
+  }
+}

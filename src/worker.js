@@ -6,8 +6,9 @@ let isInitialized = false;
 process.on('message', msg => {
   if (!isInitialized && msg.hasOwnProperty('type') && msg.type === 'initialize') {
     try {
-      performer = require(path.join(__dirname, 'worker', msg.worker));
-      if (performer.hasOwnProperty('init')) performer.init();
+      const Performer = require(path.join(__dirname, 'worker', msg.worker));
+      performer = Object.create(Performer);
+      if ('init' in performer) performer.init(msg.options);
       isInitialized = true;
       msg.isInitialized = true;
       process.send(msg);

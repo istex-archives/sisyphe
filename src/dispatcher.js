@@ -1,14 +1,15 @@
 const debounce = require('lodash').debounce;
 const EventEmitter = require('events');
 
-const Dispatcher = Object.create(new EventEmitter());
+const Dispatcher = Object.create(EventEmitter.prototype);
 
 /**
  * @param {any} task
  * @param {any} options
  * @returns {Dispatcher}
  */
-Dispatcher.init = function(task, options) {
+Dispatcher.init = function (task, options) {
+  EventEmitter.call(this);
   this.waitingQueue = [];
   this.tasks = task;
   this.options = options;
@@ -19,7 +20,7 @@ Dispatcher.init = function(task, options) {
  * @param {Overseer} overseer
  * @returns {Dispatcher}
  */
-Dispatcher.addToWaitingQueue = function(overseer) {
+Dispatcher.addToWaitingQueue = function (overseer) {
   this.waitingQueue.push(overseer);
   return this;
 };
@@ -28,7 +29,7 @@ Dispatcher.addToWaitingQueue = function(overseer) {
   * @param {any} done callback (overseer)
   * @returns {Promise}
  */
-Dispatcher.getPatient = function() {
+Dispatcher.getPatient = function () {
   return new Promise(resolve => {
     if (this.waitingQueue.length !== 0) return resolve(this.waitingQueue.shift());
     const checkPatientIsAvailable = setInterval(() => {
@@ -40,14 +41,14 @@ Dispatcher.getPatient = function() {
   });
 };
 
-Dispatcher.stop = debounce(function(stop) {
+Dispatcher.stop = debounce(function (stop) {
   this.tasks.getJobCounts().then(jobCounts => {
     if (jobCounts.active + jobCounts.waiting === 0) return stop();
     this.stop();
   });
 }, 500);
 
-Dispatcher.start = function() {
+Dispatcher.start = function () {
   return new Promise(resolve => {
     this.waitingQueue.map(overseer => {
       overseer.on('message', msg => {

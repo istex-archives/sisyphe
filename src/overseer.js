@@ -10,16 +10,20 @@ const Overseer = {};
  * @param {any} WorkerType
  * @returns Promise
  */
-Overseer.init = function (WorkerType) {
+Overseer.init = function (WorkerType, options) {
   this.fork = fork(path.join(__dirname, 'worker.js'));
   this.on = this.fork.on.bind(this.fork);
   const initObj = {
     type: 'initialize',
-    worker: WorkerType
+    worker: WorkerType,
+    options
   };
   return new Promise((resolve, reject) => {
-    this.fork.send(initObj, null, {}, (error) => {
-      (error) ? reject(error) : resolve();
+    this.fork.send(initObj, null, {}, error => {
+      if (error) reject(error);
+    });
+    this.fork.once('message', msg => {
+      if (msg.isInitialized) resolve(this);
     });
   });
 };
@@ -34,8 +38,8 @@ Overseer.send = function (obj) {
     data: obj
   };
   return new Promise((resolve, reject) => {
-    this.fork.send(msg, null, {}, (error) => {
-      (error) ? reject(error) : resolve();
+    this.fork.send(msg, null, {}, error => {
+      error ? reject(error) : resolve();
     });
   });
 };
