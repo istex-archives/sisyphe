@@ -26,4 +26,11 @@ process.on('message', msg => {
       (error) ? process.send(error) : process.send(msg);
     });
   }
+
+  if (isInitialized && msg.hasOwnProperty('type') && msg.type === 'stop') {
+    performer.finalJob(msg.options, (error) => {
+      if (error) return process.send(error);
+      process.kill(process.pid);
+    });
+  }
 });
