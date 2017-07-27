@@ -35,9 +35,6 @@ Manufactory.initializeWorkers = function () {
 Manufactory.final = function () {
   return Promise.map(this.dispatchers, dispatcher => {
     return dispatcher.patients[0].final();
-    // return Promise.map(dispatcher.patients, overseer => {
-    //   return overseer.final();
-    // });
   });
 };
 
