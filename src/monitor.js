@@ -10,44 +10,43 @@ const monitor = {}
 
 
 monitor.init = function(options = {}) {
-
   this.refresh = options.refresh || 2000
   this.workers = []
+  this.redisKeys = {}
   this.prefix = options.prefix
   this.monitorController = monitorController.init()
   return this
 }
 
-monitor.launch = async function() {
-  let workers = []
-  setInterval(() => {
-    return Promise.map(workers, async(queue) => {
+monitor.launch = function() {
+  setInterval(async () => {
+    const queues = await this.getQueue()
+    Promise.map(queues, async(queue) => {
       const jobsCount = await queue.getJobCounts()
       jobsCount.name = queue.name
       return jobsCount
     }).then(async(data) => {
-      const isThereAWaitingWorker = this.monitorController.refresh(data)
-      if (!isThereAWaitingWorker) {
-        return workers = await getQueue(this.prefix)
-      }
+      this.monitorController.refresh(data)
     })
   }, this.refresh);
 }
 
-function getQueue(prefix) {
-  return new Promise(function(resolve, reject) {
-    client.keys("*" + prefix + ":*:id", function(err, obj) {
+monitor.getQueue = function() {
+  return new Promise((resolve, reject) => {
+    client.keys("*" + this.prefix + ":*:id", (err, obj) => {
       if (err) {
         reject(err);
         return;
       }
-      const keys = []
       for (var i = 0; i < obj.length; i++) {
-        keys.push(new Queue(obj[i].split(':')[1], {
-          prefix
-        }));
+        if (!this.redisKeys.hasOwnProperty(obj[i])) {
+          this.redisKeys[obj[i]] = {}
+          this.workers.push(new Queue(obj[i].split(':')[1], {
+            prefix:this.prefix
+          }));
+        }
       }
-      resolve(keys)
+      resolve(this.workers)
     })
   });
 }
