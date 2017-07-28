@@ -34,7 +34,7 @@ monitorController.init = function() {
 }
 
 monitorController.addWorker = function(name) {
-  if (name !== 'walker') {
+  if (name !== 'walker-fs') {
     this.listWorkers.push(name)
   }
 }
@@ -48,23 +48,20 @@ monitorController.updateData = function(data) {
   }
   for (var i = 0; i < data.length; i++) { // dispatch worker by status
     const module = data[i]
-    if (module.name === 'walker') {
-      this.maxFile = module.waiting
+    if (module.name === 'walker-fs') {
+      this.maxFile = module.completed + module.waiting
       continue
     }
-    if ((module.completed + module.failed) > 0 && module.waiting > 0) {
-      // current module
+    if (module.waiting < this.listWorkers[module.name].waiting) {
       this.workersData.currentModule.name = module.name
       this.workersData.currentModule = module
-    }
-    if (module.waiting && !(module.completed + module.failed)) {
-      // waiting modules
+    } else if (module.waiting) {
       this.workersData.waitingModules[module.name] = {}
-    }
-    if (module.waiting === 0 && (module.completed + module.failed)) {
-      // done modules
+    } else if (!module.waiting) {
       this.workersData.doneModules[module.name] = {}
+    } else {
     }
+    this.listWorkers[module.name].waiting = module.waiting
   }
   const nbModulesDone = monitorHelpers.nbProperty(this.workersData.doneModules)
   const nbModulesCurrent = monitorHelpers.nbProperty(this.workersData.currentModule)
@@ -110,9 +107,15 @@ monitorController.updateView = function(data) {
 }
 
 monitorController.refresh = function(data) {
+  for (var i = 0; i < data.length; i++) {
+    if (this.listWorkers[data[i].name] === undefined) {
+      this.listWorkers[data[i].name] = {waiting: data[i].waiting}
+    }
+  }
   this.updateData(data)
   this.updateView()
   this.screen.render()
+  return monitorHelpers.nbProperty(this.workersData.waitingModules) ? true : false
 }
 
 

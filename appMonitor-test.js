@@ -3,9 +3,15 @@ const Queue = require('bull');
 
 async function launchMonitor() {
   const prefix = 'sisyphe'
-  const filetype = new Queue("filetype", {prefix});
-  const xml = new Queue("xml", {prefix});
-  const walker = new Queue("walker", {prefix});
+  const filetype = new Queue("filetype", {
+    prefix
+  });
+  const xml = new Queue("xml", {
+    prefix
+  });
+  const walker = new Queue("walker-fs", {
+    prefix
+  });
 
 
   const nbDocs = 800
@@ -25,21 +31,34 @@ async function launchMonitor() {
       id: ~~(Math.random() * 100)
     });
   }
+  return process(xml).then(_ => {
+      log('xml')
+      return process(filetype)
+    }).then(_=>{
+      log('filetype')
+    })
+}
 
-  xml.process((docs, next) => {
-    const xmlTimeout = setTimeout(async function() {
-      const job = await xml.getJobCounts()
-      if (!job.waiting) {
-        clearTimeout(xmlTimeout)
-        filetype.process(async (docs, next) => {
-          setTimeout(function() {
-            next()
-          }, 10);
-        });
-      }
-      next()
-    }, 10);
+
+function log(data) {
+  console.log(data)
+}
+
+function process(queue) {
+  return new Promise(function(resolve, reject) {
+    log(queue.name)
+    queue.process((docs, next) => {
+      const xmlTimeout = setTimeout(async function() {
+        const job = await queue.getJobCounts()
+        log(job.waiting)
+        if (!job.waiting) {
+          log('lkfrrrrfrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+          clearTimeout(xmlTimeout)
+          resolve()
+        }
+        next()
+      }, 10);
+    });
   });
-
 }
 launchMonitor()

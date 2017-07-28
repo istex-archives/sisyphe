@@ -21,7 +21,14 @@
     "colors": "^1.1.2",
     "commander": "^2.11.0",
     "cpu-stat": "^2.0.1",
-    "lodash": "^4.16.4"
+    "lodash": "^4.16.4",
+    "debug": "^2.2.0",
+    "ioredis": "^3.1.2",
+    "pm2": "^2.6.1",
+    "pretty-ms": "^2.1.0",
+    "recluster": "^0.4.5",
+    "redis": "^2.6.2",
+    "winston": "^2.2.0"
   },
   "devDependencies": {
     "chai": "^4.1.0",
