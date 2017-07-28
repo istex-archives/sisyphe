@@ -3,7 +3,8 @@ logs/*
 *.log
 npm-debug.log*
 job/
-temp/
+temp/*
+config/temp/*
 xpaths
 checksum
 
@@ -43,6 +44,11 @@ jspm_packages
 # Webstorm
 .idea
 
+# Visual Studio Code
+.vscode
+
+# Tern project
+.tern-project
 
 # Created by https://www.gitignore.io/api/macos,linux,webstorm,node,java,osx,sublimetext
 
