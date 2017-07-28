@@ -40,28 +40,37 @@ monitorController.addWorker = function(name) {
 }
 
 monitorController.updateData = function(data) {
-  // reinitData for the loop
-  this.workersData = {
-    waitingModules: {},
-    doneModules: {},
-    currentModule: {}
-  }
-  for (var i = 0; i < data.length; i++) { // dispatch worker by status
+  let thereIsACurrent = false
+  for (var i = 0; i < data.length; i++) {
     const module = data[i]
     if (module.name === 'walker-fs') {
       this.maxFile = module.completed + module.waiting
       continue
     }
-    if (module.waiting < this.listWorkers[module.name].waiting) {
+    if (this.listWorkers[data[i].name] === undefined || this.listWorkers[data[i].name].waiting === 0) {
+      this.listWorkers[data[i].name] = {
+        waiting: data[i].waiting
+      }
+    }
+    if (this.listWorkers[data[i].name].waiting > data[i].waiting) {
+      thereIsACurrent = true
+      delete this.workersData.waitingModules[module.name]
+      delete this.workersData.doneModules[module.name]
+      this.listWorkers[module.name].waiting = module.waiting
       this.workersData.currentModule.name = module.name
       this.workersData.currentModule = module
-    } else if (module.waiting) {
+    } else if (data[i].waiting) {
+      delete this.workersData.doneModules[module.name]
       this.workersData.waitingModules[module.name] = {}
-    } else if (!module.waiting) {
-      this.workersData.doneModules[module.name] = {}
     } else {
+      delete this.workersData.waitingModules[module.name]
+      this.workersData.doneModules[module.name] = {}
     }
-    this.listWorkers[module.name].waiting = module.waiting
+    this.listWorkers[data[i].name].waiting = data[i].waiting
+  }
+  if (!thereIsACurrent) {
+    if (this.workersData.currentModule.hasOwnProperty('name'))
+      delete this.workersData.waitingModules[this.workersData.currentModule.name]
   }
   const nbModulesDone = monitorHelpers.nbProperty(this.workersData.doneModules)
   const nbModulesCurrent = monitorHelpers.nbProperty(this.workersData.currentModule)
@@ -103,15 +112,9 @@ monitorController.updateView = function(data) {
     percent: this.totalPercent,
     color: monitorHelpers.getColorOfPercent(this.totalPercent)
   }]);
-
 }
 
 monitorController.refresh = function(data) {
-  for (var i = 0; i < data.length; i++) {
-    if (this.listWorkers[data[i].name] === undefined) {
-      this.listWorkers[data[i].name] = {waiting: data[i].waiting}
-    }
-  }
   this.updateData(data)
   this.updateView()
   this.screen.render()
