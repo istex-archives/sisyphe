@@ -7,6 +7,7 @@ const path = require('path');
 const Manufactory = require('../src/manufactory');
 
 describe(`${pkg.name}/src/manufactory.js`, function () {
+  this.timeout(20000);
   describe('#init', function () {
     it('should be initialized successfully', function () {
       const enterprise = Object.create(Manufactory);

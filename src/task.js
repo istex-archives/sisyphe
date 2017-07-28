@@ -20,7 +20,7 @@ Task.init = function (options) {
  * @returns Promise
  */
 Task.add = function (obj) {
-  return this.queue.add(obj);
+  return this.queue.add(obj, {removeOnComplete: true});
 };
 
 Task.process = function (functionProcess) {

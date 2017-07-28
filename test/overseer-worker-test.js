@@ -6,6 +6,7 @@ const expect = chai.expect;
 const Overseer = require('../src/overseer');
 
 describe(`${pkg.name}/src/overseer.js`, function () {
+  this.timeout(20000);
   describe('#init', function () {
     it('should be initialized successfully', function (done) {
       const bobTheOverseer = Object.create(Overseer);
@@ -57,7 +58,6 @@ describe(`${pkg.name}/src/overseer.js`, function () {
   });
 
   describe('#send', function () {
-    this.timeout(10000);
     it('should send some data', function (done) {
       const data = {
         number: 159,
