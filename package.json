@@ -14,7 +14,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.5.0",
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.7.5",
     "bluebird": "^3.4.1",
@@ -22,18 +21,12 @@
     "colors": "^1.1.2",
     "commander": "^2.11.0",
     "cpu-stat": "^2.0.1",
-    "debug": "^2.2.0",
-    "lodash": "^4.16.4",
-    "pm2": "^2.6.1",
-    "pretty-ms": "^2.1.0",
-    "recluster": "^0.4.5",
-    "redis": "^2.6.2",
-    "winston": "^2.2.0"
+    "lodash": "^4.16.4"
   },
   "devDependencies": {
     "chai": "^4.1.0",
     "lerna": "2.0.0",
     "mocha": "^3.1.2",
-    "nyc": "^11.1.0"
+    "nyc": "^11.0.0"
   }
 }
