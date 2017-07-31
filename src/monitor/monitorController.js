@@ -71,11 +71,11 @@ monitorController.updateData = function(data) {
   if (!nbModulesCurrent) this.workersData.currentModule = {
     name: 'None',
     waiting: '',
-    completed: '',
     failed: ''
   }
   const currentDone = this.workersData.currentModule.completed + this.maxFile * nbModulesDone
   this.totalPercent = ~~((currentDone * 100) / (this.maxFile * this.listWorkers.length))
+  return this
 }
 
 monitorController.updateView = function(data) {
@@ -87,7 +87,6 @@ monitorController.updateView = function(data) {
     headers: ['Module ' + this.workersData.currentModule.name],
     data: [
       [colors.blue('waiting'), colors.blue(this.workersData.currentModule.waiting)],
-      [colors.green('completed'), colors.green(this.workersData.currentModule.completed)],
       [colors.red('failed'), colors.red(this.workersData.currentModule.failed)]
     ]
   });
@@ -95,7 +94,7 @@ monitorController.updateView = function(data) {
     headers: ['Modules'],
     data: monitorHelpers.propertyToArray(this.workersData.doneModules)
   });
-  this.workersView.walker.setContent('Walker Texas Ranger has found ' + this.maxFile.toString() + ' files');
+  this.workersView.walker.setContent('Walker-fs has found ' + this.maxFile.toString() + ' files');
   const percent = ~~(((this.maxFile - this.workersData.currentModule.waiting) * 100) / (this.maxFile))
   this.workersView.progress.setStack([{
     percent,
@@ -106,6 +105,7 @@ monitorController.updateView = function(data) {
     percent: this.totalPercent,
     color: monitorHelpers.getColorOfPercent(this.totalPercent)
   }]);
+  return this
 }
 
 monitorController.refresh = function(data) {
