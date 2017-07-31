@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const chai = require('chai');
 const expect = chai.expect;
 const monitor = require('../src/monitor');
+const monitorController = require('../src/monitor/monitorController');
 const Queue = require('bull');
 
 const redis = require("redis")
@@ -45,12 +46,7 @@ describe(`${pkg.name}/src/monitor.js`, function() {
         refresh: 10,
         silent: true
       }).launch()
-      expect(monitorTest.intervalLoop).to.be.an('object').to.have.ownPropertyDescriptor('_idleTimeout', {
-        value: 40,
-        writable: true,
-        enumerable: true,
-        configurable: true
-      })
+      expect(monitorTest.intervalLoop).to.be.an('object').own.property('_idleTimeout', 40)
       done()
     });
   });
@@ -79,7 +75,7 @@ describe(`${pkg.name}/src/monitor.js`, function() {
         setTimeout(function() {
           console.log(workers[0].name);
           expect(monitorTest.workers).to.be.an('array').to.have.lengthOf(3)
-          expect(monitorTest.workers[0]).to.be.an('object').to.have.ownPropertyDescriptor('name')
+          expect(monitorTest.workers[0]).to.be.an('object').own.property('name')
           done()
         }, 100);
       })
@@ -93,13 +89,41 @@ describe(`${pkg.name}/src/monitor.js`, function() {
         refresh: 10,
         silent: true
       }).launch().exit()
-      expect(monitorTest.intervalLoop).to.be.an('object').to.have.ownPropertyDescriptor('_idleTimeout', {
-        value: -1,
-        writable: true,
-        enumerable: true,
-        configurable: true
-      })
+      expect(monitorTest.intervalLoop).to.be.an('object').own.property('_idleTimeout', -1)
       done()
+    });
+  });
+});
+
+
+describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
+  describe('#init', function() {
+    it('should be initialized successfully', function() {
+      let monitorControllerTest = Object.create(monitorController)
+      monitorControllerTest.init()
+      expect(monitorControllerTest.screen).to.be.an('Object')
+      expect(monitorControllerTest.grid).to.be.an('Object')
+
+      expect(monitorControllerTest.workersView).to.be.an('Object')
+      expect(monitorControllerTest.workersView).own.property('walker')
+      expect(monitorControllerTest.workersView).own.property('waitingModules')
+      expect(monitorControllerTest.workersView).own.property('doneModules')
+      expect(monitorControllerTest.workersView).own.property('currentModule')
+      expect(monitorControllerTest.workersView).own.property('progress')
+      expect(monitorControllerTest.workersView).own.property('total')
+      expect(monitorControllerTest.workersView).own.property('time')
+      expect(monitorControllerTest.workersView).own.property('logs')
+      expect(monitorControllerTest.workersView).own.property('question')
+
+      expect(monitorControllerTest.workersData).to.be.an('Object')
+      expect(monitorControllerTest.workersData).own.property('waitingModules')
+      expect(monitorControllerTest.workersData).own.property('doneModules')
+      expect(monitorControllerTest.workersData).own.property('currentModule')
+
+      expect(monitorControllerTest.maxFile).to.be.an('number')
+        .to.equal(0)
+
+      expect(monitorControllerTest.listWorkers).to.be.an('Array').to.be.empty
     });
   });
 });
