@@ -33,12 +33,6 @@ monitorController.init = function() {
   return this
 }
 
-monitorController.addWorker = function(name) {
-  if (name !== 'walker-fs') {
-    this.listWorkers.push(name)
-  }
-}
-
 monitorController.updateData = function(data) {
   let thereIsACurrent = false
   for (var i = 0; i < data.length; i++) {
