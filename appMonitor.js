@@ -1,5 +1,5 @@
 const program = require('commander')
-const monitor = require('./src/monitor')
+let monitor = require('./src/monitor')
 const Queue = require('bull');
 const version = require('./package.json').version;
 
@@ -12,7 +12,7 @@ program
 
 const prefix = program.prefix || 'sisyphe'
 const refresh = program.refresh || 40
-
+monitor = new monitor()
 monitor.init({
   refresh,
   prefix,
