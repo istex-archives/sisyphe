@@ -26,6 +26,9 @@ Monitor.prototype.launch = function() {
       const jobsCount = await queue.getJobCounts()
       jobsCount.name = queue.name
       jobsCount.maxFile = queue.maxFile
+      delete jobsCount.delayed
+      delete jobsCount.active
+      delete jobsCount.completed
       return jobsCount
     }).then(async(data) => {
       if (!this.silent) this.monitorController.refresh(data)
