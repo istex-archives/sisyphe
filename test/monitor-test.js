@@ -73,7 +73,6 @@ describe(`${pkg.name}/src/monitor.js`, function() {
           silent: true
         }).launch()
         setTimeout(function() {
-          console.log(workers[0].name);
           expect(monitorTest.workers).to.be.an('array').to.have.lengthOf(3)
           expect(monitorTest.workers[0]).to.be.an('object').own.property('name')
           done()
@@ -100,7 +99,9 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
   describe('#init', function() {
     it('should be initialized successfully', function() {
       let monitorControllerTest = Object.create(monitorController)
-      monitorControllerTest.init()
+      monitorControllerTest.init({
+        silent: true
+      })
       expect(monitorControllerTest.screen).to.be.an('Object')
       expect(monitorControllerTest.grid).to.be.an('Object')
 
@@ -124,6 +125,70 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
         .to.equal(0)
 
       expect(monitorControllerTest.listWorkers).to.be.an('Array').to.be.empty
+    });
+  });
+  describe('#refresh', function() {
+    it('should be refresh successfully', function() {
+      let monitorControllerTest = Object.create(monitorController)
+      const data = [{
+        waiting: 10,
+        failed: 0,
+        name: 'filetype',
+        maxFile: 1600
+      }, {
+        waiting: 0,
+        failed: 0,
+        name: 'xml',
+        maxFile: 1500
+      }]
+      monitorControllerTest = monitorControllerTest.init().refresh(data)
+      expect(monitorControllerTest.workersData.currentModule).to.be.an('object')
+      expect(monitorControllerTest.workersData.currentModule).own.property('name', 'None')
+      expect(monitorControllerTest.workersData.currentModule).own.property('waiting', '')
+      expect(monitorControllerTest.workersData.currentModule).own.property('failed', '')
+
+      expect(monitorControllerTest.workersData.waitingModules).to.be.an('object')
+      expect(monitorControllerTest.workersData.waitingModules).own.property('filetype')
+      expect(monitorControllerTest.workersData.waitingModules.filetype).own.property('name', 'filetype')
+      expect(monitorControllerTest.workersData.waitingModules.filetype).own.property('waiting', 10)
+      expect(monitorControllerTest.workersData.waitingModules.filetype).own.property('failed', 0)
+
+      expect(monitorControllerTest.workersData.doneModules).to.be.an('object')
+      expect(monitorControllerTest.workersData.doneModules).own.property('xml')
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('name', 'xml')
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('waiting', 0)
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('failed', 0)
+
+      expect(monitorControllerTest.maxFile).to.equal(1600)
+
+      const data2 = [{
+        waiting: 9,
+        failed: 0,
+        name: 'filetype',
+        maxFile: 1600
+      }, {
+        waiting: 0,
+        failed: 0,
+        name: 'xml',
+        maxFile: 1500
+      }]
+      monitorControllerTest.refresh(data2)
+
+      expect(monitorControllerTest.workersData.currentModule).to.be.an('object')
+      expect(monitorControllerTest.workersData.currentModule).own.property('name', 'filetype')
+      expect(monitorControllerTest.workersData.currentModule).own.property('waiting', 9)
+      expect(monitorControllerTest.workersData.currentModule).own.property('failed', 0)
+
+      expect(monitorControllerTest.workersData.waitingModules).to.be.an('object')
+      expect(monitorControllerTest.workersData.waitingModules).to.not.have.own.property('filetype')
+
+      expect(monitorControllerTest.workersData.doneModules).to.be.an('object')
+      expect(monitorControllerTest.workersData.doneModules).own.property('xml')
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('name', 'xml')
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('waiting', 0)
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('failed', 0)
+
+
     });
   });
 });
