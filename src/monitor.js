@@ -46,9 +46,6 @@ Monitor.prototype.getQueue = function() {
         return;
       }
       for (var i = 0; i < obj.length; i++) {
-        if (obj[i] === undefined) {
-          continue;
-        }
         const keyValue = await getKeyValue(obj[i])
         if (!this.redisKeys.hasOwnProperty(obj[i])) {
           this.redisKeys[obj[i]] = {}
