@@ -11,7 +11,7 @@ program
   .parse(process.argv);
 
 const prefix = program.prefix || 'sisyphe'
-const refresh = program.refresh || 1000
+const refresh = program.refresh || 40
 
 monitor.init({
   refresh,

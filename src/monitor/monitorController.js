@@ -43,10 +43,7 @@ monitorController.updateData = function(data) {
   let thereIsACurrent = false
   for (var i = 0; i < data.length; i++) {
     const module = data[i]
-    if (module.name === 'walker-fs') {
-      this.maxFile = module.completed + module.waiting
-      continue
-    }
+    if (module.name === 'walker-fs') continue
     if (this.listWorkers[data[i].name] === undefined || this.listWorkers[data[i].name].waiting === 0) {
       this.listWorkers[data[i].name] = {
         waiting: data[i].waiting
@@ -61,14 +58,17 @@ monitorController.updateData = function(data) {
       this.workersData.currentModule = module
     } else if (data[i].waiting) {
       delete this.workersData.doneModules[module.name]
-      this.workersData.waitingModules[module.name] = {}
+      this.workersData.waitingModules[module.name] = module
     } else {
       delete this.workersData.waitingModules[module.name]
-      this.workersData.doneModules[module.name] = {}
+      this.workersData.doneModules[module.name] = module
     }
     this.listWorkers[data[i].name].waiting = data[i].waiting
+    if (+this.maxFile< +module.maxFile) {
+      this.maxFile = module.maxFile
+    }
   }
-  if (!thereIsACurrent) {
+  if (!thereIsACurrent) { // if no modules are in current queue, the current queue is keep and module in current queue is remove from waiting queue
     if (this.workersData.currentModule.hasOwnProperty('name'))
       delete this.workersData.waitingModules[this.workersData.currentModule.name]
   }
@@ -102,7 +102,7 @@ monitorController.updateView = function(data) {
     data: monitorHelpers.propertyToArray(this.workersData.doneModules)
   });
   this.workersView.walker.setContent('Walker Texas Ranger has found ' + this.maxFile.toString() + ' files');
-  const percent = ~~((this.workersData.currentModule.completed * 100) / (this.workersData.currentModule.completed + this.workersData.currentModule.waiting + this.workersData.currentModule.failed))
+  const percent = ~~(((this.maxFile - this.workersData.currentModule.waiting) * 100) / (this.maxFile))
   this.workersView.progress.setStack([{
     percent,
     stroke: monitorHelpers.getColorOfPercent(percent)
