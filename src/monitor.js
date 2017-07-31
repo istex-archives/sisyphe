@@ -6,20 +6,21 @@ const Promise = require('bluebird')
 const redis = require("redis")
 const client = redis.createClient();
 
-const monitor = {}
+function Monitor() {}
 
 
-monitor.init = function(options = {}) {
-  this.refresh = (options.refresh && options.refresh>40) ? options.refresh : 40
+Monitor.prototype.init = function(options = {}) {
+  this.refresh = (options.refresh && options.refresh > 40) ? options.refresh : 40
   this.workers = []
   this.redisKeys = {}
   this.prefix = options.prefix
-  this.monitorController = monitorController.init()
+  this.silent = options.silent || false
   return this
 }
 
-monitor.launch = function() {
-  setInterval(async () => {
+Monitor.prototype.launch = function() {
+  if (!this.silent) this.monitorController = monitorController.init()
+  this.intervalLoop = setInterval(async() => {
     const queues = await this.getQueue()
     Promise.map(queues, async(queue) => {
       const jobsCount = await queue.getJobCounts()
@@ -27,14 +28,16 @@ monitor.launch = function() {
       jobsCount.maxFile = queue.maxFile
       return jobsCount
     }).then(async(data) => {
-      this.monitorController.refresh(data)
+      if (!this.silent) this.monitorController.refresh(data)
+      return data
     })
   }, this.refresh);
+  return this
 }
 
-monitor.getQueue = function() {
+Monitor.prototype.getQueue = function() {
   return new Promise((resolve, reject) => {
-    client.keys("*" + this.prefix + ":*:id", async (err, obj) => {
+    client.keys("*" + this.prefix + ":*:id", async(err, obj) => {
       if (err) {
         reject(err);
         return;
@@ -47,7 +50,7 @@ monitor.getQueue = function() {
         if (!this.redisKeys.hasOwnProperty(obj[i])) {
           this.redisKeys[obj[i]] = {}
           const workers = new Queue(obj[i].split(':')[1], {
-            prefix:this.prefix
+            prefix: this.prefix
           })
           workers.key = obj[i]
           this.workers.push(workers);
@@ -64,9 +67,14 @@ monitor.getQueue = function() {
   });
 }
 
+Monitor.prototype.exit = function() {
+  clearInterval(this.intervalLoop)
+  return this
+}
+
 function getKeyValue(key) {
   return new Promise(function(resolve, reject) {
-    client.get(key, (err, value)=>{
+    client.get(key, (err, value) => {
       if (err) {
         reject(err)
       }
@@ -74,4 +82,4 @@ function getKeyValue(key) {
     })
   });
 }
-module.exports = monitor
+module.exports = Monitor
