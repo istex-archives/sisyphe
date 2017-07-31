@@ -188,6 +188,33 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('name', 'xml')
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('waiting', 0)
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('failed', 0)
+
+      const data3 = [{
+        waiting: 9,
+        failed: 0,
+        name: 'filetype',
+        maxFile: 1600
+      }, {
+        waiting: 0,
+        failed: 0,
+        name: 'xml',
+        maxFile: 1500
+      }]
+      monitorControllerTest.refresh(data2)
+
+      expect(monitorControllerTest.workersData.currentModule).to.be.an('object')
+      expect(monitorControllerTest.workersData.currentModule).own.property('name', 'filetype')
+      expect(monitorControllerTest.workersData.currentModule).own.property('waiting', 9)
+      expect(monitorControllerTest.workersData.currentModule).own.property('failed', 0)
+
+      expect(monitorControllerTest.workersData.waitingModules).to.be.an('object')
+      expect(monitorControllerTest.workersData.waitingModules).to.not.have.own.property('filetype')
+
+      expect(monitorControllerTest.workersData.doneModules).to.be.an('object')
+      expect(monitorControllerTest.workersData.doneModules).own.property('xml')
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('name', 'xml')
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('waiting', 0)
+      expect(monitorControllerTest.workersData.doneModules.xml).own.property('failed', 0)
     });
   });
 });
