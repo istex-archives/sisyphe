@@ -9,6 +9,7 @@ monitorController.init = function() {
   this.screen = blessed.screen({
     smartCSR: true
   });
+
   this.grid = new contrib.grid({
     rows: 16,
     cols: 16,
@@ -58,7 +59,7 @@ monitorController.updateData = function(data) {
       this.workersData.doneModules[module.name] = module
     }
     this.listWorkers[data[i].name].waiting = data[i].waiting
-    if (+this.maxFile< +module.maxFile) {
+    if (+this.maxFile < +module.maxFile) {
       this.maxFile = module.maxFile
     }
   }
@@ -112,7 +113,7 @@ monitorController.refresh = function(data) {
   this.updateData(data)
   this.updateView()
   this.screen.render()
-  return monitorHelpers.nbProperty(this.workersData.waitingModules) ? true : false
+  return this
 }
 
 
