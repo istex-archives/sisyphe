@@ -6,6 +6,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const monitor = require('../src/monitor');
 const monitorController = require('../src/monitor/monitorController');
+const monitorHelpers = require('../src/monitor/monitorHelpers');
 const Queue = require('bull');
 
 const redis = require("redis")
@@ -187,8 +188,43 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('name', 'xml')
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('waiting', 0)
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('failed', 0)
+    });
+  });
+});
 
 
+describe(`${pkg.name}/src/monitor/monitorHelpers.js`, function() {
+  describe('#propertyToArray', function() {
+    it('should convert properties to an array', function() {
+      const arrayFromObject = monitorHelpers.propertyToArray({
+        one: "",
+        two: ['twoBis', 'twoTer'],
+        three: {
+          threeBis: ''
+        }
+      })
+      expect(arrayFromObject).to.be.an('array').to.have.lengthOf(3)
+      expect(arrayFromObject[0]).to.include('one')
+      expect(arrayFromObject[1]).to.include('two')
+      expect(arrayFromObject[2]).to.include('three')
+    });
+  });
+  describe('#getColorOfPercent', function() {
+    it('should return a color', function() {
+      for (var i = 0; i < 102; i++) {
+        expect(monitorHelpers.getColorOfPercent(i)).to.be.a('string')
+      }
+    });
+  });
+  describe('#nbProperty', function() {
+    it('should return nb of property', function() {
+      expect(monitorHelpers.nbProperty({
+        one: "",
+        two: ['twoBis', 'twoTer'],
+        three: {
+          threeBis: ''
+        }
+      })).to.equal(3)
     });
   });
 });
