@@ -36,29 +36,36 @@ monitorController.init = function() {
 
 monitorController.updateData = function(data) {
   let thereIsACurrent = false
-  for (var i = 0; i < data.length; i++) {
-    const module = data[i]
-    if (module.name === 'walker-fs') continue
-    if (this.listWorkers[data[i].name] === undefined || this.listWorkers[data[i].name].waiting === 0) {
-      this.listWorkers[data[i].name] = {
-        waiting: data[i].waiting
+  if (data.hasOwnProperty('startDate')) this.startDate = data.startDate
+  if (data.hasOwnProperty('endDate')) this.endDate = data.endDate
+  if (!data.endDate) this.time = monitorHelpers.getTimeBetween(data.startDate, Date.now())
+  else this.time = monitorHelpers.getTimeBetween(data.startDate, data.endDate)
+  for (var i = 0; i < data.data.length; i++) {
+    const module = data.data[i]
+    if (module.name === 'walker-fs' ||
+      module.name === 'start' ||
+      module.name === 'end') continue
+
+    if (this.listWorkers[module.name] === undefined || this.listWorkers[module.name].waiting === 0) {
+      this.listWorkers[module.name] = {
+        waiting: module.waiting
       }
     }
-    if (this.listWorkers[data[i].name].waiting > data[i].waiting) {
+    if (this.listWorkers[module.name].waiting > module.waiting) {
       thereIsACurrent = true
       delete this.workersData.waitingModules[module.name]
       delete this.workersData.doneModules[module.name]
       this.listWorkers[module.name].waiting = module.waiting
       this.workersData.currentModule.name = module.name
       this.workersData.currentModule = module
-    } else if (data[i].waiting) {
+    } else if (module.waiting) {
       delete this.workersData.doneModules[module.name]
       this.workersData.waitingModules[module.name] = module
     } else {
       delete this.workersData.waitingModules[module.name]
       this.workersData.doneModules[module.name] = module
     }
-    this.listWorkers[data[i].name].waiting = data[i].waiting
+    this.listWorkers[module.name].waiting = module.waiting
     if (+this.maxFile < +module.maxFile) {
       this.maxFile = module.maxFile
     }
@@ -96,6 +103,11 @@ monitorController.updateView = function(data) {
     data: monitorHelpers.propertyToArray(this.workersData.doneModules)
   });
   this.workersView.walker.setContent('Walker-fs has found ' + this.maxFile.toString() + ' files');
+  this.workersView.time.setContent(
+    (this.time.getHours()) + ' hours \n' +
+    (this.time.getMinutes()) + ' minutes\n' +
+    (this.time.getSeconds()) + ' seconds\n'
+  );
   const percent = ~~(((this.maxFile - this.workersData.currentModule.waiting) * 100) / (this.maxFile))
   this.workersView.progress.setStack([{
     percent,

@@ -14,13 +14,14 @@ Monitor.prototype.init = function(options = {}) {
   this.workers = []
   this.redisKeys = {}
   this.prefix = options.prefix
-  this.silent = options.silent || false
   return this
 }
 
-Monitor.prototype.launch = function() {
-  if (!this.silent) this.monitorController = monitorController.init()
+Monitor.prototype.launch = async function() {
+  this.monitorController = monitorController.init()
+  const startDate = await this.getStart()
   this.intervalLoop = setInterval(async() => {
+    const endDate = await this.getEnd()
     const queues = await this.getQueue()
     Promise.map(queues, async(queue) => {
       const jobsCount = await queue.getJobCounts()
@@ -31,11 +32,38 @@ Monitor.prototype.launch = function() {
       delete jobsCount.completed
       return jobsCount
     }).then(async(data) => {
-      if (!this.silent) this.monitorController.refresh(data)
+      this.monitorController.refresh({
+        data,
+        startDate,
+        endDate
+      })
       return data
     })
   }, this.refresh);
   return this
+}
+
+Monitor.prototype.getStart = function() {
+  return new Promise(function(resolve, reject) {
+    const dateStartInterval = setInterval(function() {
+      client.hgetall("bull:start:1", (err, start) => {
+        if (start && start.hasOwnProperty('data')) {
+          clearInterval(dateStartInterval)
+          resolve(start.data)
+        }
+      })
+    }, 100);
+  });
+}
+
+Monitor.prototype.getEnd = function() {
+  return new Promise(function(resolve, reject) {
+    client.hgetall("bull:end:1", (err, end) => {
+      if (end && end.hasOwnProperty('data')) {
+        resolve(end.data)
+      } else resolve(null)
+    })
+  });
 }
 
 Monitor.prototype.getQueue = function() {

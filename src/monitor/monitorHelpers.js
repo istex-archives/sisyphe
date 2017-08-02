@@ -33,3 +33,11 @@ module.exports.nbProperty = function(object) {
   }
   return nbProperty
 }
+
+module.exports.getTimeBetween = function(startDateInMs, endDateInMs) {
+  const time = new Date()
+  time.setSeconds(endDateInMs / 1000 - startDateInMs / 1000);
+  time.setMinutes(endDateInMs / (1000 * 60) - startDateInMs / (1000 * 60));
+  time.setHours(endDateInMs / (1000 * 60 * 60) - startDateInMs / (1000 * 60 * 60));
+  return time
+}

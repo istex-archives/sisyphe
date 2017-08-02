@@ -4,6 +4,7 @@ const pkg = require('./package.json');
 const path = require('path');
 const Manufactory = require('./src/manufactory');
 const numCPUs = require('os').cpus().length;
+const Queue = require('bull');
 
 program
   .version(pkg.version)
@@ -30,7 +31,9 @@ const options = {
   inputPath,
   numCPUs
 };
-
+const startQueue = new Queue('start');
+const endQueue = new Queue('end');
+startQueue.add(Date.now())
 const enterprise = Object.create(Manufactory);
 enterprise.init(options);
 workers.map(worker => {
@@ -51,6 +54,7 @@ enterprise
   })
   .then(() => {
     console.log('stop !');
+    endQueue.add(new Date().getTime())
   })
   .catch(error => {
     console.log(error);
