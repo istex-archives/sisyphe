@@ -6,10 +6,13 @@ const Promise = require('bluebird')
 const redis = require("redis")
 const client = redis.createClient();
 
-function Monitor() {}
-
-
-Monitor.prototype.init = function(options = {}) {
+/**
+ * Its role is to manage the refreshments loop and inject the data in the controller
+ * @param       {Object} [options={}] Can have properties: refresh, prefix
+ * @constructor
+ * @return {Object} this object
+ */
+function Monitor(options = {}) {
   this.refresh = (options.refresh && options.refresh > 40) ? options.refresh : 40
   this.workers = []
   this.redisKeys = {}
@@ -17,6 +20,10 @@ Monitor.prototype.init = function(options = {}) {
   return this
 }
 
+/**
+ * Launches the monitor and injects the data that is needed
+ * @return {Object} this object
+ */
 Monitor.prototype.launch = async function() {
   this.monitorController = monitorController.init()
   const startDate = await this.getStart()
@@ -43,6 +50,10 @@ Monitor.prototype.launch = async function() {
   return this
 }
 
+/**
+ * Search in redis if work started on start key
+ * @return {Promise} Promise resolve only when the start key is found
+ */
 Monitor.prototype.getStart = function() {
   return new Promise(function(resolve, reject) {
     const dateStartInterval = setInterval(function() {
@@ -56,16 +67,23 @@ Monitor.prototype.getStart = function() {
   });
 }
 
+/**
+ * Search in redis if work ended on end key
+ * @return {Promise} Promise resolve with data of end key or null
+ */
 Monitor.prototype.getEnd = function() {
   return new Promise(function(resolve, reject) {
     client.hgetall("bull:end:1", (err, end) => {
-      if (end && end.hasOwnProperty('data')) {
-        resolve(end.data)
-      } else resolve(null)
+      if (end && end.hasOwnProperty('data')) resolve(end.data)
+      else resolve(null)
     })
   });
 }
 
+/**
+ * Searches all keys in redis and stores them in the local object
+ * @return {Promise} Promise resolve with all key in redis
+ */
 Monitor.prototype.getQueue = function() {
   return new Promise((resolve, reject) => {
     client.keys("*" + this.prefix + ":*:id", async(err, obj) => {
@@ -74,7 +92,7 @@ Monitor.prototype.getQueue = function() {
         return;
       }
       for (var i = 0; i < obj.length; i++) {
-        const keyValue = await getKeyValue(obj[i])
+        const keyValue = await this.getKeyValue(obj[i])
         if (!this.redisKeys.hasOwnProperty(obj[i])) {
           this.redisKeys[obj[i]] = {}
           const workers = new Queue(obj[i].split(':')[1], {
@@ -84,9 +102,7 @@ Monitor.prototype.getQueue = function() {
           this.workers.push(workers);
         } else {
           for (var j = 0; j < this.workers.length; j++) {
-            if (this.workers[j].key == obj[i]) {
-              this.workers[j].maxFile = keyValue
-            }
+            if (this.workers[j].key == obj[i]) this.workers[j].maxFile = keyValue
           }
         }
       }
@@ -95,19 +111,21 @@ Monitor.prototype.getQueue = function() {
   });
 }
 
-Monitor.prototype.exit = function() {
-  clearInterval(this.intervalLoop)
-  return this
-}
-
-function getKeyValue(key) {
+/**
+ * Get value from a key (use to get nbJob in idKey for redis)
+ * @param  {String} key key to get value
+ * @return {Promise}     resolve with data of key
+ */
+Monitor.prototype.getKeyValue = function(key) {
   return new Promise(function(resolve, reject) {
     client.get(key, (err, value) => {
       if (err) {
         reject(err)
+        return;
       }
       resolve(value);
     })
   });
 }
+
 module.exports = Monitor

@@ -12,8 +12,7 @@ program
 
 const prefix = program.prefix || 'sisyphe'
 const refresh = program.refresh || 40
-monitor = new monitor()
-monitor.init({
+monitor = new monitor({
   refresh,
   prefix,
 }).launch()
