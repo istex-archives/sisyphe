@@ -1,5 +1,5 @@
 const Queue = require('bull');
-const monitorController = require('./monitor/monitorController')
+const MonitorController = require('./monitor/monitorController')
 const blessed = require('blessed')
 const Promise = require('bluebird')
 
@@ -25,7 +25,7 @@ function Monitor(options = {}) {
  * @return {Object} this object
  */
 Monitor.prototype.launch = async function() {
-  this.monitorController = monitorController.init()
+  this.monitorController = new MonitorController()
   const startDate = await this.getStart()
   this.intervalLoop = setInterval(async() => {
     const endDate = await this.getEnd()

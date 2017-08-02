@@ -3,9 +3,13 @@ const contrib = require('blessed-contrib')
 const colors = require('colors/safe')
 const components = require('./component')
 const monitorHelpers = require('./monitorHelpers')
-const monitorController = {}
 
-monitorController.init = function() {
+/**
+ * Its role is to manage the data for monitor and update views
+ * @constructor
+ * @return {Object} this object
+ */
+function MonitorController() {
   this.screen = blessed.screen({
     smartCSR: true
   });
@@ -34,7 +38,12 @@ monitorController.init = function() {
   return this
 }
 
-monitorController.updateData = function(data) {
+/**
+ * Manage data before update views
+ * @param  {Object} data contain: startDate, endDate, data(countJobs)
+ * @return {Object}      this
+ */
+MonitorController.prototype.updateData = function(data) {
   let thereIsACurrent = false
   if (data.hasOwnProperty('startDate')) this.startDate = data.startDate
   if (data.hasOwnProperty('endDate')) this.endDate = data.endDate
@@ -86,7 +95,11 @@ monitorController.updateData = function(data) {
   return this
 }
 
-monitorController.updateView = function(data) {
+/**
+ * Update component of view with data
+ * @return {Object}      this
+ */
+MonitorController.prototype.updateView = function() {
   this.workersView.waitingModules.setData({
     headers: ['Modules'],
     data: monitorHelpers.propertyToArray(this.workersData.waitingModules)
@@ -121,12 +134,15 @@ monitorController.updateView = function(data) {
   return this
 }
 
-monitorController.refresh = function(data) {
-  this.updateData(data)
-  this.updateView()
-  this.screen.render()
+/**
+ * Update monitorController
+ * @param  {Object} data contain: startDate, endDate, data(countJobs)
+ * @return {Object}      this object
+ */
+MonitorController.prototype.refresh = function(data) {
+  this.updateData(data).updateView().screen.render()
   return this
 }
 
 
-module.exports = monitorController
+module.exports = MonitorController
