@@ -44,58 +44,30 @@ function MonitorController() {
  * @return {Object}      this
  */
 MonitorController.prototype.updateData = function(data) {
-  let thereIsACurrent = false
+  // timer
   if (data.hasOwnProperty('startDate')) this.startDate = data.startDate
   if (data.hasOwnProperty('endDate')) this.endDate = data.endDate
   if (!data.endDate) this.time = monitorHelpers.getTimeBetween(data.startDate, Date.now())
   else this.time = monitorHelpers.getTimeBetween(data.startDate, data.endDate)
-  let nbWorker = 0;
-  for (var i = 0; i < data.data.length; i++) {
-    const module = data.data[i]
-    if (module.name === 'walker-fs' ||
-      module.name === 'start' ||
-      module.name === 'end') continue
 
-    nbWorker++
-
-    if (this.listWorkers[module.name] === undefined || this.listWorkers[module.name].waiting === 0) {
-      this.listWorkers[module.name] = {
-        waiting: module.waiting
-      }
-    }
-    if (this.listWorkers[module.name].waiting > module.waiting) {
-      thereIsACurrent = true
-      delete this.workersData.waitingModules[module.name]
-      delete this.workersData.doneModules[module.name]
-      this.listWorkers[module.name].waiting = module.waiting
-      this.workersData.currentModule.name = module.name
-      this.workersData.currentModule = module
-    } else if (module.waiting) {
-      delete this.workersData.doneModules[module.name]
-      this.workersData.waitingModules[module.name] = module
-    } else {
-      delete this.workersData.waitingModules[module.name]
-      this.workersData.doneModules[module.name] = module
-    }
-    this.listWorkers[module.name].waiting = module.waiting
-    if (+this.maxFile < +module.maxFile) {
-      this.maxFile = module.maxFile
-    }
-  }
-  if (!thereIsACurrent) { // if no modules are in current queue, the current queue is keep and module in current queue is remove from waiting queue
+  //dispatch all workers by status (waiting, current, done)
+  const routerResult = this.router(data.data)
+  if (!routerResult.thereIsACurrent) { // if no workers are in current queue, the current queue is keep and worker in current queue is remove from waiting queue
     if (this.workersData.currentModule.hasOwnProperty('name'))
       delete this.workersData.waitingModules[this.workersData.currentModule.name]
   }
-  const nbModulesDone = monitorHelpers.nbProperty(this.workersData.doneModules)
-  const nbModulesCurrent = monitorHelpers.nbProperty(this.workersData.currentModule)
-  if (!nbModulesCurrent) this.workersData.currentModule = {
+
+  // if there's no worker in current queue, we format data to display
+  if (!monitorHelpers.nbProperty(this.workersData.currentModule)) this.workersData.currentModule = {
     name: 'None',
     waiting: '',
     failed: ''
   }
-  let currentDone = (this.maxFile * nbModulesDone)
-  if (this.workersData.currentModule.waiting) currentDone += (this.maxFile - this.workersData.currentModule.waiting)
-  this.totalPercent = ~~((currentDone * 100) / (this.maxFile * (nbWorker)))
+
+  // Total percent
+  let allDone = (this.maxFile * monitorHelpers.nbProperty(this.workersData.doneModules))
+  if (this.workersData.currentModule.waiting) allDone += (this.maxFile - this.workersData.currentModule.waiting)
+  this.totalPercent = ~~((allDone * 100) / (this.maxFile * (routerResult.nbWorkers)))
 
   return this
 }
@@ -109,6 +81,7 @@ MonitorController.prototype.updateView = function() {
     headers: ['Modules'],
     data: monitorHelpers.propertyToArray(this.workersData.waitingModules)
   });
+
   this.workersView.currentModule.setData({
     headers: ['Module ' + this.workersData.currentModule.name],
     data: [
@@ -116,27 +89,78 @@ MonitorController.prototype.updateView = function() {
       [colors.red('failed'), colors.red(this.workersData.currentModule.failed)]
     ]
   });
+
   this.workersView.doneModules.setData({
     headers: ['Modules'],
     data: monitorHelpers.propertyToArray(this.workersData.doneModules)
   });
+
   this.workersView.walker.setContent('Walker-fs has found ' + this.maxFile.toString() + ' files');
+
   this.workersView.time.setContent(
     (this.time.getHours()) + ' hours \n' +
     (this.time.getMinutes()) + ' minutes\n' +
     (this.time.getSeconds()) + ' seconds\n'
   );
+
   const percent = ~~(((this.maxFile - this.workersData.currentModule.waiting) * 100) / (this.maxFile))
   this.workersView.progress.setStack([{
     percent,
     stroke: monitorHelpers.getColorOfPercent(percent)
   }])
+
   this.workersView.total.setData([{
     label: 'Total',
     percent: this.totalPercent,
     color: monitorHelpers.getColorOfPercent(this.totalPercent)
   }]);
+
   return this
+}
+
+
+/**
+ * Dispatch all workers by status (waiting, current, done)
+ * @param  {Object[]} workers Array containing jobs count
+ * @return {Object}         Object containing if a worker is running and number of worker
+ */
+MonitorController.prototype.router = function(workers) {
+  let nbWorkers = 0
+  let thereIsACurrent = false
+  for (var i = 0; i < workers.length; i++) {
+    const worker = workers[i]
+    if (worker.name === 'walker-fs' ||
+      worker.name === 'start' ||
+      worker.name === 'end') continue
+    nbWorkers++
+    if (this.listWorkers[worker.name] === undefined || this.listWorkers[worker.name].waiting === 0) {
+      this.listWorkers[worker.name] = {
+        waiting: worker.waiting
+      }
+    }
+    if (this.listWorkers[worker.name].waiting > worker.waiting) { // if previous waiting of worker is superior than current waiting, it's a working worker
+      thereIsACurrent = true
+      delete this.workersData.waitingModules[worker.name]
+      delete this.workersData.doneModules[worker.name]
+      this.workersData.currentModule.name = worker.name
+      this.workersData.currentModule = worker
+    } else if (worker.waiting || worker.maxFile < this.maxFile) { // if there's waiting job or completed task is inferior than totalFile, it's a waiting worker
+      delete this.workersData.doneModules[worker.name]
+      this.workersData.waitingModules[worker.name] = worker
+    } else { // if there's no an waiting or working worker, it's a done worker
+      delete this.workersData.waitingModules[worker.name]
+      this.workersData.doneModules[worker.name] = worker
+    }
+
+    this.listWorkers[worker.name].waiting = worker.waiting
+    if (+this.maxFile < +worker.maxFile - 1) { // -1 is for the init task
+      this.maxFile = worker.maxFile
+    }
+  }
+  return {
+    thereIsACurrent,
+    nbWorkers
+  }
 }
 
 /**
@@ -148,6 +172,5 @@ MonitorController.prototype.refresh = function(data) {
   this.updateData(data).updateView().screen.render()
   return this
 }
-
 
 module.exports = MonitorController
