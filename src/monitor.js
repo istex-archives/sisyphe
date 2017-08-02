@@ -24,29 +24,30 @@ function Monitor(options = {}) {
  * Launches the monitor and injects the data that is needed
  * @return {Object} this object
  */
-Monitor.prototype.launch = async function() {
+Monitor.prototype.launch = function() {
   this.monitorController = new MonitorController()
-  const startDate = await this.getStart()
-  this.intervalLoop = setInterval(async() => {
-    const endDate = await this.getEnd()
-    const queues = await this.getQueue()
-    Promise.map(queues, async(queue) => {
-      const jobsCount = await queue.getJobCounts()
-      jobsCount.name = queue.name
-      jobsCount.maxFile = queue.maxFile
-      delete jobsCount.delayed
-      delete jobsCount.active
-      delete jobsCount.completed
-      return jobsCount
-    }).then(async(data) => {
-      this.monitorController.refresh({
-        data,
-        startDate,
-        endDate
+  const startDate = this.getStart().then(startDate => {
+    this.intervalLoop = setInterval(async() => {
+      const endDate = await this.getEnd()
+      const queues = await this.getQueue()
+      Promise.map(queues, async(queue) => {
+        const jobsCount = await queue.getJobCounts()
+        jobsCount.name = queue.name
+        jobsCount.maxFile = queue.maxFile
+        delete jobsCount.delayed
+        delete jobsCount.active
+        delete jobsCount.completed
+        return jobsCount
+      }).then(async(data) => {
+        this.monitorController.refresh({
+          data,
+          startDate,
+          endDate
+        })
+        return data
       })
-      return data
-    })
-  }, this.refresh);
+    }, this.refresh);
+  })
   return this
 }
 
@@ -55,9 +56,9 @@ Monitor.prototype.launch = async function() {
  * @return {Promise} Promise resolve only when the start key is found
  */
 Monitor.prototype.getStart = function() {
-  return new Promise(function(resolve, reject) {
-    const dateStartInterval = setInterval(function() {
-      client.hgetall("bull:start:1", (err, start) => {
+  return new Promise((resolve, reject) => {
+    const dateStartInterval = setInterval(() => {
+      client.hgetall(this.prefix + ":start:1", (err, start) => {
         if (start && start.hasOwnProperty('data')) {
           clearInterval(dateStartInterval)
           resolve(start.data)
@@ -72,8 +73,8 @@ Monitor.prototype.getStart = function() {
  * @return {Promise} Promise resolve with data of end key or null
  */
 Monitor.prototype.getEnd = function() {
-  return new Promise(function(resolve, reject) {
-    client.hgetall("bull:end:1", (err, end) => {
+  return new Promise((resolve, reject) => {
+    client.hgetall(this.prefix + ":end:1", (err, end) => {
       if (end && end.hasOwnProperty('data')) resolve(end.data)
       else resolve(null)
     })

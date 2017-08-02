@@ -27,8 +27,7 @@ beforeEach(function() {
 describe(`${pkg.name}/src/monitor.js`, function() {
   describe('#init', function() {
     it('should be initialized successfully', function() {
-      const monitorTest = new monitor()
-      monitorTest.init({
+      const monitorTest = new monitor({
         prefix: 'testMonitor',
         refresh: 10,
         silent: true
@@ -41,14 +40,23 @@ describe(`${pkg.name}/src/monitor.js`, function() {
   });
   describe('#launch', function() {
     it('should be launch successfully', function(done) {
-      let monitorTest = new monitor()
-      monitorTest = monitorTest.init({
+      let monitorTest = new monitor({
         prefix: 'testMonitor',
         refresh: 10,
         silent: true
       }).launch()
-      expect(monitorTest.intervalLoop).to.be.an('object').own.property('_idleTimeout', 40)
-      done()
+      expect(monitorTest.intervalLoop).to.be.undefined
+      const startQueue = new Queue('start', {
+        prefix: 'testMonitor'
+      });
+      startQueue.add({
+        id: ~~(Math.random() * 100)
+      }).then(data=>{
+        setTimeout(function () {
+          expect(monitorTest.intervalLoop).to.be.an('object').own.property('_idleTimeout', 40)
+          done()
+        }, 100);
+      })
     });
   });
   describe('#getKeys', function() {
@@ -66,31 +74,23 @@ describe(`${pkg.name}/src/monitor.js`, function() {
           });
         }
         return worker
-      }).then(workers => {
-        let monitorTest = new monitor()
-        monitorTest = monitorTest.init({
+      }).then(async workers => {
+        const startQueue = new Queue('start', {
+          prefix: 'testMonitor'
+        });
+        await startQueue.add({
+          id: ~~(Math.random() * 100)
+        })
+        let monitorTest = new monitor({
           prefix: 'testMonitor',
-          refresh: 10,
-          silent: true
+          refresh: 10
         }).launch()
         setTimeout(function() {
-          expect(monitorTest.workers).to.be.an('array').to.have.lengthOf(3)
+          expect(monitorTest.workers).to.be.an('array').to.have.lengthOf(4)
           expect(monitorTest.workers[0]).to.be.an('object').own.property('name')
           done()
-        }, 100);
+        }, 200);
       })
-    });
-  });
-  describe('#exit', function() {
-    it('timer should be broken', function(done) {
-      let monitorTest = new monitor()
-      monitorTest = monitorTest.init({
-        prefix: 'testMonitor',
-        refresh: 10,
-        silent: true
-      }).launch().exit()
-      expect(monitorTest.intervalLoop).to.be.an('object').own.property('_idleTimeout', -1)
-      done()
     });
   });
 });
@@ -99,10 +99,7 @@ describe(`${pkg.name}/src/monitor.js`, function() {
 describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
   describe('#init', function() {
     it('should be initialized successfully', function() {
-      let monitorControllerTest = Object.create(monitorController)
-      monitorControllerTest.init({
-        silent: true
-      })
+      let monitorControllerTest = new monitorController()
       expect(monitorControllerTest.screen).to.be.an('Object')
       expect(monitorControllerTest.grid).to.be.an('Object')
 
@@ -130,7 +127,6 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
   });
   describe('#refresh', function() {
     it('should be refresh successfully', function() {
-      let monitorControllerTest = Object.create(monitorController)
       const data = [{
         waiting: 10,
         failed: 0,
@@ -140,9 +136,11 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
         waiting: 0,
         failed: 0,
         name: 'xml',
-        maxFile: 1500
+        maxFile: 1600
       }]
-      monitorControllerTest = monitorControllerTest.init().refresh(data)
+      let monitorControllerTest = new monitorController().refresh({
+        data
+      })
       expect(monitorControllerTest.workersData.currentModule).to.be.an('object')
       expect(monitorControllerTest.workersData.currentModule).own.property('name', 'None')
       expect(monitorControllerTest.workersData.currentModule).own.property('waiting', '')
@@ -162,19 +160,10 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
 
       expect(monitorControllerTest.maxFile).to.equal(1600)
 
-      const data2 = [{
-        waiting: 9,
-        failed: 0,
-        name: 'filetype',
-        maxFile: 1600
-      }, {
-        waiting: 0,
-        failed: 0,
-        name: 'xml',
-        maxFile: 1500
-      }]
-      monitorControllerTest.refresh(data2)
-
+      data[0].waiting = 9
+      monitorControllerTest.refresh({
+        data
+      })
       expect(monitorControllerTest.workersData.currentModule).to.be.an('object')
       expect(monitorControllerTest.workersData.currentModule).own.property('name', 'filetype')
       expect(monitorControllerTest.workersData.currentModule).own.property('waiting', 9)
@@ -189,19 +178,9 @@ describe(`${pkg.name}/src/monitor/monitorController.js`, function() {
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('waiting', 0)
       expect(monitorControllerTest.workersData.doneModules.xml).own.property('failed', 0)
 
-      const data3 = [{
-        waiting: 9,
-        failed: 0,
-        name: 'filetype',
-        maxFile: 1600
-      }, {
-        waiting: 0,
-        failed: 0,
-        name: 'xml',
-        maxFile: 1500
-      }]
-      monitorControllerTest.refresh(data2)
-
+      monitorControllerTest.refresh({
+        data
+      })
       expect(monitorControllerTest.workersData.currentModule).to.be.an('object')
       expect(monitorControllerTest.workersData.currentModule).own.property('name', 'filetype')
       expect(monitorControllerTest.workersData.currentModule).own.property('waiting', 9)
