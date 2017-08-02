@@ -49,11 +49,14 @@ MonitorController.prototype.updateData = function(data) {
   if (data.hasOwnProperty('endDate')) this.endDate = data.endDate
   if (!data.endDate) this.time = monitorHelpers.getTimeBetween(data.startDate, Date.now())
   else this.time = monitorHelpers.getTimeBetween(data.startDate, data.endDate)
+  let nbWorker = 0;
   for (var i = 0; i < data.data.length; i++) {
     const module = data.data[i]
     if (module.name === 'walker-fs' ||
       module.name === 'start' ||
       module.name === 'end') continue
+
+    nbWorker++
 
     if (this.listWorkers[module.name] === undefined || this.listWorkers[module.name].waiting === 0) {
       this.listWorkers[module.name] = {
@@ -90,8 +93,10 @@ MonitorController.prototype.updateData = function(data) {
     waiting: '',
     failed: ''
   }
-  const currentDone = this.workersData.currentModule.completed + this.maxFile * nbModulesDone
-  this.totalPercent = ~~((currentDone * 100) / (this.maxFile * this.listWorkers.length))
+  let currentDone = (this.maxFile * nbModulesDone)
+  if (this.workersData.currentModule.waiting) currentDone += (this.maxFile - this.workersData.currentModule.waiting)
+  this.totalPercent = ~~((currentDone * 100) / (this.maxFile * (nbWorker)))
+
   return this
 }
 
