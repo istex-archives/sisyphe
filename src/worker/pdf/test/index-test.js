@@ -33,19 +33,17 @@ describe('doTheJob', function () {
 
 describe('getPdfMetaData', function () {
   it("should return a promise with the PDF's metadata", function () {
-    return sisyphePdf.getPdfMetaData(dataInput).then((pdfMetadata) => {
-      expect(pdfMetadata).to.have.property('info');
-      expect(pdfMetadata).to.have.property('metadata');
-      expect(pdfMetadata.info).to.have.property('PDFFormatVersion');
-      expect(pdfMetadata.info).to.have.property('Title');
-      expect(pdfMetadata.info).to.have.property('Author');
+    return sisyphePdf.getPdfMetaData(dataInput.path).then((pdfMetadata) => {
+      expect(pdfMetadata).to.have.property('PDFFormatVersion');
+      expect(pdfMetadata).to.have.property('Title');
+      expect(pdfMetadata).to.have.property('Author');
     })
   })
 });
 
 describe('getPdfWordCount', function () {
   it("should return a promise with the total number of words in the pdf", function () {
-    return sisyphePdf.getPdfWordCount(dataInput).then((pdfWordCount) => {
+    return sisyphePdf.getPdfWordCount(dataInput.path).then((pdfWordCount) => {
       expect(pdfWordCount).to.be.a('number');
       expect(pdfWordCount).to.equal(574);
     })
