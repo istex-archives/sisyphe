@@ -1,10 +1,13 @@
 #!/usr/bin/env node
+
 const program = require('commander');
 const pkg = require('./package.json');
 const path = require('path');
 const Manufactory = require('./src/manufactory');
 const numCPUs = require('os').cpus().length;
 const Queue = require('bull');
+const redis = require("redis")
+const client = redis.createClient();
 
 program
   .version(pkg.version)
@@ -30,32 +33,37 @@ const options = {
   configDir,
   inputPath,
   numCPUs
-};
-const startQueue = new Queue('start');
-const endQueue = new Queue('end');
-startQueue.add(Date.now())
-const enterprise = Object.create(Manufactory);
-enterprise.init(options);
-workers.map(worker => {
-  enterprise.addWorker(worker);
-});
-enterprise
-  .initializeWorkers()
-  .then(result => {
-    console.log('init: ok !');
-    enterprise.dispatchers[5].on('result', msg => {
-      console.log(msg);
-      // process.stdout.write('.');
-    });
-    return enterprise.start();
-  })
-  .then(() => {
-    return enterprise.final();
-  })
-  .then(() => {
-    console.log('stop !');
-    endQueue.add(new Date().getTime())
-  })
-  .catch(error => {
-    console.log(error);
+}
+
+
+client.flushall((err) => {
+  if (err) console.log(err)
+  const startQueue = new Queue('start');
+  const endQueue = new Queue('end');
+  startQueue.add(Date.now())
+  const enterprise = Object.create(Manufactory);
+  enterprise.init(options);
+  workers.map(worker => {
+    enterprise.addWorker(worker);
   });
+  enterprise
+    .initializeWorkers()
+    .then(result => {
+      console.log('init: ok !');
+      enterprise.dispatchers[5].on('result', msg => {
+        console.log(msg);
+        // process.stdout.write('.');
+      });
+      return enterprise.start();
+    })
+    .then(() => {
+      return enterprise.final();
+    })
+    .then(() => {
+      console.log('stop !');
+      endQueue.add(new Date().getTime())
+    })
+    .catch(error => {
+      console.log(error);
+    });
+})
