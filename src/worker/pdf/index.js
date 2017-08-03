@@ -14,7 +14,6 @@ sisyphePdf.doTheJob = function(data, next) {
       data.pdfWordByPage = ~~(data.pdfWordCount / data.pdfPageTotal);
       next(null, data);
     }).catch((error) => {
-      console.log(error);
       data.pdfError = JSON.stringify(error);
       next(null, data);
     })
@@ -29,7 +28,7 @@ sisyphePdf.getPdfMetaData = function(filePath) {
       const metadataObject = {}
       stdout.split('\n').map(meta => {
         const metadataLine = meta.split(': ').map(m => m.trim())
-        metadataObject[metadataLine[0]] = metadataLine[1]
+        if (metadataLine[0] !== '') metadataObject[metadataLine[0]] = metadataLine[1]
       })
       metadataObject.PDFFormatVersion = metadataObject['PDF version']
       delete metadataObject['PDF version']
@@ -41,7 +40,11 @@ sisyphePdf.getPdfMetaData = function(filePath) {
 sisyphePdf.getPdfWordCount = function(filePath) {
   return new Promise(function(resolve, reject) {
     cp.exec('pdftotext "' + filePath + '" -', function(error, stdout, stderr) {
-      if (stderr) return reject(stderr)
+      if (stderr){
+        const errorObject = {} // if an error occur he is transform to an object
+        stderr.split('\n').map(error=>errorObject[error.split(': ')[0]] = error.split(': ')[1])
+        return reject(errorObject)
+      }
       resolve(stdout.split(/\s+/).length)
     });
   })
