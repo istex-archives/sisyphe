@@ -26,28 +26,25 @@ function Monitor(options = {}) {
  */
 Monitor.prototype.launch = function() {
   this.monitorController = new MonitorController()
-  const startDate = this.getStart().then(startDate => {
-    this.intervalLoop = setInterval(async() => {
-      const endDate = await this.getEnd()
-      const queues = await this.getQueue()
-      Promise.map(queues, async(queue) => {
-        const jobsCount = await queue.getJobCounts()
-        jobsCount.name = queue.name
-        jobsCount.maxFile = queue.maxFile
-        delete jobsCount.delayed
-        delete jobsCount.active
-        delete jobsCount.completed
-        return jobsCount
-      }).then(async(data) => {
-        this.monitorController.refresh({
-          data,
-          startDate,
-          endDate
-        })
-        return data
+  this.intervalLoop = setInterval(async() => {
+    const [startDate, endDate, queues] = await Promise.all([this.getStart(), this.getEnd(), this.getQueue()])
+    Promise.map(queues, async(queue) => {
+      const jobsCount = await queue.getJobCounts()
+      jobsCount.name = queue.name
+      jobsCount.maxFile = queue.maxFile
+      delete jobsCount.delayed
+      delete jobsCount.active
+      delete jobsCount.completed
+      return jobsCount
+    }).then(async(data) => {
+      this.monitorController.refresh({
+        data,
+        startDate,
+        endDate
       })
-    }, this.refresh);
-  })
+      return data
+    })
+  }, this.refresh);
   return this
 }
 

@@ -12,11 +12,11 @@ Task.init = async function (options) {
   } else {
     this.queue = new Queue(options.name);
   }
-  
+
   //init all queue in redis
   await this.queue.add({init:true},{jobId:'init-'+options.name})
   const job = await this.queue.getJob('init-'+options.name)
-  await job.remove()
+  if (job && job !== null) job.remove()
 
   return this;
 };

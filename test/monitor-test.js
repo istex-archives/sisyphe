@@ -45,18 +45,8 @@ describe(`${pkg.name}/src/monitor.js`, function() {
         refresh: 10,
         silent: true
       }).launch()
-      expect(monitorTest.intervalLoop).to.be.undefined
-      const startQueue = new Queue('start', {
-        prefix: 'testMonitor'
-      });
-      startQueue.add({
-        id: ~~(Math.random() * 100)
-      }).then(data=>{
-        setTimeout(function () {
-          expect(monitorTest.intervalLoop).to.be.an('object').own.property('_idleTimeout', 40)
-          done()
-        }, 100);
-      })
+      expect(monitorTest.intervalLoop).to.be.an('object').own.property('_idleTimeout', 40)
+      done()
     });
   });
   describe('#getKeys', function() {
