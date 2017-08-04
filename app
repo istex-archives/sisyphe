@@ -49,19 +49,35 @@ client.flushall((err) => {
   enterprise
     .initializeWorkers()
     .then(result => {
-      console.log('init: ok !');
-      enterprise.dispatchers[5].on('result', msg => {
-        console.log(msg);
-        // process.stdout.write('.');
+      enterprise.start()
+      console.log('┌ All workers have been initialized');
+      return new Promise(function(resolve, reject) {
+        enterprise.dispatchers.map(dispatcher=>{
+          let i = 0
+          dispatcher.on('result', msg => {
+            i++
+            process.stdout.clearLine();
+            process.stdout.cursorTo(0);
+            process.stdout.write('├──── ' + dispatcher.patients[0].workerType + ' ==> ' + i.toString());
+          });
+          dispatcher.on('stop', patients => {
+            const currentWorker = patients[0].workerType
+            const lastWorker = workers[workers.length - 1]
+            process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
+            patients[0].final().then(data=>{ // execute finaljob
+              patients.map(patient=>{        // clean forks when finalJob is ending
+                patient.fork.kill('SIGTERM');
+              })
+              if (currentWorker === lastWorker) resolve()
+            })
+          });
+        })
       });
-      return enterprise.start();
     })
-    .then(() => {
-      return enterprise.final();
-    })
-    .then(() => {
-      console.log('stop !');
-      endQueue.add(new Date().getTime())
+    .then(async () => {
+      console.log('└ All workers have completed their work');
+      await endQueue.add(new Date().getTime())
+      process.exit(0)
     })
     .catch(error => {
       console.log(error);

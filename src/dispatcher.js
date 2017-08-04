@@ -55,7 +55,10 @@ Dispatcher.getPatient = function () {
 
 Dispatcher.stop = debounce(function (callback) {
   this.tasks.getJobCounts().then(jobCounts => {
-    if (jobCounts.active + jobCounts.waiting === 0) return callback();
+    if (jobCounts.active + jobCounts.waiting === 0) {
+      this.emit('stop', this.patients)
+      return callback();
+    }
     this.stop();
   });
 }, 500);
