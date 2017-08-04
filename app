@@ -14,6 +14,7 @@ program
   .usage('[options] <path>')
   .option('-n, --corpusname <name>', 'Corpus name', 'default')
   .option('-c, --config-dir <path>', 'Configuration folder path', 'none')
+  .option('-s, --silent', 'Silence output', false)
   .parse(process.argv);
 
 // Corpusname is default, we stop here
@@ -26,6 +27,7 @@ const argPath = program.args[0];
 const inputPath = argPath.charAt(0) === '/' ? argPath : path.join(__dirname, argPath);
 const configDirOpt = program.configDir;
 const configDir = configDirOpt.charAt(0) === '/' ? configDirOpt : path.join(__dirname, configDirOpt);
+const silent = program.silent
 
 const workers = ['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out'];
 const options = {
@@ -50,20 +52,22 @@ client.flushall((err) => {
     .initializeWorkers()
     .then(result => {
       enterprise.start()
-      console.log('┌ All workers have been initialized');
+      if (!silent) console.log('┌ All workers have been initialized');
       return new Promise(function(resolve, reject) {
         enterprise.dispatchers.map(dispatcher=>{
           let i = 0
           dispatcher.on('result', msg => {
-            i++
-            process.stdout.clearLine();
-            process.stdout.cursorTo(0);
-            process.stdout.write('├──── ' + dispatcher.patients[0].workerType + ' ==> ' + i.toString());
+            if (!silent) {
+              i++
+              process.stdout.clearLine();
+              process.stdout.cursorTo(0);
+              process.stdout.write('├──── ' + dispatcher.patients[0].workerType + ' ==> ' + i.toString());
+            }
           });
           dispatcher.on('stop', patients => {
             const currentWorker = patients[0].workerType
             const lastWorker = workers[workers.length - 1]
-            process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
+            if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
             patients[0].final().then(data=>{ // execute finaljob
               patients.map(patient=>{        // clean forks when finalJob is ending
                 patient.fork.kill('SIGTERM');
@@ -75,7 +79,7 @@ client.flushall((err) => {
       });
     })
     .then(async () => {
-      console.log('└ All workers have completed their work');
+      if (!silent) console.log('└ All workers have completed their work');
       await endQueue.add(new Date().getTime())
       process.exit(0)
     })
