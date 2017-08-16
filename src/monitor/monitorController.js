@@ -3,6 +3,7 @@ const contrib = require('blessed-contrib')
 const colors = require('colors/safe')
 const components = require('./component')
 const monitorHelpers = require('./monitorHelpers')
+const os = require('os')
 
 /**
  * Its role is to manage the data for monitor and update views
@@ -61,6 +62,7 @@ MonitorController.prototype.updateData = function(data) {
   if (!monitorHelpers.nbProperty(this.workersData.currentModule)) this.workersData.currentModule = {
     name: 'None',
     waiting: '',
+    completed: '',
     failed: ''
   }
 
@@ -86,6 +88,7 @@ MonitorController.prototype.updateView = function() {
     headers: ['Module ' + this.workersData.currentModule.name],
     data: [
       [colors.blue('waiting'), colors.blue(this.workersData.currentModule.waiting)],
+      [colors.green('completed'), colors.green(this.workersData.currentModule.completed)],
       [colors.red('failed'), colors.red(this.workersData.currentModule.failed)]
     ]
   });
@@ -115,6 +118,13 @@ MonitorController.prototype.updateView = function() {
     color: monitorHelpers.getColorOfPercent(this.totalPercent)
   }]);
 
+  const loadavg = os.loadavg()
+  for (var i = 0; i < loadavg.length; i++) {
+    loadavg[i] = loadavg[i].toFixed(1) + ' '
+  }
+  this.workersView.loadAverage.setContent(
+    loadavg.toString()
+  );
   return this
 }
 
@@ -144,6 +154,7 @@ MonitorController.prototype.router = function(workers) {
       delete this.workersData.doneModules[worker.name]
       this.workersData.currentModule.name = worker.name
       this.workersData.currentModule = worker
+      this.workersData.currentModule.completed = this.maxFile - worker.waiting
     } else if (worker.waiting || worker.maxFile < this.maxFile) { // if there's waiting job or completed task is inferior than totalFile, it's a waiting worker
       delete this.workersData.doneModules[worker.name]
       this.workersData.waitingModules[worker.name] = worker
@@ -151,7 +162,6 @@ MonitorController.prototype.router = function(workers) {
       delete this.workersData.waitingModules[worker.name]
       this.workersData.doneModules[worker.name] = worker
     }
-
     this.listWorkers[worker.name].waiting = worker.waiting
     if (+this.maxFile < +worker.maxFile - 1) { // -1 is for the init task
       this.maxFile = worker.maxFile

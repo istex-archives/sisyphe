@@ -54,13 +54,19 @@ module.exports.loadInterface = function(grid) {
       color: 'red'
     }]
   });
-  components.time = grid.set(13, 12, 3, 2, blessed.box, {
+  components.time = grid.set(14, 12, 2, 2, blessed.box, {
     label: 'Time',
     content: "0",
     left: 'center'
   });
   components.logs = grid.set(13, 0, 3, 12, blessed.box, {
     label: 'Logs',
+    content: "0",
+    left: 'center'
+  });
+
+  components.loadAverage = grid.set(13, 12, 1, 2, blessed.box, {
+    label: 'Load Average',
     content: "0",
     left: 'center'
   });
