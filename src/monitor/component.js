@@ -3,11 +3,11 @@ const contrib = require('blessed-contrib')
 
 module.exports.loadInterface = function(grid) {
   const components = {}
-  components.walker = grid.set(0, 0, 1, 16, blessed.box, {
+  components.walker = grid.set(0, 0, 2, 16, blessed.box, {
     content: "sisyphe is starting",
     left: 'center'
   });
-  components.waitingModules = grid.set(1, 0, 12, 4, contrib.table, {
+  components.waitingModules = grid.set(2, 0, 10, 4, contrib.table, {
     fg: 'green',
     interactive: false,
     label: 'Waiting modules',
@@ -17,7 +17,7 @@ module.exports.loadInterface = function(grid) {
     border: 'dashed',
     fillCellBorders: true
   });
-  components.doneModules = grid.set(1, 12, 12, 4, contrib.table, {
+  components.doneModules = grid.set(2, 12, 10, 4, contrib.table, {
     fg: 'green',
     interactive: false,
     label: 'Done modules',
@@ -27,7 +27,7 @@ module.exports.loadInterface = function(grid) {
     border: 'dashed',
     fillCellBorders: true
   });
-  components.currentModule = grid.set(1, 4, 9, 8, contrib.table, {
+  components.currentModule = grid.set(2, 4, 7, 8, contrib.table, {
     fg: 'green',
     interactive: false,
     label: 'Current module',
@@ -37,12 +37,12 @@ module.exports.loadInterface = function(grid) {
     border: 'dashed',
     fillCellBorders: true
   });
-  components.progress = grid.set(10, 4, 3, 8, contrib.gauge, {
+  components.progress = grid.set(9, 4, 3, 8, contrib.gauge, {
     label: 'Current module progress',
     stroke: 'green',
     fill: 'white'
   })
-  components.total = grid.set(13, 14, 3, 2, contrib.donut, {
+  components.total = grid.set(12, 14, 4, 2, contrib.donut, {
     label: 'Total',
     radius: 8,
     arcWidth: 3,
@@ -59,13 +59,13 @@ module.exports.loadInterface = function(grid) {
     content: "0",
     left: 'center'
   });
-  components.logs = grid.set(13, 0, 3, 12, blessed.box, {
+  components.logs = grid.set(12, 0, 4, 12, blessed.box, {
     label: 'Logs',
     content: "0",
     left: 'center'
   });
 
-  components.loadAverage = grid.set(13, 12, 1, 2, blessed.box, {
+  components.loadAverage = grid.set(12, 12, 2, 2, blessed.box, {
     label: 'Load Average',
     content: "0",
     left: 'center'
