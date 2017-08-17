@@ -46,7 +46,7 @@ Sisyphe.prototype.init = async function(workers) {
   this.log = {
     error: [],
     warning: [],
-    info: ["Initialisation"]
+    info: ["Initialisation OK"]
   }
   this.workers = workers;
   await client.flushallAsync()
@@ -81,7 +81,8 @@ Sisyphe.prototype.launch = async function() {
       })
       if (currentWorker === lastWorker) {
         if (!silent) console.log('└ All workers have completed their work');
-        await client.hsetAsync("monitoring", "end", Date.now())
+        this.log.info.push('All workers have completed their work')
+        await client.hmsetAsync("monitoring", "end", Date.now(), "log", JSON.stringify(this.log));
         process.exit(0)
       }
     })

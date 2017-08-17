@@ -1,3 +1,4 @@
+const colors = require('colors/safe')
 /**
  * List of help function
  * @constructor
@@ -17,6 +18,42 @@ MonitorHelpers.prototype.propertyToArray = function(object) {
     }
   }
   return arrayWaitingModules
+}
+
+
+/**
+ * Format array of log with colors
+ * @param  {Array} log array containing type containing log
+ * @return {Array}        Array logs with colors
+ */
+MonitorHelpers.prototype.getColorLog = function(logs) {
+  const formatedLogs = []
+  for (var i = 0; i < Object.keys(logs).length; i++) {
+    const type = Object.keys(logs)[i]
+    formatedLogs.push(getColor(type, '┌─────────────────────'))
+    formatedLogs.push(getColor(type, '├─ ' + type + ':'))
+    for (var j = 0; j < logs[type].length; j++) {
+      formatedLogs.push(getColor(type, '├─── ' + logs[type][j]))
+    }
+    formatedLogs.push(getColor(type, '└─────────────────────'))
+  }
+
+  function getColor(type, string) {
+    switch (type) {
+      case 'warning':
+        return colors.yellow(string)
+        break;
+      case 'error':
+        return colors.red(string)
+        break;
+      case 'info':
+        return colors.blue(string)
+        break;
+      default:
+        return string
+    }
+  }
+  return formatedLogs
 }
 
 /**

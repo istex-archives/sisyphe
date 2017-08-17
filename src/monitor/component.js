@@ -62,9 +62,15 @@ module.exports.loadInterface = function(grid) {
   components.logs = grid.set(12, 0, 4, 12, blessed.box, {
     label: 'Logs',
     content: "0",
-    left: 'center'
+    left: 'center',
+    keys: true,
+    scrollable:true,
+    focused:true,
+    scrollbar: {
+      ch: ' ',
+      inverse: true
+    }
   });
-
   components.loadAverage = grid.set(12, 12, 2, 2, blessed.box, {
     label: 'Load Average',
     content: "0",
@@ -86,6 +92,5 @@ module.exports.loadInterface = function(grid) {
       }
     }
   });
-
   return components
 }

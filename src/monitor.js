@@ -43,7 +43,8 @@ Monitor.prototype.launch = function() {
       this.monitorController.refresh({
         data,
         startDate: monitoring.start,
-        endDate: monitoring.end
+        endDate: monitoring.end,
+        log: monitoring.log
       })
       return data
     })
@@ -69,7 +70,9 @@ Monitor.prototype.getQueue = async function(workers) {
   const queues = await Promise.map(workers, async worker => {
     if (!this.redisKeys[worker]) {
       this.redisKeys[worker] = worker
-      const queue = new Queue(worker, {prefix: this.prefix})
+      const queue = new Queue(worker, {
+        prefix: this.prefix
+      })
       queue.maxFile = await client.getAsync(`${this.prefix}:${worker}:id`)
       this.workers.push(queue);
     }

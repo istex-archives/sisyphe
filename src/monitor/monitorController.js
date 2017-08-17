@@ -65,12 +65,11 @@ MonitorController.prototype.updateData = function(data) {
     completed: '',
     failed: ''
   }
-
   // Total percent
   let allDone = (this.maxFile * monitorHelpers.nbProperty(this.workersData.doneModules))
   if (this.workersData.currentModule.waiting) allDone += (this.maxFile - this.workersData.currentModule.waiting)
   this.totalPercent = ~~((allDone * 100) / (this.maxFile * (routerResult.nbWorkers)))
-
+  this.logs = data.log
   return this
 }
 
@@ -104,6 +103,9 @@ MonitorController.prototype.updateView = function() {
     (this.time.getHours()) + ' hours \n' +
     (this.time.getMinutes()) + ' minutes\n' +
     (this.time.getSeconds()) + ' seconds\n'
+  );
+  this.workersView.logs.setContent(
+    monitorHelpers.getColorLog(this.logs).join('\n')
   );
 
   const percent = ~~(((this.maxFile - this.workersData.currentModule.waiting) * 100) / (this.maxFile))
