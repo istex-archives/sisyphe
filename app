@@ -46,17 +46,18 @@ Sisyphe.prototype.init = async function(workers) {
   this.log = {
     error: [],
     warning: [],
-    info: ["Initialisation OK"]
+    info: []
   }
   this.workers = workers;
   await client.flushallAsync()
-  await client.hmsetAsync("monitoring", "start", Date.now(), "log", JSON.stringify(this.log), 'workers', JSON.stringify(workers));
+  await client.hmsetAsync("monitoring", "start", Date.now(), 'workers', JSON.stringify(workers));
   this.enterprise = Object.create(Manufactory);
   this.enterprise.init(options);
   this.workers.map(worker => {
     this.enterprise.addWorker(worker);
   });
   await this.enterprise.initializeWorkers()
+  await this.updateLog('info', "Initialisation OK")
 }
 
 Sisyphe.prototype.launch = async function() {
@@ -75,22 +76,24 @@ Sisyphe.prototype.launch = async function() {
       const currentWorker = patients[0].workerType
       const lastWorker = this.workers[this.workers.length - 1]
       if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
-      this.log.info.push(currentWorker + ' has finished')
-      await client.hsetAsync("monitoring", "log", JSON.stringify(this.log));
+      await this.updateLog('info', currentWorker + ' has finished')
       await patients[0].final() // execute finaljob
       patients.map(patient => { // clean forks when finalJob is ending
         patient.fork.kill('SIGTERM');
       })
       if (currentWorker === lastWorker) {
         if (!silent) console.log('└ All workers have completed their work');
-        this.log.info.push('All workers have completed their work')
-        await client.hmsetAsync("monitoring", "end", Date.now(), "log", JSON.stringify(this.log));
+        await this.updateLog('info', 'All workers have completed their work')
         process.exit(0)
       }
     })
   });
 }
 
+Sisyphe.prototype.updateLog = async function(type, string) {
+  this.log[type].push(string)
+  await client.hmsetAsync("monitoring", "end", Date.now(), "log", JSON.stringify(this.log));
+}
 
 const sisyphe = new Sisyphe()
 sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(_ => {

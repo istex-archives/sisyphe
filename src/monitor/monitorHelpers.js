@@ -28,7 +28,9 @@ MonitorHelpers.prototype.propertyToArray = function(object) {
  */
 MonitorHelpers.prototype.getColorLog = function(logs) {
   const formatedLogs = []
-  for (var i = 0; i < Object.keys(logs).length; i++) {
+  if (!logs) return []
+  const types = Object.keys(logs)
+  for (var i = 0; i < types.length; i++) {
     const type = Object.keys(logs)[i]
     formatedLogs.push(getColor(type, '┌─────────────────────'))
     formatedLogs.push(getColor(type, '├─ ' + type + ':'))

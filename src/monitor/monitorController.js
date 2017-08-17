@@ -104,8 +104,9 @@ MonitorController.prototype.updateView = function() {
     (this.time.getMinutes()) + ' minutes\n' +
     (this.time.getSeconds()) + ' seconds\n'
   );
+  const logs = monitorHelpers.getColorLog(this.logs)
   this.workersView.logs.setContent(
-    monitorHelpers.getColorLog(this.logs).join('\n')
+    logs.join('\n')
   );
 
   const percent = ~~(((this.maxFile - this.workersData.currentModule.waiting) * 100) / (this.maxFile))
