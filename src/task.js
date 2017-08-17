@@ -5,19 +5,13 @@ const Task = {};
  * @param {any} options
  * @returns Task
  */
-Task.init = async function (options) {
+Task.init = function (options) {
   this.name = options.name;
   if (options.hasOwnProperty('stringRedisConnection')) {
     this.queue = new Queue(options.name, options.stringRedisConnection);
   } else {
     this.queue = new Queue(options.name);
   }
-
-  //init all queue in redis
-  await this.queue.add({init:true},{jobId:'init-'+options.name})
-  const job = await this.queue.getJob('init-'+options.name)
-  if (job && job !== null) job.remove()
-
   return this;
 };
 
