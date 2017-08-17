@@ -34,7 +34,7 @@ Monitor.prototype.launch = function() {
     await Promise.map(queues, async(queue) => {
       const jobsCount = await queue.getJobCounts()
       jobsCount.name = queue.name
-      jobsCount.maxFile = queue.maxFile
+      jobsCount.maxFile = this.redisKeys[queue.name].maxFile
       delete jobsCount.delayed
       delete jobsCount.active
       delete jobsCount.completed
@@ -69,13 +69,13 @@ Monitor.prototype.getMonitoring = async function() {
 Monitor.prototype.getQueue = async function(workers) {
   const queues = await Promise.map(workers, async worker => {
     if (!this.redisKeys[worker]) {
-      this.redisKeys[worker] = worker
+      this.redisKeys[worker] = {}
       const queue = new Queue(worker, {
         prefix: this.prefix
       })
-      queue.maxFile = await client.getAsync(`${this.prefix}:${worker}:id`)
       this.workers.push(queue);
     }
+    this.redisKeys[worker].maxFile = await client.getAsync(`${this.prefix}:${worker}:id`)
   })
   return this.workers
 }

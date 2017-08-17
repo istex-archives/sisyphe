@@ -160,7 +160,7 @@ MonitorController.prototype.router = function(workers) {
     } else if (worker.waiting || worker.maxFile < this.maxFile) { // if there's waiting job or completed task is inferior than totalFile, it's a waiting worker
       delete this.workersData.doneModules[worker.name]
       this.workersData.waitingModules[worker.name] = worker
-    } else { // if there's no an waiting or working worker, it's a done worker
+    } else { // if this is not an waiting or working worker, it's a done worker
       delete this.workersData.waitingModules[worker.name]
       this.workersData.doneModules[worker.name] = worker
     }
@@ -169,6 +169,7 @@ MonitorController.prototype.router = function(workers) {
       this.maxFile = worker.maxFile
     }
   }
+
   return {
     thereIsACurrent,
     nbWorkers

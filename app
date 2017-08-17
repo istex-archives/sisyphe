@@ -75,6 +75,8 @@ Sisyphe.prototype.launch = async function() {
       const currentWorker = patients[0].workerType
       const lastWorker = this.workers[this.workers.length - 1]
       if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
+      this.log.info.push(currentWorker + ' has finished')
+      await client.hsetAsync("monitoring", "log", JSON.stringify(this.log));
       await patients[0].final() // execute finaljob
       patients.map(patient => { // clean forks when finalJob is ending
         patient.fork.kill('SIGTERM');
