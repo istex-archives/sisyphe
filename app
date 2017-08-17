@@ -1,15 +1,20 @@
 #!/usr/bin/env node
+
 const program = require('commander');
 const pkg = require('./package.json');
 const path = require('path');
 const Manufactory = require('./src/manufactory');
 const numCPUs = require('os').cpus().length;
+const Queue = require('bull');
+const redis = require("redis")
+const client = redis.createClient();
 
 program
   .version(pkg.version)
   .usage('[options] <path>')
   .option('-n, --corpusname <name>', 'Corpus name', 'default')
   .option('-c, --config-dir <path>', 'Configuration folder path', 'none')
+  .option('-s, --silent', 'Silence output', false)
   .parse(process.argv);
 
 // Corpusname is default, we stop here
@@ -22,6 +27,7 @@ const argPath = program.args[0];
 const inputPath = argPath.charAt(0) === '/' ? argPath : path.join(__dirname, argPath);
 const configDirOpt = program.configDir;
 const configDir = configDirOpt.charAt(0) === '/' ? configDirOpt : path.join(__dirname, configDirOpt);
+const silent = program.silent
 
 const workers = ['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out'];
 const options = {
@@ -29,29 +35,55 @@ const options = {
   configDir,
   inputPath,
   numCPUs
-};
+}
 
-const enterprise = Object.create(Manufactory);
-enterprise.init(options);
-workers.map(worker => {
-  enterprise.addWorker(worker);
-});
-enterprise
-  .initializeWorkers()
-  .then(result => {
-    console.log('init: ok !');
-    enterprise.dispatchers[5].on('result', msg => {
-      console.log(msg);
-      // process.stdout.write('.');
-    });
-    return enterprise.start();
-  })
-  .then(() => {
-    return enterprise.final();
-  })
-  .then(() => {
-    console.log('stop !');
-  })
-  .catch(error => {
-    console.log(error);
+
+client.flushall((err) => {
+  if (err) console.log(err)
+  const startQueue = new Queue('start');
+  const endQueue = new Queue('end');
+  startQueue.add(Date.now())
+  const enterprise = Object.create(Manufactory);
+  enterprise.init(options);
+  workers.map(worker => {
+    enterprise.addWorker(worker);
   });
+  enterprise
+    .initializeWorkers()
+    .then(result => {
+      enterprise.start()
+      if (!silent) console.log('┌ All workers have been initialized');
+      return new Promise(function(resolve, reject) {
+        enterprise.dispatchers.map(dispatcher=>{
+          let i = 0
+          dispatcher.on('result', msg => {
+            if (!silent) {
+              i++
+              process.stdout.clearLine();
+              process.stdout.cursorTo(0);
+              process.stdout.write('├──── ' + dispatcher.patients[0].workerType + ' ==> ' + i.toString());
+            }
+          });
+          dispatcher.on('stop', patients => {
+            const currentWorker = patients[0].workerType
+            const lastWorker = workers[workers.length - 1]
+            if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
+            patients[0].final().then(data=>{ // execute finaljob
+              patients.map(patient=>{        // clean forks when finalJob is ending
+                patient.fork.kill('SIGTERM');
+              })
+              if (currentWorker === lastWorker) resolve()
+            })
+          });
+        })
+      });
+    })
+    .then(async () => {
+      if (!silent) console.log('└ All workers have completed their work');
+      await endQueue.add(new Date().getTime())
+      process.exit(0)
+    })
+    .catch(error => {
+      console.log(error);
+    });
+})
