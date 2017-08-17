@@ -44,7 +44,7 @@ Manufactory.final = function () {
 Manufactory.start = function () {
   return this.dispatchers[0].tasks.add({ directory: this.pathToAnalyze }).then(() => {
     return Promise.each(this.dispatchers, dispatcher => {
-      return dispatcher.start();
+      return dispatcher.start().catch(err=>console.log('ezlkfnkjdvbkjfbkjvfjbkvfjbkvfjbkfvjbkvfdkjvdfvdfkjb'));
     });
   });
 };
@@ -85,10 +85,6 @@ Manufactory.createOverseersForDispatchers = function () {
  */
 Manufactory.bindDispatchers = function () {
   this.dispatchers.map((dispatcher, index, array) => {
-    dispatcher.tasks.on('failed', (job, err) => {
-      console.log(err);
-    });
-
     const isLastDispatcher = array.length === index + 1;
     if (isLastDispatcher) return;
     dispatcher.on('result', msg => {

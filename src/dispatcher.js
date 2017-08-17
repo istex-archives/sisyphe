@@ -9,11 +9,14 @@ const Dispatcher = Object.create(EventEmitter.prototype);
  * @param {any} options
  * @returns {Dispatcher}
  */
-Dispatcher.init = function (task, options) {
+Dispatcher.init = function(task, options) {
   EventEmitter.call(this);
   this.patients = [];
   this.waitingQueue = [];
   this.tasks = task;
+  this.tasks.on('failed', (job, err) => {
+    this.emit('error', err)
+  });
   this.options = options;
   return this;
 };
@@ -22,7 +25,7 @@ Dispatcher.init = function (task, options) {
  * @param {Overseer} overseer
  * @returns {Dispatcher}
  */
-Dispatcher.addPatient = function (overseer) {
+Dispatcher.addPatient = function(overseer) {
   this.patients.push(overseer);
   this.waitingQueue.push(overseer);
   return this;
@@ -32,16 +35,20 @@ Dispatcher.addPatient = function (overseer) {
  * @param {Overseer} overseer
  * @returns {Dispatcher}
  */
-Dispatcher.addToWaitingQueue = function (overseer) {
-  this.waitingQueue.push(overseer);
+Dispatcher.addToWaitingQueue = function(overseer) {
+  try {
+    this.waitingQueue.push(overseer);
+  } catch (err) {
+    this.emit('error', err)
+  }
   return this;
 };
 
 /**
-  * @param {any} done callback (overseer)
-  * @returns {Promise}
+ * @param {any} done callback (overseer)
+ * @returns {Promise}
  */
-Dispatcher.getPatient = function () {
+Dispatcher.getPatient = function() {
   return new Promise(resolve => {
     if (this.waitingQueue.length !== 0) return resolve(this.waitingQueue.shift());
     const checkPatientIsAvailable = setInterval(() => {
@@ -53,7 +60,7 @@ Dispatcher.getPatient = function () {
   });
 };
 
-Dispatcher.stop = debounce(function (callback) {
+Dispatcher.stop = debounce(function(callback) {
   this.tasks.getJobCounts().then(jobCounts => {
     if (jobCounts.active + jobCounts.waiting === 0) {
       this.emit('stop', this.patients)
@@ -63,7 +70,7 @@ Dispatcher.stop = debounce(function (callback) {
   });
 }, 500);
 
-Dispatcher.start = function () {
+Dispatcher.start = function() {
   return new Promise(resolve => {
     this.patients.map(overseer => {
       overseer.on('message', msg => {

@@ -87,10 +87,21 @@ Sisyphe.prototype.launch = async function() {
         process.exit(0)
       }
     })
+    dispatcher.on('error', async error => {
+      console.error(error);
+      this.updateLog('error', error)
+    })
   });
 }
 
 Sisyphe.prototype.updateLog = async function(type, string) {
+  if (type === 'error') {
+    const caller_line = string.stack.split("\n")[1];
+    const method = caller_line.split(':')[0].split('/').pop()
+    const line = '(' + caller_line.split(':')[1] + ':'
+    const column = caller_line.split(':')[2]
+    string = string.message + ': ' + method + line + column
+  }
   this.log[type].push(string)
   await client.hmsetAsync("monitoring", "end", Date.now(), "log", JSON.stringify(this.log));
 }
@@ -101,5 +112,17 @@ sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(_ => 
 }).then(_ => {
   if (!silent) console.log('┌ All workers have been initialized');
 }).catch(err => {
+  sisyphe.updateLog('error', err)
   console.log(err);
 })
+
+process.on('uncaughtException', function(err) {
+  sisyphe.updateLog('error', err)
+  console.log('Caught exception: ' + err);
+});
+
+process.on('unhandledRejection', err => {
+  sisyphe.updateLog('error', err)
+  console.log('Caught exception: ' + err);
+  // Will print "unhandledRejection err is not defined"
+});
