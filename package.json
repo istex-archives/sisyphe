@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "lerna bootstrap",
-    "test": "nyc mocha && lerna run --ignore *-worker test",
-    "test-core": "nyc mocha",
+    "test": "mocha && lerna run --ignore *-worker test",
+    "test-core": "mocha",
     "test-worker": "lerna run --ignore *-worker test",
     "updated": "lerna updated",
     "publish": "lerna publish --skip-npm && git push --follow-tags"
