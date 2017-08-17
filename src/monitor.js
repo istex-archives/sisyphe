@@ -4,6 +4,8 @@ const blessed = require('blessed')
 const Promise = require('bluebird')
 
 const redis = require("redis")
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
 const client = redis.createClient();
 
 /**
@@ -27,8 +29,9 @@ function Monitor(options = {}) {
 Monitor.prototype.launch = function() {
   this.monitorController = new MonitorController()
   this.intervalLoop = setInterval(async() => {
-    const [startDate, endDate, queues] = await Promise.all([this.getStart(), this.getEnd(), this.getQueue()])
-    Promise.map(queues, async(queue) => {
+    const monitoring = await this.getMonitoring()
+    const queues = await this.getQueue(monitoring.workers)
+    await Promise.map(queues, async(queue) => {
       const jobsCount = await queue.getJobCounts()
       jobsCount.name = queue.name
       jobsCount.maxFile = queue.maxFile
@@ -39,8 +42,8 @@ Monitor.prototype.launch = function() {
     }).then(async(data) => {
       this.monitorController.refresh({
         data,
-        startDate,
-        endDate
+        startDate: monitoring.start,
+        endDate: monitoring.end
       })
       return data
     })
@@ -48,82 +51,30 @@ Monitor.prototype.launch = function() {
   return this
 }
 
-/**
- * Search in redis if work started on start key
- * @return {Promise} Promise resolve only when the start key is found
- */
-Monitor.prototype.getStart = function() {
-  return new Promise((resolve, reject) => {
-    const dateStartInterval = setInterval(() => {
-      client.hgetall(this.prefix + ":start:1", (err, start) => {
-        if (start && start.hasOwnProperty('data')) {
-          clearInterval(dateStartInterval)
-          resolve(start.data)
-        }
-      })
-    }, 100);
-  });
-}
-
-/**
- * Search in redis if work ended on end key
- * @return {Promise} Promise resolve with data of end key or null
- */
-Monitor.prototype.getEnd = function() {
-  return new Promise((resolve, reject) => {
-    client.hgetall(this.prefix + ":end:1", (err, end) => {
-      if (end && end.hasOwnProperty('data')) resolve(end.data)
-      else resolve(null)
-    })
-  });
+Monitor.prototype.getMonitoring = async function() {
+  const monitoring = {}
+  const keys = await client.hkeysAsync('monitoring')
+  const data = await Promise.map(keys, async key => {
+    monitoring[key] = JSON.parse(await client.hgetAsync('monitoring', key))
+    return
+  })
+  return monitoring;
 }
 
 /**
  * Searches all keys in redis and stores them in the local object
  * @return {Promise} Promise resolve with all key in redis
  */
-Monitor.prototype.getQueue = function() {
-  return new Promise((resolve, reject) => {
-    client.keys("*" + this.prefix + ":*:id", async(err, obj) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      for (var i = 0; i < obj.length; i++) {
-        const keyValue = await this.getKeyValue(obj[i])
-        if (!this.redisKeys.hasOwnProperty(obj[i])) {
-          this.redisKeys[obj[i]] = {}
-          const workers = new Queue(obj[i].split(':')[1], {
-            prefix: this.prefix
-          })
-          workers.key = obj[i]
-          this.workers.push(workers);
-        } else {
-          for (var j = 0; j < this.workers.length; j++) {
-            if (this.workers[j].key == obj[i]) this.workers[j].maxFile = keyValue
-          }
-        }
-      }
-      resolve(this.workers)
-    })
-  });
-}
-
-/**
- * Get value from a key (use to get nbJob in idKey for redis)
- * @param  {String} key key to get value
- * @return {Promise}     resolve with data of key
- */
-Monitor.prototype.getKeyValue = function(key) {
-  return new Promise(function(resolve, reject) {
-    client.get(key, (err, value) => {
-      if (err) {
-        reject(err)
-        return;
-      }
-      resolve(value);
-    })
-  });
+Monitor.prototype.getQueue = async function(workers) {
+  const queues = await Promise.map(workers, async worker => {
+    if (!this.redisKeys[worker]) {
+      this.redisKeys[worker] = worker
+      const queue = new Queue(worker, {prefix: this.prefix})
+      queue.maxFile = await client.getAsync(`${this.prefix}:${worker}:id`)
+      this.workers.push(queue);
+    }
+  })
+  return this.workers
 }
 
 module.exports = Monitor

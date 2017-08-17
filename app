@@ -50,7 +50,7 @@ Sisyphe.prototype.init = async function(workers) {
   }
   this.workers = workers;
   await client.flushallAsync()
-  await client.hmsetAsync("monitoring", "start", Date.now(), "log", JSON.stringify(this.log));
+  await client.hmsetAsync("monitoring", "start", Date.now(), "log", JSON.stringify(this.log), 'workers', JSON.stringify(workers));
   this.enterprise = Object.create(Manufactory);
   this.enterprise.init(options);
   this.workers.map(worker => {
