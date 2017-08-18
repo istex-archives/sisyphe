@@ -34,16 +34,12 @@ describe(`${pkg.name}/src/overseer.js`, function () {
         done();
       });
     });
-
+    
     it("shouldn't be initialized and return an error", function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('veryDumbWorker').catch(error => {
-        done(error);
-      });
-      bobTheOverseer.on('message', msg => {
-        expect(msg.type).to.equal('error');
-        expect(msg.code).to.equal('MODULE_NOT_FOUND');
-        done();
+        expect(error).to.be.an.instanceOf(Error)
+        done()
       });
     });
   });
