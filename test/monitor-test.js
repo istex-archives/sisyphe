@@ -49,40 +49,6 @@ describe(`${pkg.name}/src/monitor.js`, function() {
       done()
     });
   });
-  describe('#getKeys', function() {
-    it('all workers should be found', function(done) {
-      const workers = ['filetype', 'xml', 'walker']
-      Promise.mapSeries(workers, worker => {
-        return new Queue(worker, {
-          prefix: 'testMonitor'
-        });
-      }).mapSeries(async worker => {
-        const nbDocs = 32
-        for (var i = 0; i < nbDocs; i++) {
-          await worker.add({
-            id: ~~(Math.random() * 100)
-          });
-        }
-        return worker
-      }).then(async workers => {
-        const startQueue = new Queue('start', {
-          prefix: 'testMonitor'
-        });
-        await startQueue.add({
-          id: ~~(Math.random() * 100)
-        })
-        let monitorTest = new monitor({
-          prefix: 'testMonitor',
-          refresh: 10
-        }).launch()
-        setTimeout(function() {
-          expect(monitorTest.workers).to.be.an('array').to.have.lengthOf(4)
-          expect(monitorTest.workers[0]).to.be.an('object').own.property('name')
-          done()
-        }, 200);
-      })
-    });
-  });
 });
 
 
