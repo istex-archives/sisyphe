@@ -30,7 +30,11 @@ Monitor.prototype.launch = function() {
   this.monitorController = new MonitorController()
   this.intervalLoop = setInterval(async() => {
     const monitoring = await this.getMonitoring()
+    if (!monitoring.hasOwnProperty('workers')) {
+      return
+    }
     const queues = await this.getQueue(monitoring.workers)
+
     await Promise.map(queues, async(queue) => {
       const jobsCount = await queue.getJobCounts()
       jobsCount.name = queue.name
