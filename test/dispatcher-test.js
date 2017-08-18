@@ -12,6 +12,9 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
     it('should be initialized successfully', function () {
       const ventilator = Object.create(Dispatcher);
       const task = Object.create(Task);
+      task.init({
+        name: 'test-dispatcher-init'
+      });
       ventilator.init(task, {
         name: 'test-dispatcher-init'
       });
@@ -40,6 +43,9 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
     it("should return a overseer when it's ready", function (done) {
       const ventilator = Object.create(Dispatcher);
       const task = Object.create(Task);
+      task.init({
+        name: 'test-dispatcher-getPatient'
+      });
       ventilator.init(task, {
         name: 'test-dispatcher-getPatient'
       });
