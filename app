@@ -84,6 +84,7 @@ Sisyphe.prototype.launch = async function() {
       if (currentWorker === lastWorker) {
         if (!silent) console.log('└ All workers have completed their work');
         await this.updateLog('info', 'All workers have completed their work')
+        await client.hmsetAsync("monitoring", "end", Date.now());
         process.exit(0)
       }
     })
@@ -101,7 +102,7 @@ Sisyphe.prototype.updateLog = async function(type, string) {
     string = string.message + ': ' + string.stack.split("\n")[1];
   }
   this.log[type].push(string)
-  await client.hmsetAsync("monitoring", "end", Date.now(), "log", JSON.stringify(this.log));
+  await client.hsetAsync("monitoring", "log", JSON.stringify(this.log));
 }
 
 const sisyphe = new Sisyphe()
