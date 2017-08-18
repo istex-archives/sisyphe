@@ -1,13 +1,12 @@
 {
   "name": "sisyphe",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "postinstall": "lerna bootstrap",
-    "test": "nyc mocha && lerna run --ignore *-worker test",
-    "test-core": "nyc mocha",
-    "test-worker": "lerna run --ignore *-worker test",
+    "test": "mocha && lerna run --ignore *-worker test",
+    "coverage": "nyc mocha",
     "updated": "lerna updated",
     "publish": "lerna publish --skip-npm && git push --follow-tags"
   },
