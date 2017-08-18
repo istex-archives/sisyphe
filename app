@@ -113,14 +113,3 @@ sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(_ => 
 }).catch(err => {
   sisyphe.updateLog('error', err)
 })
-
-process.on('uncaughtException', function(err) {
-  sisyphe.updateLog('error', err)
-  console.log('unCaught exception: ' + err);
-});
-
-process.on('unhandledRejection', err => {
-  sisyphe.updateLog('error', err)
-  console.log('unhandledRejection: ' + err);
-  // Will print "unhandledRejection err is not defined"
-});
