@@ -10,7 +10,7 @@ const Overseer = {};
  * @param {any} WorkerType
  * @returns Promise
  */
-Overseer.init = function (workerType, options) {
+Overseer.init = function(workerType, options) {
   this.workerType = workerType;
   this.fork = fork(path.join(__dirname, 'worker.js'));
   this.on = this.fork.on.bind(this.fork);
@@ -20,25 +20,35 @@ Overseer.init = function (workerType, options) {
     options
   };
   return new Promise((resolve, reject) => {
-    this.fork.send(initObj, null, {}, error => {
-      if (error) reject(error);
-    });
     this.fork.once('message', msg => {
       if (msg.isInitialized && msg.type === 'initialize') resolve(this);
+      if (msg.type == 'error') {
+        const err = new Error(msg.message);
+        [err.message,err.stack,err.code] = [msg.message,msg.stack,msg.code]
+        reject(err)
+      }
+    });
+    this.fork.send(initObj, null, {}, error => {
+      if (error) reject(error)
     });
   });
 };
 
-Overseer.final = function () {
+Overseer.final = function() {
   const finalObj = {
     type: 'final'
   };
   return new Promise((resolve, reject) => {
+    this.fork.on('message', msg => {
+      if (msg.type == 'error') {
+        const err = new Error(msg.message);
+        [err.message,err.stack,err.code] = [msg.message,msg.stack,msg.code]
+        reject(err)
+      }
+      if (msg.type === 'final') resolve(this);
+    });
     this.fork.send(finalObj, null, {}, error => {
       if (error) reject(error);
-    });
-    this.fork.on('message', msg => {
-      if (msg.type === 'final') resolve(this);
     });
   });
 };
@@ -47,7 +57,7 @@ Overseer.final = function () {
  * @param {any} obj
  * @returns Promise
  */
-Overseer.send = function (obj) {
+Overseer.send = function(obj) {
   const msg = {
     type: 'job',
     data: obj

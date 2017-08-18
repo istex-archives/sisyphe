@@ -26,6 +26,13 @@ Dispatcher.init = function(task, options) {
  * @returns {Dispatcher}
  */
 Dispatcher.addPatient = function(overseer) {
+  overseer.on('message', msg => {
+    if (msg.type == 'error') {
+      const err = new Error(msg.message);
+      [err.message,err.stack,err.code] = [msg.message,msg.stack,msg.code]
+      this.emit('error', err)
+    }
+  });
   this.patients.push(overseer);
   this.waitingQueue.push(overseer);
   return this;
@@ -67,6 +74,8 @@ Dispatcher.stop = debounce(function(callback) {
       return callback();
     }
     this.stop();
+  }).catch(err=>{
+    this.emit('error', err)
   });
 }, 500);
 

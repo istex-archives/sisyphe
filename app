@@ -58,10 +58,10 @@ Sisyphe.prototype.init = async function(workers) {
   });
   await this.enterprise.initializeWorkers()
   await this.updateLog('info', "Initialisation OK")
+  if (!silent) console.log('┌ All workers have been initialized');
 }
 
 Sisyphe.prototype.launch = async function() {
-  this.enterprise.start()
   this.enterprise.dispatchers.map(dispatcher => {
     let i = 0
     dispatcher.on('result', msg => {
@@ -77,7 +77,7 @@ Sisyphe.prototype.launch = async function() {
       const lastWorker = this.workers[this.workers.length - 1]
       if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
       await this.updateLog('info', currentWorker + ' has finished')
-      await patients[0].final() // execute finaljob
+      await patients[0].final().catch(err=>this.updateLog('error', err)) // execute finaljob
       patients.map(patient => { // clean forks when finalJob is ending
         patient.fork.kill('SIGTERM');
       })
@@ -92,15 +92,13 @@ Sisyphe.prototype.launch = async function() {
       this.updateLog('error', error)
     })
   });
+  await this.enterprise.start()
 }
 
 Sisyphe.prototype.updateLog = async function(type, string) {
   if (type === 'error') {
-    const caller_line = string.stack.split("\n")[1];
-    const method = caller_line.split(':')[0].split('/').pop()
-    const line = '(' + caller_line.split(':')[1] + ':'
-    const column = caller_line.split(':')[2]
-    string = string.message + ': ' + method + line + column
+    console.error(string);
+    string = string.message + ': ' + string.stack.split("\n")[1];
   }
   this.log[type].push(string)
   await client.hmsetAsync("monitoring", "end", Date.now(), "log", JSON.stringify(this.log));
@@ -110,19 +108,18 @@ const sisyphe = new Sisyphe()
 sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(_ => {
   return sisyphe.launch()
 }).then(_ => {
-  if (!silent) console.log('┌ All workers have been initialized');
+
 }).catch(err => {
   sisyphe.updateLog('error', err)
-  console.log(err);
 })
 
 process.on('uncaughtException', function(err) {
   sisyphe.updateLog('error', err)
-  console.log('Caught exception: ' + err);
+  console.log('unCaught exception: ' + err);
 });
 
 process.on('unhandledRejection', err => {
   sisyphe.updateLog('error', err)
-  console.log('Caught exception: ' + err);
+  console.log('unhandledRejection: ' + err);
   // Will print "unhandledRejection err is not defined"
 });

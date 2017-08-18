@@ -27,12 +27,14 @@ Manufactory.addWorker = function (worker) {
  * @returns {Promise}
  */
 Manufactory.initializeWorkers = function () {
+
   return this.createDispatchers().createOverseersForDispatchers().then(() => {
     return this.bindDispatchers();
   });
 };
 
 Manufactory.final = function () {
+  console.log('final');
   return Promise.map(this.dispatchers, dispatcher => {
     return dispatcher.patients[0].final();
   });
@@ -44,7 +46,7 @@ Manufactory.final = function () {
 Manufactory.start = function () {
   return this.dispatchers[0].tasks.add({ directory: this.pathToAnalyze }).then(() => {
     return Promise.each(this.dispatchers, dispatcher => {
-      return dispatcher.start().catch(err=>console.log('ezlkfnkjdvbkjfbkjvfjbkvfjbkvfjbkfvjbkvfdkjvdfvdfkjb'));
+      return dispatcher.start();
     });
   });
 };
