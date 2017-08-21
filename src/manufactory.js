@@ -27,7 +27,6 @@ Manufactory.addWorker = function (worker) {
  * @returns {Promise}
  */
 Manufactory.initializeWorkers = function () {
-
   return this.createDispatchers().createOverseersForDispatchers().then(() => {
     return this.bindDispatchers();
   });

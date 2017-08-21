@@ -4,7 +4,6 @@ let performer;
 let isInitialized = false;
 
 process.on('message', msg => {
-
   if (!isInitialized && msg.hasOwnProperty('type') && msg.type === 'initialize') {
     try {
       // throw new Error('My Error')
