@@ -35,7 +35,7 @@ Task.getJobCounts = function () {
 };
 
 Task.on = function () {
-  return this.queue.on;
+  return this.queue.on.bind(this.queue);
 };
 
 module.exports = Task;
