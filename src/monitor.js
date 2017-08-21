@@ -1,6 +1,5 @@
 const Queue = require('bull');
 const MonitorController = require('./monitor/monitorController');
-const blessed = require('blessed');
 const Promise = require('bluebird');
 
 const redis = require('redis');
@@ -59,7 +58,7 @@ Monitor.prototype.launch = function () {
 Monitor.prototype.getMonitoring = async function () {
   const monitoring = {};
   const keys = await client.hkeysAsync('monitoring');
-  const data = await Promise.map(keys, async key => {
+  await Promise.map(keys, async key => {
     monitoring[key] = JSON.parse(await client.hgetAsync('monitoring', key));
   });
   return monitoring;
@@ -70,7 +69,7 @@ Monitor.prototype.getMonitoring = async function () {
  * @return {Promise} Promise resolve with all key in redis
  */
 Monitor.prototype.getQueue = async function (workers) {
-  const queues = await Promise.map(workers, async worker => {
+  await Promise.map(workers, async worker => {
     if (!this.redisKeys[worker]) {
       this.redisKeys[worker] = {};
       const queue = new Queue(worker, {

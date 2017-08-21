@@ -1,6 +1,5 @@
-const program = require('commander')
-let monitor = require('./src/monitor')
-const Queue = require('bull');
+const program = require('commander');
+const Monitor = require('./src/monitor');
 const version = require('./package.json').version;
 
 program
@@ -10,14 +9,10 @@ program
   .option('-p, --prefix <name>', 'Define the prefix for redis')
   .parse(process.argv);
 
-const prefix = program.prefix || 'sisyphe'
-const refresh = program.refresh || 40
-monitor = new monitor({
+const prefix = program.prefix || 'sisyphe';
+const refresh = program.refresh || 40;
+const monitor = new Monitor({
   refresh,
-  prefix,
-}).launch()
-
-
-process.on('unhandledRejection', error => {
-  // Will print "unhandledRejection err is not defined"
+  prefix
 });
+monitor.launch();

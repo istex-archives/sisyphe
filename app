@@ -38,9 +38,9 @@ const options = {
   numCPUs
 };
 
-const Sisyphe = function () {};
+const sisyphe = {};
 
-Sisyphe.prototype.init = async function (workers) {
+sisyphe.init = async function (workers) {
   this.log = {
     error: [],
     warning: [],
@@ -59,7 +59,7 @@ Sisyphe.prototype.init = async function (workers) {
   if (!silent) console.log('┌ All workers have been initialized');
 };
 
-Sisyphe.prototype.launch = async function () {
+sisyphe.launch = async function () {
   this.enterprise.dispatchers.map(dispatcher => {
     let i = 0;
     dispatcher.on('result', msg => {
@@ -94,7 +94,7 @@ Sisyphe.prototype.launch = async function () {
   await this.enterprise.start();
 };
 
-Sisyphe.prototype.updateLog = async function (type, string) {
+sisyphe.updateLog = async function (type, string) {
   if (type === 'error') {
     console.error(string);
     string = string.message + ': ' + string.stack.split('\n')[1];
@@ -103,11 +103,8 @@ Sisyphe.prototype.updateLog = async function (type, string) {
   await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log));
 };
 
-const sisyphe = new Sisyphe();
-sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(_ => {
+sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(() => {
   return sisyphe.launch();
-}).then(_ => {
-
 }).catch(err => {
   sisyphe.updateLog('error', err);
 });
