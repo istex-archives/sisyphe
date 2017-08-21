@@ -33,6 +33,7 @@ Manufactory.initializeWorkers = function () {
 };
 
 Manufactory.final = function () {
+  console.log('final');
   return Promise.map(this.dispatchers, dispatcher => {
     return dispatcher.patients[0].final();
   });
@@ -85,10 +86,6 @@ Manufactory.createOverseersForDispatchers = function () {
  */
 Manufactory.bindDispatchers = function () {
   this.dispatchers.map((dispatcher, index, array) => {
-    dispatcher.tasks.on('failed', (job, err) => {
-      console.log(err);
-    });
-
     const isLastDispatcher = array.length === index + 1;
     if (isLastDispatcher) return;
     dispatcher.on('result', msg => {

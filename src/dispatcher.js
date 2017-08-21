@@ -14,6 +14,9 @@ Dispatcher.init = function (task, options) {
   this.patients = [];
   this.waitingQueue = [];
   this.tasks = task;
+  this.tasks.on('failed', (job, err) => {
+    this.emit('error', err);
+  });
   this.options = options;
   return this;
 };
@@ -23,6 +26,13 @@ Dispatcher.init = function (task, options) {
  * @returns {Dispatcher}
  */
 Dispatcher.addPatient = function (overseer) {
+  overseer.on('message', msg => {
+    if (msg.type === 'error') {
+      const err = new Error(msg.message);
+      [err.message, err.stack, err.code] = [msg.message, msg.stack, msg.code];
+      this.emit('error', err);
+    }
+  });
   this.patients.push(overseer);
   this.waitingQueue.push(overseer);
   return this;
@@ -33,13 +43,17 @@ Dispatcher.addPatient = function (overseer) {
  * @returns {Dispatcher}
  */
 Dispatcher.addToWaitingQueue = function (overseer) {
-  this.waitingQueue.push(overseer);
+  try {
+    this.waitingQueue.push(overseer);
+  } catch (err) {
+    this.emit('error', err);
+  }
   return this;
 };
 
 /**
-  * @param {any} done callback (overseer)
-  * @returns {Promise}
+ * @param {any} done callback (overseer)
+ * @returns {Promise}
  */
 Dispatcher.getPatient = function () {
   return new Promise(resolve => {
@@ -55,8 +69,13 @@ Dispatcher.getPatient = function () {
 
 Dispatcher.stop = debounce(function (callback) {
   this.tasks.getJobCounts().then(jobCounts => {
-    if (jobCounts.active + jobCounts.waiting === 0) return callback();
+    if (jobCounts.active + jobCounts.waiting === 0) {
+      this.emit('stop', this.patients);
+      return callback();
+    }
     this.stop();
+  }).catch(err => {
+    this.emit('error', err);
   });
 }, 500);
 

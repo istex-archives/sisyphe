@@ -6,6 +6,7 @@ let isInitialized = false;
 process.on('message', msg => {
   if (!isInitialized && msg.hasOwnProperty('type') && msg.type === 'initialize') {
     try {
+      // throw new Error('My Error')
       const Performer = require(path.join(__dirname, 'worker', msg.worker));
       performer = Object.create(Performer);
       if ('init' in performer) performer.init(msg.options);
@@ -16,14 +17,20 @@ process.on('message', msg => {
       process.send({
         type: 'error',
         message: error.message,
-        code: error.code
+        code: error.code,
+        stack: error.stack
       });
     }
   }
 
   if (isInitialized && msg.hasOwnProperty('type') && msg.type === 'job') {
     performer.doTheJob(msg.data, (error, data) => {
-      error ? process.send(error) : process.send(msg);
+      error ? process.send({
+        type: 'error',
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      }) : process.send(msg);
     });
   }
 
@@ -34,7 +41,8 @@ process.on('message', msg => {
           process.send({
             type: 'error',
             message: error.message,
-            code: error.code
+            code: error.code,
+            stack: error.stack
           });
         } else {
           process.send(msg);

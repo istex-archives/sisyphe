@@ -20,11 +20,16 @@ Overseer.init = function (workerType, options) {
     options
   };
   return new Promise((resolve, reject) => {
-    this.fork.send(initObj, null, {}, error => {
-      if (error) reject(error);
-    });
     this.fork.once('message', msg => {
       if (msg.isInitialized && msg.type === 'initialize') resolve(this);
+      if (msg.type === 'error') {
+        const err = new Error(msg.message);
+        [err.message, err.stack, err.code] = [msg.message, msg.stack, msg.code];
+        reject(err);
+      }
+    });
+    this.fork.send(initObj, null, {}, error => {
+      if (error) reject(error);
     });
   });
 };
@@ -34,11 +39,16 @@ Overseer.final = function () {
     type: 'final'
   };
   return new Promise((resolve, reject) => {
+    this.fork.on('message', msg => {
+      if (msg.type === 'error') {
+        const err = new Error(msg.message);
+        [err.message, err.stack, err.code] = [msg.message, msg.stack, msg.code];
+        reject(err);
+      }
+      if (msg.type === 'final') resolve(this);
+    });
     this.fork.send(finalObj, null, {}, error => {
       if (error) reject(error);
-    });
-    this.fork.on('message', msg => {
-      if (msg.type === 'final') resolve(this);
     });
   });
 };

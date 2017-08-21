@@ -7,6 +7,7 @@ temp/*
 config/temp/*
 xpaths
 checksum
+**/package-lock.json
 
 # Runtime data
 pids
@@ -37,6 +38,7 @@ jspm_packages
 
 # Optional npm cache directory
 .npm
+package-lock.json
 
 # Optional REPL history
 .node_repl_history
@@ -49,6 +51,10 @@ jspm_packages
 
 # Tern project
 .tern-project
+
+# Docs
+documentation
+confJsdoc.conf
 
 # Created by https://www.gitignore.io/api/macos,linux,webstorm,node,java,osx,sublimetext
 
