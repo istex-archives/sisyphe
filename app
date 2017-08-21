@@ -30,12 +30,13 @@ const inputPath = argPath.charAt(0) === '/' ? argPath : path.join(__dirname, arg
 const configDirOpt = program.configDir;
 const configDir = configDirOpt.charAt(0) === '/' ? configDirOpt : path.join(__dirname, configDirOpt);
 const silent = program.silent;
-
+const now = Date.now();
 const options = {
   corpusname: program.corpusname,
   configDir,
   inputPath,
-  numCPUs
+  numCPUs,
+  now
 };
 
 const sisyphe = {};
