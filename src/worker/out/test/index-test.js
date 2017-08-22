@@ -36,6 +36,6 @@ describe('doTheJob', () => {
   });
   after(() => {
     const fileToDelete = path.resolve(__dirname, '../logs/analyse-test-2017-08-17T13:22:09.863Z.log');
-    fs.unlinkSync(fileToDelete);
+    if (fs.existsSync(fileToDelete)) fs.unlinkSync(fileToDelete);
   });
 });
