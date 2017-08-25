@@ -10,7 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.0",
+    "node-podofo": "^1.0.0",
     "pdfjs-dist": "^1.8.510",
+    "popplonode": "git+https://github.com/istex/popplonode.git#v1.1.0",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {

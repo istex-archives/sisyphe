@@ -2,7 +2,6 @@ const path = require('path');
 
 let performer;
 let isInitialized = false;
-
 process.on('message', msg => {
   if (!isInitialized && msg.hasOwnProperty('type') && msg.type === 'initialize') {
     try {
@@ -10,6 +9,7 @@ process.on('message', msg => {
       const Performer = require(path.join(__dirname, 'worker', msg.worker));
       performer = Object.create(Performer);
       if ('init' in performer) performer.init(msg.options);
+      msg.potentialError = performer.potentialError
       isInitialized = true;
       msg.isInitialized = true;
       process.send(msg);

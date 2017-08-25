@@ -1,7 +1,7 @@
 const debounce = require('lodash').debounce;
 const Promise = require('bluebird');
 const EventEmitter = require('events');
-
+const Overseer = require('./overseer')
 const Dispatcher = Object.create(EventEmitter.prototype);
 
 /**
@@ -89,12 +89,25 @@ Dispatcher.start = function () {
           this.stop(resolve);
         }
       });
-    });
+      overseer.on('exit', (code,signal) => {
+        if (signal === 'SIGSEGV') {
+          this.patients.map(async (patient,id)=>{
+            if (patient.fork.signalCode === 'SIGSEGV') {
+              this.patients.splice(id, 1)
+              const overseer = await Object.create(Overseer).init(patient.workerType, patient.options)
+              this.addPatient(overseer)
+              this.stop(resolve);
+            }
+          })
+
+        }
+      });
+    }); 
 
     this.tasks.process(job => {
       return this.getPatient().then(overseer => {
-        return overseer.send(job.data);
-      });
+        return overseer.send(job.data)
+      })
     });
   });
 };
