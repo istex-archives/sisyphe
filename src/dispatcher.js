@@ -102,7 +102,7 @@ Dispatcher.start = function () {
 
         }
       });
-    }); 
+    });
 
     this.tasks.process(job => {
       return this.getPatient().then(overseer => {
