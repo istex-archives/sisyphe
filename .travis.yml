@@ -16,6 +16,7 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - cmake
       - xmlstarlet
       - g++-4.8
       - poppler-utils
