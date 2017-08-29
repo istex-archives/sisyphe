@@ -93,7 +93,6 @@ sisyphe.launch = async function () {
       }
     });
     dispatcher.on('error', async error => {
-      console.error(error);
       this.updateLog('error', error);
     });
   });
@@ -102,9 +101,16 @@ sisyphe.launch = async function () {
 
 sisyphe.updateLog = async function (type, string) {
   if (type === 'error') {
-    console.error(string);
-    string = string.message + ': ' + string.stack.split('\n')[1];
+    const error = string
+    string = error.message + ': ' + error.stack.split('\n')[1];
+    if (error.hasOwnProperty('infos') && Array.isArray(error.infos)) {
+      for (var i = 0; i < error.infos.length; i++) {
+        var info = error.infos[i];
+        string += '##'+info
+      }
+    }
   }
+  console.error(string)
   this.log[type].push(string);
   await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log));
 };

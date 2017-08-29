@@ -21,16 +21,18 @@ Overseer.init = function (workerType, options) {
     options
   };
 
-
   return new Promise((resolve, reject) => {
     this.fork.send(initObj, null, {}, error => {
       if (error) reject(error);
     });
     this.on('message', msg => {
       if (msg.isInitialized && msg.type === 'initialize') {
-        this.potentialError = msg.potentialError
+        this.fork.potentialError = msg.potentialError
         resolve(this)
       }
+      // if (msg.type == 'job') {
+      //   this.fork.endFunction()
+      // }
       if (msg.type === 'error') {
         const error = new Error(msg.code)
         error.stack = msg.stack
@@ -73,7 +75,8 @@ Overseer.send = function (obj) {
   return new Promise((resolve, reject) => {
     this.fork.send(msg, null, {}, error => {
       if (error) return reject(error)
-      resolve()
+        this.fork.currentFile = obj
+        resolve()
     })
 
   });

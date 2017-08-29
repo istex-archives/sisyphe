@@ -80,7 +80,9 @@ Dispatcher.stop = debounce(function (callback) {
 }, 500);
 
 Dispatcher.start = function () {
+  const self = this
   return new Promise(resolve => {
+    this.startResolve = resolve
     this.patients.map(overseer => {
       overseer.on('message', msg => {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
@@ -89,19 +91,8 @@ Dispatcher.start = function () {
           this.stop(resolve);
         }
       });
-      overseer.on('exit', (code,signal) => {
-        if (signal === 'SIGSEGV') {
-          this.patients.map(async (patient,id)=>{
-            if (patient.fork.signalCode === 'SIGSEGV') {
-              this.patients.splice(id, 1)
-              const overseer = await Object.create(Overseer).init(patient.workerType, patient.options)
-              this.addPatient(overseer)
-              this.stop(resolve);
-            }
-          })
-
-        }
-      });
+      
+      overseer.on('exit', this.exitFunction.bind(this));
     });
 
     this.tasks.process(job => {
@@ -112,4 +103,55 @@ Dispatcher.start = function () {
   });
 };
 
+Dispatcher.exitFunction = async function (code, signal) {
+  if (signal === "SIGSEGV") {
+    const deadFork = this.cleanDead()
+    await this.recreateFork(deadFork)
+    const err = new Error('Processus terminé')
+    err.stack = '\n Signal: ' + signal
+    err.infos = [deadFork.fork.currentFile.path]
+    this.emit('error', err)
+    this.stop(this.startResolve);
+  }
+}
+
+Dispatcher.recreateFork = async function (deadFork) {
+  const newOverseer = await Object.create(Overseer).init(deadFork.workerType, deadFork.options)
+  newOverseer.on('exit', this.exitFunction.bind(this))
+  // newOverseer.on('exit', exitFunction)
+  this.addPatient(newOverseer)
+}
+
+Dispatcher.cleanDead = function(overseer){
+  let deadFork
+  for (var i = 0; i < this.patients.length; i++) {
+    var patient = this.patients[i];
+    if (patient.fork.signalCode === 'SIGSEGV') {
+      deadFork = patient
+      this.patients.splice(i, 1)
+    }
+    break;
+  }
+  this.patients.map((patient, index)=>{
+    
+  })
+  return deadFork
+}
+
+
+
+
+
+exitFunction = async function (code, signal) {
+  if (signal === 'SIGSEGV') {
+    for (var i = 0; i < self.patients.length; i++) {
+      var patient = self.patients[i];
+      if (patient.fork.signalCode === 'SIGSEGV') {
+        
+      }
+    }
+    
+
+  }
+}
 module.exports = Dispatcher;
