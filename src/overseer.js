@@ -30,9 +30,6 @@ Overseer.init = function (workerType, options) {
         this.fork.potentialError = msg.potentialError
         resolve(this)
       }
-      // if (msg.type == 'job') {
-      //   this.fork.endFunction()
-      // }
       if (msg.type === 'error') {
         const error = new Error(msg.code)
         error.stack = msg.stack

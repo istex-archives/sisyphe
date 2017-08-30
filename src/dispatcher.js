@@ -110,7 +110,7 @@ Dispatcher.exitFunction = async function (code, signal) {
     const err = new Error('Processus terminé')
     err.stack = '\n Signal: ' + signal
     err.infos = [deadFork.fork.currentFile.path]
-    this.emit('error', err)
+    this.emit('error', {type:'job', err, job:deadFork.fork.currentFile})
     this.stop(this.startResolve);
   }
 }
@@ -118,7 +118,6 @@ Dispatcher.exitFunction = async function (code, signal) {
 Dispatcher.recreateFork = async function (deadFork) {
   const newOverseer = await Object.create(Overseer).init(deadFork.workerType, deadFork.options)
   newOverseer.on('exit', this.exitFunction.bind(this))
-  // newOverseer.on('exit', exitFunction)
   this.addPatient(newOverseer)
 }
 
@@ -132,26 +131,8 @@ Dispatcher.cleanDead = function(overseer){
     }
     break;
   }
-  this.patients.map((patient, index)=>{
-    
-  })
   return deadFork
 }
 
 
-
-
-
-exitFunction = async function (code, signal) {
-  if (signal === 'SIGSEGV') {
-    for (var i = 0; i < self.patients.length; i++) {
-      var patient = self.patients[i];
-      if (patient.fork.signalCode === 'SIGSEGV') {
-        
-      }
-    }
-    
-
-  }
-}
 module.exports = Dispatcher;
