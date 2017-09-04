@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dispatcher.html">Dispatcher</a><ul class='methods'><li data-type='method'><a href="Dispatcher.html#.addPatient">addPatient</a></li><li data-type='method'><a href="Dispatcher.html#.addToWaitingQueue">addToWaitingQueue</a></li><li data-type='method'><a href="Dispatcher.html#.cleanDead">cleanDead</a></li><li data-type='method'><a href="Dispatcher.html#.exitFunction">exitFunction</a></li><li data-type='method'><a href="Dispatcher.html#.getPatient">getPatient</a></li><li data-type='method'><a href="Dispatcher.html#.init">init</a></li><li data-type='method'><a href="Dispatcher.html#.recreateFork">recreateFork</a></li><li data-type='method'><a href="Dispatcher.html#.start">start</a></li></ul></li><li><a href="sisyphe.html">sisyphe</a><ul class='methods'><li data-type='method'><a href="sisyphe.html#.init">init</a></li><li data-type='method'><a href="sisyphe.html#.launch">launch</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><p><a href="https://travis-ci.org/istex/sisyphe"><img src="https://travis-ci.org/istex/sisyphe.svg?branch=master" alt="Build Status"></a>
+<a href="https://www.bithound.io/github/istex/sisyphe"><img src="https://www.bithound.io/github/istex/sisyphe/badges/score.svg" alt="bitHound Overall Score"></a></p>
+<p><img src="./logo-sisyphe.jpg" alt="sisyphe"></p>
+<h2>Sisyphe</h2><p>Sisyphe is a generic NodeJS recursive folder analyser terminal application &amp; a (<a href="https://github.com/lerna/lerna">lerna</a>) git <a href="https://github.com/babel/babel/blob/master/doc/design/monorepo.md">monorepo</a>.</p>
+<p><img src="./sisyphe.gif" alt="Sisyphe-pic"></p>
+<h3>Requirements</h3><p>Test with NodeJS@8.1, Redis@3.2.6 &amp; ElasticSearch@5.1.1 &amp; XMLStarlet@1.6.1(libxml2@2.9.4)</p>
+<h3>Install it</h3><ol>
+<li>Download the lastest Sisyphe version </li>
+<li>Just do : <code>npm install</code></li>
+<li>... that's it.</li>
+</ol>
+<h3>Test</h3><p><code>npm run test</code> will test sisyphe &amp; its workers</p>
+<h3>Help</h3><p><code>./app.js --help</code> Will output help</p>
+<h3>Options</h3><pre class="prettyprint source"><code>-V, --version            output the version number
+-n, --corpusname &lt;name>  Corpus name
+-c, --config-dir &lt;path>  Configuration folder path
+-s, --silent             Silence output
+-h, --help               output usage information</code></pre><h3>How it works ?</h3><p>Just start Sisyphe on a folder with any files in it.</p>
+<p><code>node app.js -c folderName ~/Documents/customfolder/corpus</code></p>
+<p>Sisyphe is now working in background with all your computer thread.
+Just take a coffee and wait , it will prevent you when it's done :)</p>
+<p>You should now have a file full of logs in <code>/yourcustomfolder/sisyphe/logs/sisyphe.log</code> (errors,info,duration..)</p>
+<p>For a control panel, go to <a href="https://github.com/istex/sisyphe-monitor">Sisyphe-monitor</a></p>
+<p><img src="./sisyphe-monitor.gif" alt="Sisyphe-dashboard"></p>
+<h3>Modules</h3><p>There is a list of default modules (focused on xml &amp; pdf).</p>
+<p>Those URL NEED to be updated when merge branch will be ok.</p>
+<ul>
+<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/filetype">Sisyphe-FILETYPE</a> Will detect mimetype,extension, corrupted files..</li>
+<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/pdf">Sisyphe-PDF</a> Will get info from PDF (version, author, meta...)</li>
+<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/xml">Sisyphe-XML</a> Will check if it's wellformed, valid-dtd's, get elements from balises ...</li>
+<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/xpath">Sisyphe-XPATH</a>  Will generate a complete list of xpaths from submitted folder</li>
+<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/out">Sisyphe-OUT</a> Will export data to json file &amp; ElasticSearch database</li>
+</ul>
+<h3>Developpement on worker</h3><p>When you work on worker, just:</p>
+<ul>
+<li>Commit your changes as easy</li>
+<li>Do a <code>npm run updated</code> (to check what worker has changed)</li>
+<li>Do a <code>npm run publish</code> (it will ask you to change version of module worker &amp; publish it to github)</li>
+</ul></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Mon Sep 04 2017 17:16:08 GMT+0200 (CEST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
