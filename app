@@ -89,9 +89,7 @@ sisyphe.launch = async function () {
       }
     });
     dispatcher.on('error', async error => {
-      if (error.hasOwnProperty('type') && error.type === 'job') {
-        
-      }
+      console.log(error)
       monitoring.updateLog('error', error);
     });
   });

@@ -91,7 +91,6 @@ Dispatcher.start = function () {
           this.stop(resolve);
         }
       });
-      
       overseer.on('exit', this.exitFunction.bind(this));
     });
 
@@ -107,10 +106,13 @@ Dispatcher.exitFunction = async function (code, signal) {
   if (signal === "SIGSEGV") {
     const deadFork = this.cleanDead()
     await this.recreateFork(deadFork)
-    const err = new Error('Processus terminé')
-    err.stack = '\n Signal: ' + signal
-    err.infos = [deadFork.fork.currentFile.path]
-    this.emit('error', {type:'job', err, job:deadFork.fork.currentFile})
+    const err = {
+      message: 'Processus terminé',
+      stack: '\n Signal: ' + signal,
+      infos: [deadFork.fork.currentFile.path]
+    }
+    deadFork.fork.currentFile.workerType = deadFork.workerType
+    this.emit('error', { type: 'job', err, job: deadFork.fork.currentFile })
     this.stop(this.startResolve);
   }
 }
@@ -121,15 +123,15 @@ Dispatcher.recreateFork = async function (deadFork) {
   this.addPatient(newOverseer)
 }
 
-Dispatcher.cleanDead = function(overseer){
+Dispatcher.cleanDead = function (overseer) {
   let deadFork
   for (var i = 0; i < this.patients.length; i++) {
     var patient = this.patients[i];
     if (patient.fork.signalCode === 'SIGSEGV') {
       deadFork = patient
       this.patients.splice(i, 1)
+      break;
     }
-    break;
   }
   return deadFork
 }

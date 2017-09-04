@@ -9,13 +9,18 @@ const monitoring = {
         error: [],
         warning: [],
         info: []
-    }
+    },
+    workersError:{}
 }
 monitoring.updateLog = async function (type, string) {
     if (type === 'error') {
-        console.log('====================',string)
-        const error = string
-        string = error.message + ': ' + error.stack.split('\n')[1];
+        const error = string.err
+        if (string.hasOwnProperty('job') && string.job.hasOwnProperty('workerType') ) {
+            if (!this.workersError[string.job.workerType]) this.workersError[string.job.workerType] = []
+            this.workersError[string.job.workerType].push(string.job)
+        }
+        if (error.hasOwnProperty('stack')) string = error.message + ': ' + error.stack.split('\n')[1];
+        else string = ''
         if (error.hasOwnProperty('infos') && Array.isArray(error.infos)) {
             for (var i = 0; i < error.infos.length; i++) {
                 var info = error.infos[i];
@@ -23,9 +28,8 @@ monitoring.updateLog = async function (type, string) {
             }
         }
     }
-    console.error(string)
     this.log[type].push(string);
-    await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log));
+    await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log), 'workersError', JSON.stringify(this.workersError));
 };
 
 
