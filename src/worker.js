@@ -9,7 +9,7 @@ process.on('message', msg => {
       const Performer = require(path.join(__dirname, 'worker', msg.worker));
       performer = Object.create(Performer);
       if ('init' in performer) performer.init(msg.options);
-      msg.potentialError = performer.potentialError
+      msg.potentialError = performer.potentialError;
       isInitialized = true;
       msg.isInitialized = true;
       process.send(msg);

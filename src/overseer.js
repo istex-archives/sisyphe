@@ -12,7 +12,7 @@ const Overseer = {};
  */
 Overseer.init = function (workerType, options) {
   this.workerType = workerType;
-  this.options = options
+  this.options = options;
   this.fork = fork(path.join(__dirname, 'worker.js'));
   this.on = this.fork.on.bind(this.fork);
   const initObj = {
@@ -27,17 +27,16 @@ Overseer.init = function (workerType, options) {
     });
     this.on('message', msg => {
       if (msg.isInitialized && msg.type === 'initialize') {
-        this.fork.potentialError = msg.potentialError
-        resolve(this)
+        this.fork.potentialError = msg.potentialError;
+        resolve(this);
       }
       if (msg.type === 'error') {
-        const error = new Error(msg.code)
-        error.stack = msg.stack
-        reject(error)
+        const error = new Error(msg.code);
+        error.stack = msg.stack;
+        reject(error);
       }
     });
   });
-  return this
 };
 
 Overseer.final = function () {
@@ -68,14 +67,13 @@ Overseer.send = function (obj) {
     type: 'job',
     data: obj
   };
-  this.currentData = obj
+  this.currentData = obj;
   return new Promise((resolve, reject) => {
     this.fork.send(msg, null, {}, error => {
-      if (error) return reject(error)
-        this.fork.currentFile = obj
-        resolve()
-    })
-
+      if (error) return reject(error);
+      this.fork.currentFile = obj;
+      resolve();
+    });
   });
 };
 

@@ -1,7 +1,7 @@
 const debounce = require('lodash').debounce;
 const Promise = require('bluebird');
 const EventEmitter = require('events');
-const Overseer = require('./overseer')
+const Overseer = require('./overseer');
 const Dispatcher = Object.create(EventEmitter.prototype);
 
 /**
@@ -80,9 +80,8 @@ Dispatcher.stop = debounce(function (callback) {
 }, 500);
 
 Dispatcher.start = function () {
-  const self = this
   return new Promise(resolve => {
-    this.startResolve = resolve
+    this.startResolve = resolve;
     this.patients.map(overseer => {
       overseer.on('message', msg => {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
@@ -96,45 +95,44 @@ Dispatcher.start = function () {
 
     this.tasks.process(job => {
       return this.getPatient().then(overseer => {
-        return overseer.send(job.data)
-      })
+        return overseer.send(job.data);
+      });
     });
   });
 };
 
 Dispatcher.exitFunction = async function (code, signal) {
-  if (signal === "SIGSEGV") {
-    const deadFork = this.cleanDead()
-    await this.recreateFork(deadFork)
+  if (signal === 'SIGSEGV') {
+    const deadFork = this.cleanDead();
+    await this.recreateFork(deadFork);
     const err = {
       message: 'Processus terminé',
       stack: '\n Signal: ' + signal,
       infos: [deadFork.fork.currentFile.path]
-    }
-    deadFork.fork.currentFile.workerType = deadFork.workerType
-    this.emit('error', { type: 'job', err, job: deadFork.fork.currentFile })
+    };
+    deadFork.fork.currentFile.workerType = deadFork.workerType;
+    this.emit('error', { type: 'job', err, job: deadFork.fork.currentFile });
     this.stop(this.startResolve);
   }
-}
+};
 
 Dispatcher.recreateFork = async function (deadFork) {
-  const newOverseer = await Object.create(Overseer).init(deadFork.workerType, deadFork.options)
-  newOverseer.on('exit', this.exitFunction.bind(this))
-  this.addPatient(newOverseer)
-}
+  const newOverseer = await Object.create(Overseer).init(deadFork.workerType, deadFork.options);
+  newOverseer.on('exit', this.exitFunction.bind(this));
+  this.addPatient(newOverseer);
+};
 
 Dispatcher.cleanDead = function (overseer) {
-  let deadFork
+  let deadFork;
   for (var i = 0; i < this.patients.length; i++) {
     var patient = this.patients[i];
     if (patient.fork.signalCode === 'SIGSEGV') {
-      deadFork = patient
-      this.patients.splice(i, 1)
+      deadFork = patient;
+      this.patients.splice(i, 1);
       break;
     }
   }
-  return deadFork
-}
-
+  return deadFork;
+};
 
 module.exports = Dispatcher;
