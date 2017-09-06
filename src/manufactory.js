@@ -89,7 +89,7 @@ Manufactory.bindDispatchers = function () {
     if (isLastDispatcher) return;
     dispatcher.on('result', msg => {
       if (msg.data.hasOwnProperty('directory') && msg.data.hasOwnProperty('files')) {
-        msg.data.directories.map(directory => dispatcher.tasks.add({ directory}));
+        msg.data.directories.map(directory => dispatcher.tasks.add({ directory }));
         msg.data.files.map(file => this.dispatchers[index + 1].tasks.add(file));
       } else {
         this.dispatchers[index + 1].tasks.add(msg.data);

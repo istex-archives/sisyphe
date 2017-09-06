@@ -42,7 +42,6 @@ const options = {
 const sisyphe = {};
 
 sisyphe.init = async function (workers) {
-  
   this.workers = workers;
   await client.flushallAsync();
   await client.hmsetAsync('monitoring', 'start', Date.now(), 'workers', JSON.stringify(workers));
@@ -74,9 +73,9 @@ sisyphe.launch = async function () {
       await monitoring.updateLog('info', currentWorker + ' has finished');
       for (var i = 0; i < patients.length; i++) {
         var patient = patients[i];
-        if (!patient.signalCode==='SIGSEGV') {
-          await patient.final().catch(err=>err)
-        } 
+        if (!patient.signalCode === 'SIGSEGV') {
+          await patient.final().catch(err => err);
+        }
       }
       patients.map(patient => { // clean forks when finalJob is ending
         patient.fork.kill('SIGTERM');
@@ -89,7 +88,7 @@ sisyphe.launch = async function () {
       }
     });
     dispatcher.on('error', async error => {
-      console.log(error)
+      console.log(error);
       monitoring.updateLog('error', error);
     });
   });
