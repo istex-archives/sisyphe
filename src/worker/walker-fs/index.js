@@ -5,7 +5,7 @@ const path = require('path');
 const walkerFs = {};
 
 walkerFs.init = function (options = {corpusname: 'default'}) {
-  this.now = Date.now();
+  this.now = options.hasOwnProperty('now') ? options.now : new Date().now;
   this.corpusname = options.corpusname;
 };
 walkerFs.doTheJob = function (data, done) {
