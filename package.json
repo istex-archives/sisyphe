@@ -8,7 +8,7 @@
     "test": "mocha && lerna run --ignore *-worker test",
     "coverage": "nyc mocha",
     "updated": "lerna updated",
-    "docs": "js",
+    "docs": "node_modules/.bin/jsdoc -c jsdoc.conf  -R README.md -r .",
     "publish": "lerna publish --skip-npm && git push --follow-tags"
   },
   "author": "",
