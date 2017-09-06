@@ -38,8 +38,8 @@ describe(`${pkg.name}/src/overseer.js`, function () {
     it("shouldn't be initialized and return an error", function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('veryDumbWorker').catch(error => {
-        expect(error).to.be.an.instanceOf(Error)
-        done()
+        expect(error).to.be.an.instanceOf(Error);
+        done();
       });
     });
   });
