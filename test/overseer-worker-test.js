@@ -34,12 +34,12 @@ describe(`${pkg.name}/src/overseer.js`, function () {
         done();
       });
     });
-    
+
     it("shouldn't be initialized and return an error", function (done) {
       const bobTheOverseer = Object.create(Overseer);
       bobTheOverseer.init('veryDumbWorker').catch(error => {
-        expect(error).to.be.an.instanceOf(Error)
-        done()
+        expect(error).to.be.an.instanceOf(Error);
+        done();
       });
     });
   });
@@ -98,7 +98,6 @@ describe(`${pkg.name}/src/overseer.js`, function () {
       });
       bobTheOverseer.on('message', msg => {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
-          console.log(msg);
           expect(msg.type).to.equal('job');
           expect(msg.data).to.deep.equal(data);
           done();

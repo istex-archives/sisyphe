@@ -1,7 +1,7 @@
 const debounce = require('lodash').debounce;
 const Promise = require('bluebird');
 const EventEmitter = require('events');
-
+const Overseer = require('./overseer');
 const Dispatcher = Object.create(EventEmitter.prototype);
 
 /**
@@ -14,8 +14,8 @@ Dispatcher.init = function (task, options) {
   this.patients = [];
   this.waitingQueue = [];
   this.tasks = task;
-  this.tasks.on('failed', (job, err) => {
-    this.emit('error', err);
+  this.tasks.on('failed', (job, error) => {
+    this.emit('error', error);
   });
   this.options = options;
   return this;
@@ -43,11 +43,7 @@ Dispatcher.addPatient = function (overseer) {
  * @returns {Dispatcher}
  */
 Dispatcher.addToWaitingQueue = function (overseer) {
-  try {
-    this.waitingQueue.push(overseer);
-  } catch (err) {
-    this.emit('error', err);
-  }
+  this.waitingQueue.push(overseer);
   return this;
 };
 
@@ -67,16 +63,16 @@ Dispatcher.getPatient = function () {
   });
 };
 
-Dispatcher.stop = debounce(function (callback) {
-  this.tasks.getJobCounts().then(jobCounts => {
-    if (jobCounts.active + jobCounts.waiting === 0) {
-      this.emit('stop', this.patients);
-      return callback();
-    }
-    this.stop();
-  }).catch(err => {
-    this.emit('error', err);
-  });
+Dispatcher.stillJobToDo = debounce(function (callback) {
+  this.tasks
+    .getJobCounts()
+    .then(jobCounts => {
+      const readyToStop = jobCounts.active + jobCounts.waiting === 0;
+      readyToStop ? callback() : this.stillJobToDo();
+    })
+    .catch(error => {
+      this.emit('error', error);
+    });
 }, 500);
 
 Dispatcher.start = function () {
@@ -86,8 +82,13 @@ Dispatcher.start = function () {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
           this.emit('result', msg);
           this.addToWaitingQueue(overseer);
-          this.stop(resolve);
+          this.stillJobToDo(resolve);
         }
+      });
+      overseer.on('exit', (code, signal) => {
+        this.exit(signal).then(() => {
+          this.stillJobToDo(resolve);
+        });
       });
     });
 
@@ -97,6 +98,40 @@ Dispatcher.start = function () {
       });
     });
   });
+};
+
+Dispatcher.exit = function (signal) {
+  if (signal === 'SIGSEGV') {
+    const deadPatient = this.extractDeadPatient();
+    return this.resurrectPatient(deadPatient).then(() => {
+      const error = {
+        message: 'Child process has been stopped',
+        stack: `Signal: ${signal}`,
+        infos: deadPatient.dataProcessing
+      };
+      this.emit('error', error);
+    });
+  }
+  return Promise.resolve();
+};
+
+Dispatcher.resurrectPatient = async function (deadPatient) {
+  const newOverseer = await Object.create(Overseer).init(deadPatient.workerType, deadPatient.options);
+  newOverseer.on('exit', this.exit);
+  this.addPatient(newOverseer);
+};
+
+Dispatcher.extractDeadPatient = function () {
+  let deadPatient;
+  for (var i = 0; i < this.patients.length; i++) {
+    var patient = this.patients[i];
+    if (patient.fork.signalCode === 'SIGSEGV') {
+      deadPatient = patient;
+      this.patients.splice(i, 1);
+      break;
+    }
+  }
+  return deadPatient;
 };
 
 module.exports = Dispatcher;

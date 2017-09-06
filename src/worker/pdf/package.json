@@ -10,11 +10,12 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "pdfjs-dist": "^1.8.510",
+    "popplonode": "git+https://github.com/istex/popplonode.git#v1.2.0",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^3.4.2"
-  }
+    "mocha": "^3.5.0"
+  },
+  "false": {}
 }

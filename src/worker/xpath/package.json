@@ -18,13 +18,13 @@
   "homepage": "https://github.com/istex/sisyphe-xpath#readme",
   "dependencies": {
     "mkdirp": "^0.5.1",
-    "redis": "^2.7.1",
+    "redis": "^2.8.0",
     "xpath-generator": "^1.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "kuler": "0.0.0",
-    "mocha": "^3.4.2",
+    "mocha": "^3.5.0",
     "rimraf": "^2.6.1"
   }
 }
