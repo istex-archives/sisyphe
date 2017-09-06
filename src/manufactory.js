@@ -4,11 +4,16 @@ const Task = require('./task');
 const Promise = require('bluebird');
 const os = require('os');
 
+
+/**
+ * @constructor
+ */
 const Manufactory = {};
 
 /**
+ * Init the manufactory with the path of the corpus and nb of CPU core available
  * @param {Object} [options={ inputPath: '.', numCPUs: os.cpus().length }]
- * @returns {Manufactory}
+ * @return {Manufactory}
  */
 Manufactory.init = function (options = { inputPath: '.', numCPUs: os.cpus().length }) {
   this.workers = [];
@@ -24,7 +29,8 @@ Manufactory.addWorker = function (worker) {
 };
 
 /**
- * @returns {Promise}
+ * Initialize each dispatcher with their Overseer
+ * @return {Promise}
  */
 Manufactory.initializeWorkers = function () {
   return this.createDispatchers().createOverseersForDispatchers().then(() => {
@@ -32,6 +38,12 @@ Manufactory.initializeWorkers = function () {
   });
 };
 
+
+/**
+ * Call the final job on the first Overseer of each dispatcher
+ * @async
+ * @return {Promise}  Promise resolve when final is executed
+ */
 Manufactory.final = function () {
   return Promise.map(this.dispatchers, dispatcher => {
     return dispatcher.patients[0].final();
@@ -39,7 +51,9 @@ Manufactory.final = function () {
 };
 
 /**
- * @returns {Promise}
+ * Launch dispatchers
+ * @async
+ * @return {Promise} Promise resolve whend all task are completed
  */
 Manufactory.start = function () {
   return this.dispatchers[0].tasks.add({ directory: this.pathToAnalyze }).then(() => {
@@ -50,7 +64,8 @@ Manufactory.start = function () {
 };
 
 /**
- * @returns {Manufactory}
+ * Create Dispatchers with the list of workers
+ * @return {Manufactory}
  */
 Manufactory.createDispatchers = function () {
   this.dispatchers = this.workers.map(worker => {
@@ -66,7 +81,8 @@ Manufactory.createDispatchers = function () {
 };
 
 /**
- * @returns {Promise}
+ * For each dispatchers, one overseer is add per CPU
+ * @return {Promise}
  */
 Manufactory.createOverseersForDispatchers = function () {
   return Promise.map(this.dispatchers, dispatcher => {
@@ -81,6 +97,7 @@ Manufactory.createOverseersForDispatchers = function () {
 };
 
 /**
+ * Create the flow between dispatchers
  * @returns {Manufactory}
  */
 Manufactory.bindDispatchers = function () {

@@ -2,13 +2,21 @@ const fork = require('child_process').fork;
 const path = require('path');
 const Promise = require('bluebird');
 
-const Overseer = {};
-
-// TODO ajouter un listener sur exit lors d'un kill du worker et lancer un re-fork !
 
 /**
- * @param {any} WorkerType
- * @returns Promise
+ * @constructor
+ */
+const Overseer = {};
+
+/**
+ * Init the overseer and his worker
+ * @param {String} workerType
+ * @param {Object} options
+ * @param {Object} options.corpusname Name of the corpus
+ * @param {Object} options.configDir Directory of the config
+ * @param {Object} options.inputPath Root of jobs
+ * @param {Object} options.numCpus How many Cpus is available
+ * @return {Promise}
  */
 Overseer.init = function (workerType, options) {
   this.workerType = workerType;
@@ -39,6 +47,11 @@ Overseer.init = function (workerType, options) {
   });
 };
 
+
+/**
+ * Launch the final job of the worker
+ * @return {Promise}  Empty promise
+ */
 Overseer.final = function () {
   const finalObj = {
     type: 'final'
@@ -59,8 +72,9 @@ Overseer.final = function () {
 };
 
 /**
- * @param {any} obj
- * @returns Promise
+ * Send a job to the worker
+ * @param {Object} obj Task to send in worker
+ * @return {Promise}
  */
 Overseer.send = function (obj) {
   const msg = {

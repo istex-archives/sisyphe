@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/task.js - Documentation</title>
+    <title>docs/scripts/fulltext-search-ui.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">src/task.js</h1>
+    <h1 class="page-title">docs/scripts/fulltext-search-ui.js</h1>
     
 
     
@@ -37,65 +37,95 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const Queue = require('bull');
+            <pre class="prettyprint source linenums"><code>window.SearcherDisplay = (function($) {
+    /**
+     * This class provides support for displaying quick search text results to users.
+     */
+    function SearcherDisplay() { }
 
-/**
- * @constructor
- */
-const Task = {};
+    SearcherDisplay.prototype.init = function() {
+        this._displayQuickSearch();
+    };
 
-/**
- * Init all queue for redis
- * @param {Object} options  Options for redis
- * @param {Object} options.name  Name of the redis queue
- * @param {Object} options.stringRedisConnection  Url to redis
- * @return {Task}
- */
-Task.init = function (options) {
-  this.name = options.name;
-  if (options.hasOwnProperty('stringRedisConnection')) {
-    this.queue = new Queue(options.name, options.stringRedisConnection);
-  } else {
-    this.queue = new Queue(options.name);
-  }
-  return this;
-};
+    /**
+     * This method creates the quick text search entry in navigation menu and wires all required events.
+     */
+    SearcherDisplay.prototype._displayQuickSearch = function() {
+            var quickSearch = $(document.createElement("iframe")),
+                   body = $("body"),
+                   self = this;
 
-/**
- * Add a task in redis
- * @param {Object} obj Object representing a task
- * @return {Promise}
- */
-Task.add = function (obj) {
-  return this.queue.add(obj, {removeOnComplete: true});
-};
+            quickSearch.attr("src", "quicksearch.html");
+            quickSearch.css("width", "0px");
+            quickSearch.css("height", "0px");
 
-/**
- * Process all tasks in redis
- * @param  {callback} functionProcess Callback to get job
- */
-Task.process = function (functionProcess) {
-  this.queue.process(functionProcess);
-};
+            body.append(quickSearch);
 
-/**
- * Get number of waiting, failed and completed tasks from redis
- * @returns Promise
- */
-Task.getJobCounts = function () {
-  return this.queue.getJobCounts();
-};
+            $(window).on("message", function(msg) {
+                var msgData = msg.originalEvent.data;
 
+                if (msgData.msgid != "docstrap.quicksearch.done") {
+                    return;
+                }
 
-/**
- * Bind event on queue
- * @return {Queue}  Bull queue
- */
-Task.on = function () {
-  return this.queue.on.call(this.queue, ...arguments);
-};
+                var results = msgData.results || [];
 
-module.exports = Task;
+                self._displaySearchResults(results);
+            });
+
+            function startSearch() {
+              var searchTerms = $('#search-input').prop("value");
+              if (searchTerms) {
+                quickSearch[0].contentWindow.postMessage({
+                  "searchTerms": searchTerms,
+                  "msgid": "docstrap.quicksearch.start"
+                }, "*");
+              }
+            }
+
+            $('#search-input').on('keyup', function(evt) {
+              if (evt.keyCode != 13) {
+                return;
+              }
+              startSearch();
+              return false;
+            });
+            $('#search-submit').on('click', function() {
+              startSearch();
+              return false;
+            });
+    };
+
+    /**
+     * This method displays the quick text search results in a modal dialog.
+     */
+    SearcherDisplay.prototype._displaySearchResults = function(results) {
+            var resultsHolder = $($("#searchResults").find(".modal-body")),
+                  fragment = document.createDocumentFragment(),
+                  resultsList = document.createElement("ul");
+
+            resultsHolder.empty();
+
+            for (var idx = 0; idx &lt; results.length; idx++) {
+                var result = results[idx],
+                       item = document.createElement("li"),
+                       link = document.createElement("a");
+
+                link.href = result.id;
+                link.innerHTML = result.title;
+
+                item.appendChild(link)
+                resultsList.appendChild(item);
+            }
+
+            fragment.appendChild(resultsList);
+            resultsHolder.append(fragment);
+
+            $("#searchResults").modal({"show": true});
+    };
+
+    return new SearcherDisplay();
+})($);
 </code></pre>
         </article>
     </section>

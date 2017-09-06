@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: sisyphe</title>
+	<title>Documentation Class: Overseer</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -65,13 +65,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: sisyphe</h1>
+	<h1 class="page-title">Class: Overseer</h1>
 <section>
 
 <header>
     
         <h2>
-        sisyphe
+        Overseer
         </h2>
         
     
@@ -84,16 +84,12 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="sisyphe"><span class="type-signature"></span>new sisyphe()</h4>
+    <h4 class="name" id="Overseer"><span class="type-signature"></span>new Overseer()</h4>
     
     
 </dt>
 <dd>
 
-    
-    <div class="description">
-        Sisyphe is a generic NodeJS recursive folder analyser terminal application & a (lerna) git monorepo.
-    </div>
     
 
     
@@ -180,7 +176,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".init"><span class="type-signature">&lt;static> </span>init(workers)</h4>
+    <h4 class="name" id=".final"><span class="type-signature">&lt;static> </span>final()</h4>
     
     
 </dt>
@@ -188,7 +184,109 @@
 
     
     <div class="description">
-        Init sisyphe. It flush redis, create all workers and initialize the monitoring
+        Launch the final job of the worker
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    Empty promise
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".init"><span class="type-signature">&lt;static> </span>init(workerType, options)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Init the overseer and his worker
     </div>
     
 
@@ -223,13 +321,13 @@
 
         <tr>
             
-                <td class="name"><code>workers</code></td>
+                <td class="name"><code>workerType</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;String></span>
+<span class="param-type">String</span>
 
 
 
@@ -240,7 +338,153 @@
 
             
 
-            <td class="description last">A list of workers (modules)</td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>corpusname</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Name of the corpus</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>configDir</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Directory of the config</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>inputPath</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Root of jobs</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>numCpus</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">How many Cpus is available</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -303,10 +547,6 @@
     <h5>Returns:</h5>
     
             
-<div class="param-desc">
-    Empty Promise when initiation completes
-</div>
-
 
 
 <dl>
@@ -332,7 +572,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".launch"><span class="type-signature">&lt;static> </span>launch()</h4>
+    <h4 class="name" id=".send"><span class="type-signature">&lt;static> </span>send(obj)</h4>
     
     
 </dt>
@@ -340,7 +580,7 @@
 
     
     <div class="description">
-        It launch sisyphe manage worker and catch all errors from the application to debug
+        Send a job to the worker
     </div>
     
 
@@ -349,6 +589,56 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>obj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Task to send in worker</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -405,10 +695,6 @@
     <h5>Returns:</h5>
     
             
-<div class="param-desc">
-    description
-</div>
-
 
 
 <dl>
@@ -417,7 +703,7 @@
     </dt>
     <dd>
         
-<span class="param-type">type</span>
+<span class="param-type">Promise</span>
 
 
 

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: sisyphe</title>
+	<title>Documentation Class: Manufactory</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -65,13 +65,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: sisyphe</h1>
+	<h1 class="page-title">Class: Manufactory</h1>
 <section>
 
 <header>
     
         <h2>
-        sisyphe
+        Manufactory
         </h2>
         
     
@@ -84,16 +84,12 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="sisyphe"><span class="type-signature"></span>new sisyphe()</h4>
+    <h4 class="name" id="Manufactory"><span class="type-signature"></span>new Manufactory()</h4>
     
     
 </dt>
 <dd>
 
-    
-    <div class="description">
-        Sisyphe is a generic NodeJS recursive folder analyser terminal application & a (lerna) git monorepo.
-    </div>
     
 
     
@@ -180,7 +176,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".init"><span class="type-signature">&lt;static> </span>init(workers)</h4>
+    <h4 class="name" id=".bindDispatchers"><span class="type-signature">&lt;static> </span>bindDispatchers()</h4>
     
     
 </dt>
@@ -188,7 +184,403 @@
 
     
     <div class="description">
-        Init sisyphe. It flush redis, create all workers and initialize the monitoring
+        Create the flow between dispatchers
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Manufactory.html">Manufactory</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".createDispatchers"><span class="type-signature">&lt;static> </span>createDispatchers()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Create Dispatchers with the list of workers
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Manufactory.html">Manufactory</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".createOverseersForDispatchers"><span class="type-signature">&lt;static> </span>createOverseersForDispatchers()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        For each dispatchers, one overseer is add per CPU
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".final"><span class="type-signature">&lt;async, static> </span>final()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Call the final job on the first Overseer of each dispatcher
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    Promise resolve when final is executed
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".init"><span class="type-signature">&lt;static> </span>init( [options])</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Init the manufactory with the path of the corpus and nb of CPU core available
     </div>
     
 
@@ -211,7 +603,11 @@
         <th>Type</th>
 
         
+        <th>Argument</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -223,13 +619,13 @@
 
         <tr>
             
-                <td class="name"><code>workers</code></td>
+                <td class="name"><code>options</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;String></span>
+<span class="param-type">Object</span>
 
 
 
@@ -237,10 +633,26 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
             
 
-            <td class="description last">A list of workers (modules)</td>
+            
+                <td class="default">
+                
+                    { inputPath: '.', numCPUs: os.cpus().length }
+                
+                </td>
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -303,10 +715,104 @@
     <h5>Returns:</h5>
     
             
-<div class="param-desc">
-    Empty Promise when initiation completes
-</div>
 
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Manufactory.html">Manufactory</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".initializeWorkers"><span class="type-signature">&lt;static> </span>initializeWorkers()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Initialize each dispatcher with their Overseer
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
 
 
 <dl>
@@ -332,7 +838,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".launch"><span class="type-signature">&lt;static> </span>launch()</h4>
+    <h4 class="name" id=".start"><span class="type-signature">&lt;async, static> </span>start()</h4>
     
     
 </dt>
@@ -340,7 +846,7 @@
 
     
     <div class="description">
-        It launch sisyphe manage worker and catch all errors from the application to debug
+        Launch dispatchers
     </div>
     
 
@@ -406,7 +912,7 @@
     
             
 <div class="param-desc">
-    description
+    Promise resolve whend all task are completed
 </div>
 
 
@@ -417,7 +923,7 @@
     </dt>
     <dd>
         
-<span class="param-type">type</span>
+<span class="param-type">Promise</span>
 
 
 

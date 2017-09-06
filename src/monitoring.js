@@ -2,8 +2,11 @@ const bluebird = require('bluebird');
 const redis = require('redis');
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
-
 const client = redis.createClient();
+
+/**
+ * @constructor
+ */
 const monitoring = {
   log: {
     error: [],
@@ -12,6 +15,13 @@ const monitoring = {
   },
   workersError: {}
 };
+
+
+/**
+ * Put all info in redis for monitoring
+ * @param  {string} type   type of log (error, infos...)
+ * @param  {string} string string of the log or error
+ */
 monitoring.updateLog = async function (type, string) {
   if (type === 'error') {
     const error = string.err;

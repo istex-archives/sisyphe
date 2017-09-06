@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dispatcher.html">Dispatcher</a><ul class='methods'><li data-type='method'><a href="Dispatcher.html#.addPatient">addPatient</a></li><li data-type='method'><a href="Dispatcher.html#.addToWaitingQueue">addToWaitingQueue</a></li><li data-type='method'><a href="Dispatcher.html#.cleanDead">cleanDead</a></li><li data-type='method'><a href="Dispatcher.html#.exitFunction">exitFunction</a></li><li data-type='method'><a href="Dispatcher.html#.getPatient">getPatient</a></li><li data-type='method'><a href="Dispatcher.html#.init">init</a></li><li data-type='method'><a href="Dispatcher.html#.recreateFork">recreateFork</a></li><li data-type='method'><a href="Dispatcher.html#.start">start</a></li></ul></li><li><a href="sisyphe.html">sisyphe</a><ul class='methods'><li data-type='method'><a href="sisyphe.html#.init">init</a></li><li data-type='method'><a href="sisyphe.html#.launch">launch</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dispatcher.html">Dispatcher</a><ul class='methods'><li data-type='method'><a href="Dispatcher.html#.addPatient">addPatient</a></li><li data-type='method'><a href="Dispatcher.html#.addToWaitingQueue">addToWaitingQueue</a></li><li data-type='method'><a href="Dispatcher.html#.cleanDead">cleanDead</a></li><li data-type='method'><a href="Dispatcher.html#.exitFunction">exitFunction</a></li><li data-type='method'><a href="Dispatcher.html#.getPatient">getPatient</a></li><li data-type='method'><a href="Dispatcher.html#.init">init</a></li><li data-type='method'><a href="Dispatcher.html#.recreateFork">recreateFork</a></li><li data-type='method'><a href="Dispatcher.html#.start">start</a></li></ul></li><li><a href="Manufactory.html">Manufactory</a><ul class='methods'><li data-type='method'><a href="Manufactory.html#.bindDispatchers">bindDispatchers</a></li><li data-type='method'><a href="Manufactory.html#.createDispatchers">createDispatchers</a></li><li data-type='method'><a href="Manufactory.html#.createOverseersForDispatchers">createOverseersForDispatchers</a></li><li data-type='method'><a href="Manufactory.html#.final">final</a></li><li data-type='method'><a href="Manufactory.html#.init">init</a></li><li data-type='method'><a href="Manufactory.html#.initializeWorkers">initializeWorkers</a></li><li data-type='method'><a href="Manufactory.html#.start">start</a></li></ul></li><li><a href="monitoring.html">monitoring</a><ul class='methods'><li data-type='method'><a href="monitoring.html#.updateLog">updateLog</a></li></ul></li><li><a href="Overseer.html">Overseer</a><ul class='methods'><li data-type='method'><a href="Overseer.html#.final">final</a></li><li data-type='method'><a href="Overseer.html#.init">init</a></li><li data-type='method'><a href="Overseer.html#.send">send</a></li></ul></li><li><a href="sisyphe.html">sisyphe</a><ul class='methods'><li data-type='method'><a href="sisyphe.html#.init">init</a></li><li data-type='method'><a href="sisyphe.html#.launch">launch</a></li></ul></li><li><a href="Task.html">Task</a><ul class='methods'><li data-type='method'><a href="Task.html#.add">add</a></li><li data-type='method'><a href="Task.html#.getJobCounts">getJobCounts</a></li><li data-type='method'><a href="Task.html#.init">init</a></li><li data-type='method'><a href="Task.html#.on">on</a></li><li data-type='method'><a href="Task.html#.process">process</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -50,8 +50,9 @@ const Dispatcher = Object.create(EventEmitter.prototype);
 
 /**
  * Init all variable of Dispatcher
- * @param {any} task
- * @param {any} options
+ * @param {Task} task Instance of the Task file to use
+ * @param {options} options
+ * @param {string} options.name Type of worker
  * @return {Dispatcher}
  */
 Dispatcher.init = function (task, options) {
@@ -100,7 +101,6 @@ Dispatcher.addToWaitingQueue = function (overseer) {
 
 /**
  * Remove an Overseer of the waitingQueue to send it when it's available
- * @param {any} done callback (overseer)
  * @return {Promise}
  */
 Dispatcher.getPatient = function () {
@@ -119,9 +119,7 @@ Dispatcher.getPatient = function () {
 /**
  * Debounce function to stop the execution of the dispather. Stop is reach when
  * there is no jobs (active and waiting) in 500ms
- *
- * @param  {type} callback description
- * @return {type}          description
+ * @param  {callback} callback callback to resolve when there is no job in 500ms
  */
 Dispatcher.stop = debounce(function (callback) {
   this.tasks.getJobCounts().then(jobCounts => {
@@ -139,7 +137,6 @@ Dispatcher.stop = debounce(function (callback) {
 
 /**
  * Start the execution of the dispatcher. It process jobs until there is no task
- *
  * @return {Promise}  empty Promise
  */
 Dispatcher.start = function () {
@@ -167,10 +164,9 @@ Dispatcher.start = function () {
 
 /**
  * Function executed when a exit signal is catch from forks
- *
- * @param  {number} code   the exit code if the child exited on its own.
- * @param  {string} signal the signal by which the child process was terminated.
- * @return {Promise}     empty Promise
+ * @param  {number} code   The exit code if the child exited on its own.
+ * @param  {string} signal The signal by which the child process was terminated.
+ * @return {Promise}     Empty Promise
  */
 Dispatcher.exitFunction = async function (code, signal) {
   if (signal === 'SIGSEGV') {
@@ -190,9 +186,7 @@ Dispatcher.exitFunction = async function (code, signal) {
 
 /**
  * Recreate a fork when an other is dead
- *
  * @param  {Overseer} deadFork the Overseer that has been killed
- * @return {}          empty
  */
 Dispatcher.recreateFork = async function (deadFork) {
   const newOverseer = await Object.create(Overseer).init(deadFork.workerType, deadFork.options);
@@ -204,7 +198,6 @@ Dispatcher.recreateFork = async function (deadFork) {
 
 /**
  * Search an deadFork in the list of fork and return it
- *
  * @return {Overseer} A dead fork
  */
 Dispatcher.cleanDead = function () {
@@ -233,7 +226,7 @@ module.exports = Dispatcher;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Mon Sep 04 2017 17:16:08 GMT+0200 (CEST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Wed Sep 06 2017 11:15:16 GMT+0200 (CEST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

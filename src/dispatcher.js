@@ -11,8 +11,9 @@ const Dispatcher = Object.create(EventEmitter.prototype);
 
 /**
  * Init all variable of Dispatcher
- * @param {any} task
- * @param {any} options
+ * @param {Task} task Instance of the Task file to use
+ * @param {options} options
+ * @param {string} options.name Type of worker
  * @return {Dispatcher}
  */
 Dispatcher.init = function (task, options) {
@@ -61,7 +62,6 @@ Dispatcher.addToWaitingQueue = function (overseer) {
 
 /**
  * Remove an Overseer of the waitingQueue to send it when it's available
- * @param {any} done callback (overseer)
  * @return {Promise}
  */
 Dispatcher.getPatient = function () {
@@ -80,9 +80,7 @@ Dispatcher.getPatient = function () {
 /**
  * Debounce function to stop the execution of the dispather. Stop is reach when
  * there is no jobs (active and waiting) in 500ms
- *
- * @param  {type} callback description
- * @return {type}          description
+ * @param  {callback} callback callback to resolve when there is no job in 500ms
  */
 Dispatcher.stop = debounce(function (callback) {
   this.tasks.getJobCounts().then(jobCounts => {
@@ -100,7 +98,6 @@ Dispatcher.stop = debounce(function (callback) {
 
 /**
  * Start the execution of the dispatcher. It process jobs until there is no task
- *
  * @return {Promise}  empty Promise
  */
 Dispatcher.start = function () {
@@ -128,10 +125,9 @@ Dispatcher.start = function () {
 
 /**
  * Function executed when a exit signal is catch from forks
- *
- * @param  {number} code   the exit code if the child exited on its own.
- * @param  {string} signal the signal by which the child process was terminated.
- * @return {Promise}     empty Promise
+ * @param  {number} code   The exit code if the child exited on its own.
+ * @param  {string} signal The signal by which the child process was terminated.
+ * @return {Promise}     Empty Promise
  */
 Dispatcher.exitFunction = async function (code, signal) {
   if (signal === 'SIGSEGV') {
@@ -151,9 +147,7 @@ Dispatcher.exitFunction = async function (code, signal) {
 
 /**
  * Recreate a fork when an other is dead
- *
  * @param  {Overseer} deadFork the Overseer that has been killed
- * @return {}          empty
  */
 Dispatcher.recreateFork = async function (deadFork) {
   const newOverseer = await Object.create(Overseer).init(deadFork.workerType, deadFork.options);
@@ -165,7 +159,6 @@ Dispatcher.recreateFork = async function (deadFork) {
 
 /**
  * Search an deadFork in the list of fork and return it
- *
  * @return {Overseer} A dead fork
  */
 Dispatcher.cleanDead = function () {
