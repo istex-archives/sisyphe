@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
+const bluebird = require('bluebird');
 const program = require('commander');
 const pkg = require('./package.json');
 const path = require('path');
 const Manufactory = require('./src/manufactory');
+const monitoring = require('./src/monitoring');
 const numCPUs = require('os').cpus().length;
 const redis = require('redis');
-const bluebird = require('bluebird');
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 const client = redis.createClient();
-
 program
   .version(pkg.version)
   .usage('[options] <path>')
@@ -42,11 +42,6 @@ const options = {
 const sisyphe = {};
 
 sisyphe.init = async function (workers) {
-  this.log = {
-    error: [],
-    warning: [],
-    info: []
-  };
   this.workers = workers;
   await client.flushallAsync();
   await client.hmsetAsync('monitoring', 'start', Date.now(), 'workers', JSON.stringify(workers));
@@ -56,7 +51,7 @@ sisyphe.init = async function (workers) {
     this.enterprise.addWorker(worker);
   });
   await this.enterprise.initializeWorkers();
-  await this.updateLog('info', 'Initialisation OK');
+  await monitoring.updateLog('info', 'Initialisation OK');
   if (!silent) console.log('┌ All workers have been initialized');
 };
 
@@ -75,37 +70,33 @@ sisyphe.launch = async function () {
       const currentWorker = patients[0].workerType;
       const lastWorker = this.workers[this.workers.length - 1];
       if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
-      await this.updateLog('info', currentWorker + ' has finished');
-      await patients[0].final().catch(err => this.updateLog('error', err)); // execute finaljob
+      await monitoring.updateLog('info', currentWorker + ' has finished');
+      for (var i = 0; i < patients.length; i++) {
+        var patient = patients[i];
+        if (!patient.signalCode === 'SIGSEGV') {
+          await patient.final().catch(err => err);
+        }
+      }
       patients.map(patient => { // clean forks when finalJob is ending
         patient.fork.kill('SIGTERM');
       });
       if (currentWorker === lastWorker) {
         if (!silent) console.log('└ All workers have completed their work');
-        await this.updateLog('info', 'All workers have completed their work');
+        await monitoring.updateLog('info', 'All workers have completed their work');
         await client.hmsetAsync('monitoring', 'end', Date.now());
         process.exit(0);
       }
     });
     dispatcher.on('error', async error => {
-      console.error(error);
-      this.updateLog('error', error);
+      console.log(error);
+      monitoring.updateLog('error', error);
     });
   });
   await this.enterprise.start();
 };
 
-sisyphe.updateLog = async function (type, string) {
-  if (type === 'error') {
-    console.error(string);
-    string = string.message + ': ' + string.stack.split('\n')[1];
-  }
-  this.log[type].push(string);
-  await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log));
-};
-
 sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(() => {
   return sisyphe.launch();
 }).catch(err => {
-  sisyphe.updateLog('error', err);
+  monitoring.updateLog('error', err);
 });

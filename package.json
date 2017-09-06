@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "lerna bootstrap",
     "test": "mocha && lerna run --ignore *-worker test",
-    "coverage": "nyc mocha",
+    "coverage": "nyc --reporter=text --reporter=html mocha",
     "updated": "lerna updated",
     "publish": "lerna publish --skip-npm && git push --follow-tags"
   },

@@ -1,51 +1,52 @@
 'use strict';
 
 const bluebird = require('bluebird');
-const cp = require('child_process');
-
+const Popplonode = require('popplonode');
 const sisyphePdf = {};
 
-sisyphePdf.doTheJob = function (data, next) {
-  if (data.mimetype === 'application/pdf') {
-    bluebird.join(this.getPdfMetaData(data.path), this.getPdfWordCount(data.path), (metadata, pdfWordCount) => {
-      data.pdfMetadata = metadata;
-      data.pdfPageTotal = +metadata.Pages;
-      data.pdfWordCount = +pdfWordCount;
-      data.pdfWordByPage = ~~(data.pdfWordCount / data.pdfPageTotal);
-      next(null, data);
-    }).catch((error) => {
-      data.pdfError = JSON.stringify(error);
-      next(null, data);
+sisyphePdf.init = function (options) {
+  this.popplonode = new Popplonode();
+};
+sisyphePdf.doTheJob = function (docObject, next) {
+  if (docObject.mimetype === 'application/pdf') {
+    this.popplonode.load(docObject.path);
+    const metadata = this.popplonode.getMetadata();
+    this.getPdfWordCount(metadata.TotalNbPages).then(nbWords => {
+      docObject.pdfMetadata = metadata;
+      docObject.pdfPageTotal = +metadata.TotalNbPages;
+      docObject.pdfWordCount = +nbWords;
+      docObject.pdfWordByPage = ~~(docObject.pdfWordCount / docObject.pdfPageTotal);
+      next(null, docObject);
     });
   } else {
-    next(null, data);
+    next(null, docObject);
   }
 };
 
-sisyphePdf.getPdfMetaData = function (filePath) {
-  return new Promise(function (resolve, reject) {
-    cp.exec('pdfinfo ' + filePath, function (error, stdout, stderr) {
-      const metadataObject = {};
-      stdout.split('\n').map(meta => {
-        const metadataLine = meta.split(': ').map(m => m.trim());
-        if (metadataLine[0] !== '') metadataObject[metadataLine[0]] = metadataLine[1];
+sisyphePdf.getPdfWordCount = async function (TotalNbPages) {
+  const promises = [];
+  for (var i = 0; i < TotalNbPages; i++) {
+    promises.push(new Promise((resolve, reject) => {
+      this.popplonode.getTextFromPage(i, function (err, data) {
+        if (err) return reject(err);
+        resolve(data);
       });
-      metadataObject.PDFFormatVersion = metadataObject['PDF version'];
-      delete metadataObject['PDF version'];
-      resolve(metadataObject);
+    }));
+  }
+  return bluebird.map(promises, function (data) {
+    return data.split(/\s+/).length;
+  }, {concurrency: 3}).then(data => {
+    let totalWords = 0;
+    data.map(data => {
+      totalWords += data;
+      return totalWords;
     });
-  });
-};
-
-sisyphePdf.getPdfWordCount = function (filePath) {
-  return new Promise(function (resolve, reject) {
-    cp.exec('pdftotext "' + filePath + '" -', function (error, stdout, stderr) {
-      if (stderr) {
-        const errorObject = {}; // if an error occur he is transform to an object
-        stderr.split('\n').map(error => errorObject[error.split(': ')[0]] = error.split(': ')[1]);
-        return reject(errorObject);
+    return totalWords;
+  }).catch(err => {
+    process.send({
+      err: {
+        message: err.message
       }
-      resolve(stdout.split(/\s+/).length);
     });
   });
 };

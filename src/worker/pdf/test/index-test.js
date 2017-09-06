@@ -15,6 +15,12 @@ const dataInput = {
   size: 123456
 };
 
+beforeEach(function() {
+  console.log('init');
+  return sisyphePdf.init();
+});
+
+
 describe('doTheJob', function () {
   it('should add some info about the PDF', function (done) {
     sisyphePdf.doTheJob(dataInput, (error, dataOutput) => {
@@ -26,24 +32,18 @@ describe('doTheJob', function () {
       expect(dataOutput).to.have.property('pdfWordByPage');
       expect(dataOutput.pdfWordByPage).to.be.a('number');
       expect(dataOutput).to.have.property('pdfMetadata');
+      expect(dataOutput.pdfMetadata).to.have.property('PDFFormatVersion');
+      expect(dataOutput.pdfMetadata).to.have.property('Title');
+      expect(dataOutput.pdfMetadata).to.have.property('Author');
       done();
     });
   })
 });
 
-describe('getPdfMetaData', function () {
-  it("should return a promise with the PDF's metadata", function () {
-    return sisyphePdf.getPdfMetaData(dataInput.path).then((pdfMetadata) => {
-      expect(pdfMetadata).to.have.property('PDFFormatVersion');
-      expect(pdfMetadata).to.have.property('Title');
-      expect(pdfMetadata).to.have.property('Author');
-    })
-  })
-});
-
 describe('getPdfWordCount', function () {
   it("should return a promise with the total number of words in the pdf", function () {
-    return sisyphePdf.getPdfWordCount(dataInput.path).then((pdfWordCount) => {
+    sisyphePdf.popplonode.load(dataInput.path);
+    return sisyphePdf.getPdfWordCount(1).then((pdfWordCount) => {
       expect(pdfWordCount).to.be.a('number');
       expect(pdfWordCount).to.equal(574);
     })

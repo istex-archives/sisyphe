@@ -12,6 +12,7 @@ Task.init = function (options) {
   } else {
     this.queue = new Queue(options.name);
   }
+
   return this;
 };
 

@@ -33,7 +33,6 @@ Manufactory.initializeWorkers = function () {
 };
 
 Manufactory.final = function () {
-  console.log('final');
   return Promise.map(this.dispatchers, dispatcher => {
     return dispatcher.patients[0].final();
   });
