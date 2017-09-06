@@ -14,6 +14,7 @@ Overseer.init = function (workerType, options) {
   this.workerType = workerType;
   this.options = options;
   this.fork = fork(path.join(__dirname, 'worker.js'));
+  this.dataProcessing = {};
   this.on = this.fork.on.bind(this.fork);
   const initObj = {
     type: 'initialize',
@@ -27,7 +28,6 @@ Overseer.init = function (workerType, options) {
     });
     this.on('message', msg => {
       if (msg.isInitialized && msg.type === 'initialize') {
-        this.fork.potentialError = msg.potentialError;
         resolve(this);
       }
       if (msg.type === 'error') {
@@ -67,11 +67,11 @@ Overseer.send = function (obj) {
     type: 'job',
     data: obj
   };
-  this.currentData = obj;
+
   return new Promise((resolve, reject) => {
     this.fork.send(msg, null, {}, error => {
       if (error) return reject(error);
-      this.fork.currentFile = obj;
+      this.dataProcessing = obj;
       resolve();
     });
   });

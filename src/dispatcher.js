@@ -14,8 +14,8 @@ Dispatcher.init = function (task, options) {
   this.patients = [];
   this.waitingQueue = [];
   this.tasks = task;
-  this.tasks.on('failed', (job, err) => {
-    this.emit('error', err);
+  this.tasks.on('failed', (job, error) => {
+    this.emit('error', error);
   });
   this.options = options;
   return this;
@@ -43,11 +43,7 @@ Dispatcher.addPatient = function (overseer) {
  * @returns {Dispatcher}
  */
 Dispatcher.addToWaitingQueue = function (overseer) {
-  try {
-    this.waitingQueue.push(overseer);
-  } catch (err) {
-    this.emit('error', err);
-  }
+  this.waitingQueue.push(overseer);
   return this;
 };
 
@@ -67,30 +63,33 @@ Dispatcher.getPatient = function () {
   });
 };
 
-Dispatcher.stop = debounce(function (callback) {
-  this.tasks.getJobCounts().then(jobCounts => {
-    if (jobCounts.active + jobCounts.waiting === 0) {
-      this.emit('stop', this.patients);
-      return callback();
-    }
-    this.stop();
-  }).catch(err => {
-    this.emit('error', err);
-  });
+Dispatcher.stillJobToDo = debounce(function (callback) {
+  this.tasks
+    .getJobCounts()
+    .then(jobCounts => {
+      const readyToStop = jobCounts.active + jobCounts.waiting === 0;
+      readyToStop ? callback() : this.stillJobToDo();
+    })
+    .catch(error => {
+      this.emit('error', error);
+    });
 }, 500);
 
 Dispatcher.start = function () {
   return new Promise(resolve => {
-    this.startResolve = resolve;
     this.patients.map(overseer => {
       overseer.on('message', msg => {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
           this.emit('result', msg);
           this.addToWaitingQueue(overseer);
-          this.stop(resolve);
+          this.stillJobToDo(resolve);
         }
       });
-      overseer.on('exit', this.exitFunction.bind(this));
+      overseer.on('exit', (code, signal) => {
+        this.exit(signal).then(() => {
+          this.stillJobToDo(resolve);
+        });
+      });
     });
 
     this.tasks.process(job => {
@@ -101,38 +100,38 @@ Dispatcher.start = function () {
   });
 };
 
-Dispatcher.exitFunction = async function (code, signal) {
+Dispatcher.exit = function (signal) {
   if (signal === 'SIGSEGV') {
-    const deadFork = this.cleanDead();
-    await this.recreateFork(deadFork);
-    const err = {
-      message: 'Processus terminé',
-      stack: '\n Signal: ' + signal,
-      infos: [deadFork.fork.currentFile.path]
-    };
-    deadFork.fork.currentFile.workerType = deadFork.workerType;
-    this.emit('error', { type: 'job', err, job: deadFork.fork.currentFile });
-    this.stop(this.startResolve);
+    const deadPatient = this.extractDeadPatient();
+    return this.resurrectPatient(deadPatient).then(() => {
+      const error = {
+        message: 'Child process has been stopped',
+        stack: `Signal: ${signal}`,
+        infos: deadPatient.dataProcessing
+      };
+      this.emit('error', error);
+    });
   }
+  return Promise.resolve();
 };
 
-Dispatcher.recreateFork = async function (deadFork) {
-  const newOverseer = await Object.create(Overseer).init(deadFork.workerType, deadFork.options);
-  newOverseer.on('exit', this.exitFunction.bind(this));
+Dispatcher.resurrectPatient = async function (deadPatient) {
+  const newOverseer = await Object.create(Overseer).init(deadPatient.workerType, deadPatient.options);
+  newOverseer.on('exit', this.exit);
   this.addPatient(newOverseer);
 };
 
-Dispatcher.cleanDead = function (overseer) {
-  let deadFork;
+Dispatcher.extractDeadPatient = function () {
+  let deadPatient;
   for (var i = 0; i < this.patients.length; i++) {
     var patient = this.patients[i];
     if (patient.fork.signalCode === 'SIGSEGV') {
-      deadFork = patient;
+      deadPatient = patient;
       this.patients.splice(i, 1);
       break;
     }
   }
-  return deadFork;
+  return deadPatient;
 };
 
 module.exports = Dispatcher;

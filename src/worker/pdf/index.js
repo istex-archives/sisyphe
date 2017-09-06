@@ -9,7 +9,6 @@ const sisyphePdf = {};
 
 sisyphePdf.init = function(options) {
   this.popplonode = new Popplonode()
-  this.potentialError = 'Something went wrong'
 }
 sisyphePdf.doTheJob = function(docObject, next) {
   if (docObject.mimetype === 'application/pdf') {
