@@ -65,10 +65,10 @@ Dispatcher.getPatient = function () {
 
 Dispatcher.stillJobToDo = debounce(function (callback) {
   this.tasks
-    .getJobCounts()
-    .then(jobCounts => {
-      const readyToStop = jobCounts.active + jobCounts.waiting === 0;
-      readyToStop ? callback() : this.stillJobToDo();
+  .getJobCounts()
+  .then(jobCounts => {
+    const readyToStop = jobCounts.active + jobCounts.waiting === 0;
+    readyToStop ? callback() : this.stillJobToDo();
     })
     .catch(error => {
       this.emit('error', error);
@@ -77,6 +77,7 @@ Dispatcher.stillJobToDo = debounce(function (callback) {
 
 Dispatcher.start = function () {
   return new Promise(resolve => {
+    this.resolve = resolve
     this.patients.map(overseer => {
       overseer.on('message', msg => {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
@@ -99,7 +100,6 @@ Dispatcher.start = function () {
     });
   });
 };
-
 Dispatcher.exit = function (signal) {
   if (signal === 'SIGSEGV') {
     const deadPatient = this.extractDeadPatient();
@@ -117,7 +117,11 @@ Dispatcher.exit = function (signal) {
 
 Dispatcher.resurrectPatient = async function (deadPatient) {
   const newOverseer = await Object.create(Overseer).init(deadPatient.workerType, deadPatient.options);
-  newOverseer.on('exit', this.exit);
+  newOverseer.on("exit", (code, signal) => {
+    this.exit(signal).then(() => {
+      this.stillJobToDo(this.resolve);
+    });
+  });
   this.addPatient(newOverseer);
 };
 
