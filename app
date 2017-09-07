@@ -88,8 +88,7 @@ sisyphe.launch = async function () {
       }
     });
     dispatcher.on('error', async error => {
-      console.log(error);
-      monitoring.updateLog('error', error);
+      monitoring.updateError(error);
     });
   });
   await this.enterprise.start();
@@ -98,5 +97,6 @@ sisyphe.launch = async function () {
 sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(() => {
   return sisyphe.launch();
 }).catch(err => {
-  monitoring.updateLog('error', err);
+  // console.log(err);
+  monitoring.updateError(err);
 });

@@ -17,6 +17,8 @@ sisyphePdf.doTheJob = function (docObject, next) {
       docObject.pdfWordCount = +nbWords;
       docObject.pdfWordByPage = ~~(docObject.pdfWordCount / docObject.pdfPageTotal);
       next(null, docObject);
+    }).catch(err => {
+      next(err)
     });
   } else {
     next(null, docObject);
@@ -42,13 +44,7 @@ sisyphePdf.getPdfWordCount = async function (TotalNbPages) {
       return totalWords;
     });
     return totalWords;
-  }).catch(err => {
-    process.send({
-      err: {
-        message: err.message
-      }
-    });
-  });
+  })
 };
 
 module.exports = sisyphePdf;
