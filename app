@@ -66,18 +66,18 @@ sisyphe.launch = async function () {
         process.stdout.write('├──── ' + dispatcher.patients[0].workerType + ' ==> ' + i.toString());
       }
     });
-    dispatcher.on('stop', async patients => {
-      const currentWorker = patients[0].workerType;
+    dispatcher.on('stop', async () => {
+      const currentWorker = dispatcher.patients[0].workerType;
       const lastWorker = this.workers[this.workers.length - 1];
       if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
       await monitoring.updateLog('info', currentWorker + ' has finished');
-      for (var i = 0; i < patients.length; i++) {
-        var patient = patients[i];
+      for (var i = 0; i < dispatcher.patients.length; i++) {
+        var patient = dispatcher.patients[i];
         if (!patient.signalCode === 'SIGSEGV') {
           await patient.final().catch(err => err);
         }
       }
-      patients.map(patient => { // clean forks when finalJob is ending
+      dispatcher.patients.map(patient => { // clean forks when finalJob is ending
         patient.fork.kill('SIGTERM');
       });
       if (currentWorker === lastWorker) {
@@ -99,4 +99,12 @@ sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(() =>
 }).catch(err => {
   // console.log(err);
   monitoring.updateError(err);
+});
+
+// Continue sisyphe if an unknown error is happening
+process.on('uncaughtException', function (err) {
+  console.log('Sisyphe-core-error: An uncaughtException happened : ', err, 'error');
+});
+process.on('unhandledRejection', function (err) {
+  console.log('Sisyphe-core-error: An uncaughtException happened : ', err, 'error');
 });
