@@ -17,7 +17,6 @@ monitoring.updateLog = async function(type, string) {
     string.hasOwnProperty('stack') ||
     type === 'error'
   ) return this.updateError(string)
-
   this.log[type].push(string);
   await client.hsetAsync(
     "monitoring",
@@ -33,24 +32,12 @@ monitoring.updateError = async function(err) {
     err = new Error(err);
     err.stack = undefined
   } 
-
   
-
   this.log["error"].push(err);
   await client.hsetAsync(
     "monitoring",
     "log", JSON.stringify(this.log)
   );
-};
-
-monitoring.updateError = async function (err) {
-  const error = {
-    message: err.message,
-    stack: err.stack,
-    infos: err.infos
-  };
-  this.log['error'].push(error);
-  await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log), 'workersError', JSON.stringify(this.workersError));
 };
 
 module.exports = monitoring;
