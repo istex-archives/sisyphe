@@ -71,15 +71,6 @@ sisyphe.launch = async function () {
       const lastWorker = this.workers[this.workers.length - 1];
       if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
       await monitoring.updateLog('info', currentWorker + ' has finished');
-      for (var i = 0; i < dispatcher.patients.length; i++) {
-        var patient = dispatcher.patients[i];
-        if (!patient.signalCode === 'SIGSEGV') {
-          await patient.final().catch(err => err);
-        }
-      }
-      dispatcher.patients.map(patient => { // clean forks when finalJob is ending
-        patient.fork.kill('SIGTERM');
-      });
       if (currentWorker === lastWorker) {
         if (!silent) console.log('└ All workers have completed their work');
         await monitoring.updateLog('info', 'All workers have completed their work');

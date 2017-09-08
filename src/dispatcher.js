@@ -65,11 +65,11 @@ Dispatcher.getPatient = function () {
 
 Dispatcher.stillJobToDo = debounce(function () {
   this.tasks
-  .getJobCounts()
-  .then(jobCounts => {
-    const readyToStop = jobCounts.active + jobCounts.waiting === 0;
-    readyToStop ? this.emit('stop') : this.stillJobToDo();
-  })
+    .getJobCounts()
+    .then(jobCounts => {
+      const readyToStop = jobCounts.active + jobCounts.waiting === 0;
+      readyToStop ? this.emit('stop') : this.stillJobToDo();
+    })
     .catch(error => {
       this.emit('error', error);
     });
@@ -86,12 +86,18 @@ Dispatcher.start = function () {
         }
       });
       overseer.on('exit', (code, signal) => {
-        this.exit(signal).then(() => {
-          this.stillJobToDo();
-        });
+        if (signal === 'SIGSEGV') {
+          this.exit(signal).then(() => {
+            this.stillJobToDo();
+          });
+        }
       });
     });
-    this.on('stop', () => resolve());
+    this.on('stop', async () => {
+      await this.final();
+      this.killAllPatients();
+      resolve();
+    });
     this.tasks.process(job => {
       return this.getPatient().then(overseer => {
         return overseer.send(job.data);
@@ -99,19 +105,30 @@ Dispatcher.start = function () {
     });
   });
 };
+
+Dispatcher.killAllPatients = function () {
+  this.patients.map(patient => {
+    // clean forks when finalJob is ending
+    patient.fork.kill('SIGTERM');
+  });
+};
+Dispatcher.final = function () {
+  return this.patients
+    .filter(patient => patient.fork.signalCode !== 'SIGSEGV')
+    .pop()
+    .final();
+};
+
 Dispatcher.exit = function (signal) {
-  if (signal === 'SIGSEGV') {
-    const deadPatient = this.extractDeadPatient();
-    return this.resurrectPatient(deadPatient).then(() => {
-      const error = {
-        message: 'Child process has been stopped',
-        stack: `Signal: ${signal}`,
-        infos: deadPatient.dataProcessing
-      };
-      this.emit('error', error);
-    });
-  }
-  return Promise.resolve();
+  const deadPatient = this.extractDeadPatient();
+  return this.resurrectPatient(deadPatient).then(() => {
+    const error = {
+      message: 'Child process has been stopped',
+      stack: `Signal: ${signal}`,
+      infos: deadPatient.dataProcessing
+    };
+    this.emit('error', error);
+  });
 };
 
 Dispatcher.resurrectPatient = async function (deadPatient) {

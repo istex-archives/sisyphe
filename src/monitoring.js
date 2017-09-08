@@ -19,10 +19,10 @@ monitoring.updateLog = async function (type, string) {
 
 monitoring.updateError = async function (err) {
   const error = {
-    message : err.message,
+    message: err.message,
     stack: err.stack,
     infos: err.infos
-  }
+  };
   this.log['error'].push(error);
   await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log), 'workersError', JSON.stringify(this.workersError));
 };
