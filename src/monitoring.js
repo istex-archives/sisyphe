@@ -9,7 +9,8 @@ const monitoring = {
     error: [],
     warning: [],
     info: []
-  }
+  },
+  workersError: []
 };
 monitoring.updateLog = async function(type, string) {
   if (
@@ -32,11 +33,13 @@ monitoring.updateError = async function(err) {
     err = new Error(err);
     err.stack = undefined
   } 
-  
+  if (err.hasOwnProperty('infos')) this.workersError.push(err)
+  err.time = Date.now()
   this.log["error"].push(err);
   await client.hsetAsync(
     "monitoring",
-    "log", JSON.stringify(this.log)
+    "log", JSON.stringify(this.log),
+    "workersError", JSON.stringify(this.workersError)
   );
 };
 
