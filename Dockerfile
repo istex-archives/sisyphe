@@ -7,7 +7,7 @@ COPY . /sisyphe
 WORKDIR /sisyphe
 
 RUN apt-get update -y \
-    && apt-get install -y git npm curl cmake libpoppler-cpp-dev xmlstarlet \
+    && apt-get install -y git curl cmake libpoppler-cpp-dev xmlstarlet \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -19,9 +19,8 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.33.4/install.sh | b
     && npm install -g mocha lerna \
     && npm install \
     && lerna bootstrap
-    
-RUN echo "/redis-3.2.5/src/redis-server /redis-3.2.5/redis.conf" >> ~/.bashrc \ 
-    && echo "cd sisyphe" >>~/.bashrc
+
+RUN echo "/redis-3.2.5/src/redis-server /redis-3.2.5/redis.conf" >> ~/.bashrc
 
 # RUN echo "git pull origin master && npm install && npm t" >>~/.bashrc
 EXPOSE 6379

@@ -36,7 +36,7 @@ monitoring.updateError = async function(err) {
   if (err.hasOwnProperty('infos')) this.workersError.push(err)
   err.time = Date.now()
   this.log["error"].push(err);
-  await client.hsetAsync(
+  await client.hmsetAsync(
     "monitoring",
     "log", JSON.stringify(this.log),
     "workersError", JSON.stringify(this.workersError)
