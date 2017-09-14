@@ -1,6 +1,6 @@
 {
   "name": "sisyphe",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "chai-events": "0.0.1",
     "lerna": "^2.1.2",
     "mocha": "^3.5.0",
     "nyc": "^11.2.1"
