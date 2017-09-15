@@ -35,6 +35,7 @@ monitoring.updateError = async function(err) {
   if (err.hasOwnProperty('message')) redisError.message = err.message
   if (err.hasOwnProperty("infos")) redisError.infos = err.infos;
   if (err.hasOwnProperty("stack")) redisError.stack = err.stack;
+  if (typeof err === 'string') redisError.message = err
 
   if (err.hasOwnProperty("infos") && err.infos.hasOwnProperty("path")) this.workersError.push(redisError);
   this.log["error"].push(redisError);

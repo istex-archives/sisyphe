@@ -27,11 +27,14 @@ Dispatcher.init = function (task, options) {
  */
 Dispatcher.addPatient = function (overseer) {
   const self = this
+  overseer.fork.overseer = overseer
   overseer.on('message', function(msg) {
     if (msg.type === 'error') {
       const err = new Error(msg.message);
       [err.message, err.stack, err.code, err.infos] = [msg.message, msg.stack, msg.code, this.dataProcessing];
       self.emit('error', err);
+      self.addToWaitingQueue(this.overseer);
+      self.stillJobToDo();
     }
   });
   this.patients.push(overseer);
