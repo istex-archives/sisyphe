@@ -1,5 +1,5 @@
-const bluebird = require('bluebird');
-const redis = require('redis');
+const bluebird = require("bluebird");
+const redis = require("redis");
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
@@ -10,26 +10,41 @@ const monitoring = {
     warning: [],
     info: []
   },
-  workersError: {}
+  workersError: []
 };
-monitoring.updateLog = async function (type, string) {
-  if (type === 'error') {
-    const error = string.err;
-    if (string.hasOwnProperty('job') && string.job.hasOwnProperty('workerType')) {
-      if (!this.workersError[string.job.workerType]) this.workersError[string.job.workerType] = [];
-      this.workersError[string.job.workerType].push(string.job);
-    }
-    if (error.hasOwnProperty('stack')) string = error.message + ': ' + error.stack.split('\n')[1];
-    else string = '';
-    if (error.hasOwnProperty('infos') && Array.isArray(error.infos)) {
-      for (var i = 0; i < error.infos.length; i++) {
-        var info = error.infos[i];
-        string += '##' + info;
-      }
-    }
-  }
+monitoring.updateLog = async function(type, string) {
+  if (
+    string.hasOwnProperty('message') &&
+    string.hasOwnProperty('stack') ||
+    type === 'error'
+  ) return this.updateError(string)
   this.log[type].push(string);
-  await client.hsetAsync('monitoring', 'log', JSON.stringify(this.log), 'workersError', JSON.stringify(this.workersError));
+  await client.hsetAsync(
+    "monitoring",
+    "log",JSON.stringify(this.log)
+  );
+};
+
+monitoring.updateError = async function(err) {
+  const redisError = {
+    message: 'Unknomwn error',
+    stack: '',
+    infos: 'No information',
+    time: Date.now()
+  }
+  if (err.hasOwnProperty('message')) redisError.message = err.message
+  if (err.hasOwnProperty("infos")) redisError.infos = err.infos;
+  if (err.hasOwnProperty("stack")) redisError.stack = err.stack;
+  if (typeof err === 'string') redisError.message = err
+
+  if (err.hasOwnProperty("infos") && err.infos.hasOwnProperty("path")) this.workersError.push(redisError);
+  this.log["error"].push(redisError);
+
+  await client.hmsetAsync(
+    "monitoring",
+    "log", JSON.stringify(this.log),
+    "workersError", JSON.stringify(this.workersError)
+  );
 };
 
 module.exports = monitoring;

@@ -4,8 +4,6 @@ const Promise = require('bluebird');
 
 const Overseer = {};
 
-// TODO ajouter un listener sur exit lors d'un kill du worker et lancer un re-fork !
-
 /**
  * @param {any} WorkerType
  * @returns Promise
@@ -72,6 +70,7 @@ Overseer.send = function (obj) {
     this.fork.send(msg, null, {}, error => {
       if (error) return reject(error);
       this.dataProcessing = obj;
+      this.fork.dataProcessing = obj;
       resolve();
     });
   });

@@ -2,7 +2,9 @@
 
 const pkg = require('../package.json');
 const chai = require('chai');
+chai.use(require('chai-events'));
 const expect = chai.expect;
+const should = chai.should();
 const Promise = require('bluebird');
 const Dispatcher = require('../src/dispatcher');
 const Overseer = require('../src/overseer');
@@ -32,7 +34,7 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
   });
 
   describe('#stillJobToDo', function () {
-    it('should stop dispatcher', function (done) {
+    it('should stop dispatcher', function () {
       const ventilator = Object.create(Dispatcher);
       const task = Object.create(Task);
       task.init({
@@ -41,7 +43,45 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       ventilator.init(task, {
         name: 'test-dispatcher-stop'
       });
-      ventilator.stillJobToDo(done);
+      ventilator.stillJobToDo();
+      return ventilator.should.emit('stop');
+    });
+  });
+
+  describe('#final', function () {
+    it('should fire the worker final function', function () {
+      const ventilator = Object.create(Dispatcher);
+      const task = Object.create(Task);
+      task.init({ name: 'test-dispatcher-final' });
+      ventilator.init(task, { name: 'test-dispatcher-final' });
+      const overseer = Object.create(Overseer);
+      return overseer.init('dumbWorker').then(() => {
+        ventilator.addPatient(overseer);
+        return ventilator.final();
+      });
+    });
+  });
+
+  describe('#killAllPatients', function () {
+    it('should fire the worker final function', function () {
+      const ventilator = Object.create(Dispatcher);
+      const task = Object.create(Task);
+      task.init({ name: 'test-dispatcher-killAllPatients' });
+      ventilator.init(task, { name: 'test-dispatcher-killAllPatients' });
+      const overseers = [];
+      for (let i = 0; i < 4; i++) {
+        overseers.push(Object.create(Overseer));
+      }
+      return Promise.map(overseers, overseer => {
+        return overseer.init('dumbWorker');
+      }).map(overseer => {
+        ventilator.addPatient(overseer);
+      }).then(() => {
+        ventilator.killAllPatients();
+        ventilator.patients.map((patient) => {
+          expect(patient.fork.killed).to.be.true;
+        });
+      });
     });
   });
 
@@ -126,13 +166,15 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       for (let i = 0; i < 4; i++) {
         overseers.push(Object.create(Overseer));
       }
-      return Promise.map(overseers, (overseer) => {
-        return overseer.init('dumbWorker')  ;
-      }).map((overseer) => {
-        ventilator.addPatient(overseer);
-      }).then(() => {
-        return ventilator.start();
-      });
+      return Promise.map(overseers, overseer => {
+        return overseer.init('dumbWorker');
+      })
+        .map(overseer => {
+          ventilator.addPatient(overseer);
+        })
+        .then(() => {
+          return ventilator.start();
+        });
     });
   });
 
@@ -191,16 +233,19 @@ describe(`${pkg.name}/src/dispatcher.js`, function () {
       task.init({ name: 'test-dispatcher-exit' });
       ventilator.init(task, { name: 'test-dispatcher-exit' });
       const overseer = Object.create(Overseer);
-      return overseer.init('dumbWorker').then(() => {
-        ventilator.addPatient(overseer);
-        overseer.fork.kill('SIGSEGV');
-        overseer.fork.signalCode = 'SIGSEGV';
-        deadPatient = ventilator.extractDeadPatient();
-        return ventilator.resurrectPatient(deadPatient);
-      }).then(() => {
-        expect(ventilator.patients).to.have.lengthOf(1);
-        expect(ventilator.patients[0]).to.not.equal(deadPatient);
-      });
+      return overseer
+        .init('dumbWorker')
+        .then(() => {
+          ventilator.addPatient(overseer);
+          overseer.fork.kill('SIGSEGV');
+          overseer.fork.signalCode = 'SIGSEGV';
+          deadPatient = ventilator.extractDeadPatient();
+          return ventilator.resurrectPatient(deadPatient);
+        })
+        .then(() => {
+          expect(ventilator.patients).to.have.lengthOf(1);
+          expect(ventilator.patients[0]).to.not.equal(deadPatient);
+        });
     });
   });
 });

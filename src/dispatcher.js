@@ -26,11 +26,15 @@ Dispatcher.init = function (task, options) {
  * @returns {Dispatcher}
  */
 Dispatcher.addPatient = function (overseer) {
-  overseer.on('message', msg => {
+  const self = this
+  overseer.fork.overseer = overseer
+  overseer.on('message', function(msg) {
     if (msg.type === 'error') {
       const err = new Error(msg.message);
-      [err.message, err.stack, err.code] = [msg.message, msg.stack, msg.code];
-      this.emit('error', err);
+      [err.message, err.stack, err.code, err.infos] = [msg.message, msg.stack, msg.code, this.dataProcessing];
+      self.emit('error', err);
+      self.addToWaitingQueue(this.overseer);
+      self.stillJobToDo();
     }
   });
   this.patients.push(overseer);
@@ -63,12 +67,12 @@ Dispatcher.getPatient = function () {
   });
 };
 
-Dispatcher.stillJobToDo = debounce(function (callback) {
+Dispatcher.stillJobToDo = debounce(function () {
   this.tasks
     .getJobCounts()
     .then(jobCounts => {
       const readyToStop = jobCounts.active + jobCounts.waiting === 0;
-      readyToStop ? callback() : this.stillJobToDo();
+      readyToStop ? this.emit('stop') : this.stillJobToDo();
     })
     .catch(error => {
       this.emit('error', error);
@@ -82,16 +86,22 @@ Dispatcher.start = function () {
         if (msg.hasOwnProperty('type') && msg.type === 'job') {
           this.emit('result', msg);
           this.addToWaitingQueue(overseer);
-          this.stillJobToDo(resolve);
+          this.stillJobToDo();
         }
       });
       overseer.on('exit', (code, signal) => {
-        this.exit(signal).then(() => {
-          this.stillJobToDo(resolve);
-        });
+        if (signal === 'SIGSEGV') {
+          this.exit(signal).then(() => {
+            this.stillJobToDo();
+          });
+        }
       });
     });
-
+    this.on('stop', async () => {
+      await this.final();
+      this.killAllPatients();
+      resolve();
+    });
     this.tasks.process(job => {
       return this.getPatient().then(overseer => {
         return overseer.send(job.data);
@@ -100,24 +110,38 @@ Dispatcher.start = function () {
   });
 };
 
+Dispatcher.killAllPatients = function () {
+  this.patients.map(patient => {
+    // clean forks when finalJob is ending
+    patient.fork.kill('SIGTERM');
+  });
+};
+Dispatcher.final = function () {
+  return this.patients
+    .filter(patient => patient.fork.signalCode !== 'SIGSEGV')
+    .pop()
+    .final();
+};
+
 Dispatcher.exit = function (signal) {
-  if (signal === 'SIGSEGV') {
-    const deadPatient = this.extractDeadPatient();
-    return this.resurrectPatient(deadPatient).then(() => {
-      const error = {
-        message: 'Child process has been stopped',
-        stack: `Signal: ${signal}`,
-        infos: deadPatient.dataProcessing
-      };
-      this.emit('error', error);
-    });
-  }
-  return Promise.resolve();
+  const deadPatient = this.extractDeadPatient();
+  return this.resurrectPatient(deadPatient).then(() => {
+    const error = {
+      message: 'Child process has been stopped',
+      stack: `Signal: ${signal}`,
+      infos: deadPatient.dataProcessing
+    };
+    this.emit('error', error);
+  });
 };
 
 Dispatcher.resurrectPatient = async function (deadPatient) {
   const newOverseer = await Object.create(Overseer).init(deadPatient.workerType, deadPatient.options);
-  newOverseer.on('exit', this.exit);
+  newOverseer.on('exit', (code, signal) => {
+    this.exit(signal).then(() => {
+      this.stillJobToDo();
+    });
+  });
   this.addPatient(newOverseer);
 };
 
