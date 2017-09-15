@@ -48,7 +48,7 @@ describe(`${pkg.name}/src/monitoring.js`, function() {
       expect(errors[0]).have.own.property("message");
       expect(errors[0].message).to.be.equal("error");
       expect(errors[0]).have.own.property("stack");
-      expect(errors[0].stack).to.be.undefined;
+      expect(errors[0].stack).to.be.equal('');
     });
 
     it("should be push an error when an error is received", async function() {

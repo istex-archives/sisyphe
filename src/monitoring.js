@@ -26,16 +26,20 @@ monitoring.updateLog = async function(type, string) {
 };
 
 monitoring.updateError = async function(err) {
-  if (
-    !(err.hasOwnProperty('message') && err.hasOwnProperty('stack')) 
-    && typeof String
-  ) {
-    err = new Error(err);
-    err.stack = undefined
-  } 
-  if (err.hasOwnProperty('infos')) this.workersError.push(err)
-  err.time = Date.now()
-  this.log["error"].push(err);
+  const redisError = {
+    message: 'Unknomwn error',
+    stack: '',
+    infos: 'No information',
+    time: Date.now()
+  }
+  if (err.hasOwnProperty('message')) redisError.message = err.message
+  if (err.hasOwnProperty("infos")) redisError.infos = err.infos;
+  if (err.hasOwnProperty("stack")) redisError.stack = err.stack;
+  if (typeof err === 'string') redisError.message = err
+
+  if (err.hasOwnProperty("infos") && err.infos.hasOwnProperty("path")) this.workersError.push(redisError);
+  this.log["error"].push(redisError);
+
   await client.hmsetAsync(
     "monitoring",
     "log", JSON.stringify(this.log),

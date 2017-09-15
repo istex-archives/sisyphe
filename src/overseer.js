@@ -70,6 +70,7 @@ Overseer.send = function (obj) {
     this.fork.send(msg, null, {}, error => {
       if (error) return reject(error);
       this.dataProcessing = obj;
+      this.fork.dataProcessing = obj;
       resolve();
     });
   });
