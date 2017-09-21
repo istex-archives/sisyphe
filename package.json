@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "lerna bootstrap",
+    "server": "node server.js",
     "test": "mocha && lerna run --ignore *-worker test",
     "coverage": "nyc --reporter=text --reporter=html mocha",
     "updated": "lerna updated",
