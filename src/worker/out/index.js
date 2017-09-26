@@ -6,7 +6,7 @@ const Winston = require('winston');
 sisypheOut.init = function (options) {
   this.now = options.hasOwnProperty('now') ? new Date(options.now) : new Date();
   this.corpusname = options.hasOwnProperty('corpusname') ? options.corpusname : 'default';
-  this.fileLog = `logs/analyse-${this.corpusname}-${this.now.toISOString()}.log`;
+  this.fileLog = `logs/analyse-${this.corpusname}-${this.now.toISOString()}.json`;
   this.logger = new Winston.Logger();
   this.logger.configure({
     exitOnError: false,
