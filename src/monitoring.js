@@ -17,7 +17,7 @@ monitoring.updateLog = async function(type, string) {
     string.hasOwnProperty('message') &&
     string.hasOwnProperty('stack') ||
     type === 'error'
-  ) return this.updateError(string)
+  ) return this.updateError(string);
   this.log[type].push(string);
   await client.hsetAsync(
     "monitoring",
@@ -31,11 +31,11 @@ monitoring.updateError = async function(err) {
     stack: '',
     infos: 'No information',
     time: Date.now()
-  }
-  if (err.hasOwnProperty('message')) redisError.message = err.message
+  };
+  if (err.hasOwnProperty('message')) redisError.message = err.message;
   if (err.hasOwnProperty("infos")) redisError.infos = err.infos;
   if (err.hasOwnProperty("stack")) redisError.stack = err.stack;
-  if (typeof err === 'string') redisError.message = err
+  if (typeof err === 'string') redisError.message = err;
 
   if (err.hasOwnProperty("infos") && err.infos.hasOwnProperty("path")) this.workersError.push(redisError);
   this.log["error"].push(redisError);
