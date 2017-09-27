@@ -18,7 +18,7 @@ describe('init', () => {
     expect(sisypheOutTest.corpusname).to.be.a('string');
     expect(sisypheOutTest.corpusname).to.be.equal('test');
     expect(sisypheOutTest.fileLog).to.be.a('string');
-    expect(sisypheOutTest.fileLog).to.be.equal('logs/analyse-test-2017-08-17T13:22:09.863Z.log');
+    expect(sisypheOutTest.fileLog).to.be.equal('logs/analyse-test-2017-08-17T13:22:09.863Z.json');
   });
 });
 
