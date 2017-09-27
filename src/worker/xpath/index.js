@@ -78,8 +78,8 @@ sisypheXpath.finalJob = function (done) {
   }
 
   let fullXpaths = new Set(),
-    outputPath = path.resolve(__dirname, '../..', 'xpaths', this.options.corpusname),
-    outputFile = path.resolve(outputPath, `xpaths-${Date.now().toString()}.csv`);
+    outputPath = path.join('xpaths', this.options.corpusname),
+    outputFile = path.join(outputPath, `xpaths-${Date.now().toString()}.csv`);
   // When no more data in queue, sisyphe will execute it
   redisClient = redisClient || redis.createClient(`//${redisHost}:${redisPort}`, { db: config.redisDB });
 
