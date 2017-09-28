@@ -1,6 +1,6 @@
 {
   "name": "pdf",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Get the PDF informations",
   "main": "index.js",
   "scripts": {
@@ -10,12 +10,11 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "popplonode": "git+https://github.com/istex/popplonode.git#v1.3.2",
+    "popplonode": "^1.7.2",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.5.0"
-  },
-  "false": {}
+  }
 }

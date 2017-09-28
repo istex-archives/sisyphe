@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+"use strict";
 
 const bluebird = require('bluebird');
 const program = require('commander');
@@ -15,7 +16,9 @@ program
   .version(pkg.version)
   .usage('[options] <path>')
   .option('-n, --corpusname <name>', 'Corpus name', 'default')
-  .option('-c, --config-dir <path>', 'Configuration folder path', 'none')
+  .option('-c, --config-dir <path>', 'Configuration folder path')
+  .option('-t, --thread <number>', 'The number of process which sisyphe will take')
+  .option('-r, --remove-module <name>', 'Remove module name from the workflow', appender(), [])
   .option('-s, --silent', 'Silence output', false)
   .parse(process.argv);
 
@@ -25,19 +28,25 @@ if (program.corpusname === 'default' || program.configDir === 'none') {
   process.exit(0);
 }
 
-const argPath = program.args[0];
-const inputPath = argPath.charAt(0) === '/' ? argPath : path.join(__dirname, argPath);
-const configDirOpt = program.configDir;
-const configDir = configDirOpt.charAt(0) === '/' ? configDirOpt : path.join(__dirname, configDirOpt);
+const inputPath = path.resolve(program.args[0]);
+const configDir = program.configDir ? path.resolve(program.configDir) : null;
 const silent = program.silent;
 const now = Date.now();
 const options = {
   corpusname: program.corpusname,
   configDir,
   inputPath,
-  numCPUs,
+  numCPUs: program.thread || numCPUs,
   now
 };
+
+let workers = require(path.resolve(__dirname, 'src', 'worker.json')).workers;
+// remove unwanted module
+if(program.removeModule){
+  workers = workers.filter(obj=>{
+    return !program.removeModule.includes(obj);
+  });
+}
 
 const sisyphe = {};
 
@@ -85,7 +94,7 @@ sisyphe.launch = async function () {
   await this.enterprise.start();
 };
 
-sisyphe.init(['walker-fs', 'filetype', 'pdf', 'xml', 'xpath', 'out']).then(() => {
+sisyphe.init(workers).then(() => {
   return sisyphe.launch();
 }).catch(err => {
   // console.log(err);
@@ -99,3 +108,13 @@ process.on('uncaughtException', function (err) {
 process.on('unhandledRejection', function (err) {
   console.log('Sisyphe-core-error: An uncaughtException happened : ', err, 'error');
 });
+
+
+// Uses to filter workers
+function appender(xs) {
+  xs = xs || [];
+  return function (x) {
+    xs.push(x);
+    return xs;
+  };
+}
