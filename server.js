@@ -1,80 +1,59 @@
-const redis = require("redis");
-const Promise = require("bluebird");
+const redis = require('redis');
+const Promise = require('bluebird');
+var zlib = require('zlib');
 Promise.promisifyAll(redis.RedisClient.prototype);
 Promise.promisifyAll(redis.Multi.prototype);
-const fs = Promise.promisifyAll(require("fs"));
-const client = redis.createClient();
-const cp = require("child_process");
-const path = require('path')
+const fs = Promise.promisifyAll(require('fs'));
+const client = redis.createClient({ return_buffers: true });
+const cp = require('child_process');
+const path = require('path');
 
-function launch() {
-  let retrieveData = true;
+const Server = function () {
   setInterval(async _ => {
-    if (!retrieveData) return;
-    const command = await client.lpopAsync("command");
-    const get = await client.lpopAsync("download");
-    if (command) {
-      console.log(command)
-      retrieveData = false;
-      console.log('launch:', command)
-      // cp.exec(`./app ${command}`,_ =>retrieveData = true)
-    }
-    if (get) {
-      const files = await fs.readdirAsync('logs')
-      const dates = files
-        .map(file => {
-          const split = file.split("-")
-          return split.splice(split.length - 3);
-        })
-        .filter(dateArray=>dateArray.length === 3)
-        .map(array => array.join("-"))
-      const lastAnalyse = dates.sort().pop();
-      const logFile = files.filter(log => log.includes(lastAnalyse)).pop()
-      const logPath = path.resolve("logs", logFile);
-      const corpusname = JSON.parse(await readFirstLine(logPath)).corpusname
-      const xpath = (await fs.readdirAsync(path.join('xpaths', corpusname)))
-        .sort().pop()
-      const xpathPath = path.resolve('xpaths', corpusname, xpath)
-      const xpathContent = await fs.readFileAsync(xpathPath, 'utf8')
-      const logContent = await fs.readFileAsync(logPath, 'utf8')
-      await client.lpushAsync("downloadResponse", JSON.stringify({
-        corpusname,
-        xpath: {
-          file: xpath,
-          content: xpathContent
-        },
-        log: {
-          file: logFile,
-          content: logContent
-        }
-      }));
-      console.log('send!')
-    }
-    else {
-      retrieveData = true;
-    }
-  }, 1000)
-}
+    const redisResult = await client.lpopAsync('server');
+    const parseResult = redisResult ? JSON.parse(redisResult) : redisResult;
+    if (parseResult === null) return;
+    if (parseResult.action === 'launch') this.launch(parseResult.command);
+    if (parseResult.action === 'download') this.download(parseResult.download);
+  }, 500);
+};
 
-launch()
+Server.prototype.launch = function (command) {
+  cp.exec(`./app ${command}`);
+  console.log('launch:', command);
+};
 
-function readFirstLine (path) {
-  return new Promise((resolve, reject) => {
-    var rs = fs.createReadStream(path, {encoding: 'utf8'});
-    var acc = '';
-    var pos = 0;
-    var index;
-    rs
-      .on('data', function (chunk) {
-        index = chunk.indexOf('\n');
-        acc += chunk;
-        index !== -1 ? rs.close() : pos += chunk.length;
-      })
-      .on('close', function () {
-        resolve(acc.slice(0, pos + index));
-      })
-      .on('error', function (err) {
-        reject(err);
-      })
+function getFiles (pathdir, parent = '', root = 'true') {
+  let files = fs.readdirSync(pathdir).map(docs => {
+    const absolute = path.resolve(pathdir, docs);
+    if (fs.lstatSync(absolute).isDirectory()) {
+      parent += path.basename(absolute) + '/';
+      return getFiles(absolute, parent, false);
+    }
+    return {
+      path: parent + docs,
+      content: fs.readFileSync(absolute, 'utf8')
+    };
   });
+  if (root) {
+    files = flatten(files);
+  }
+  return files;
 }
+function flatten (arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(
+      Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
+    );
+  }, []);
+}
+
+Server.prototype.download = async function (id) {
+  const sessions = await fs.readdirAsync('out');
+  const sessionToZip = path.resolve('out/', sessions.sort().pop());
+  let files = getFiles(sessionToZip);
+  files = zlib.deflateSync(JSON.stringify(files), { level: 9 });
+  console.log('send !');
+  await client.lpushAsync('downloadResponse', files);
+};
+const server = new Server();
