@@ -19,6 +19,15 @@ app.get("/download/latest", async function(req, res) {
 app.post("/launch", async function(req, res) {
   cp.exec(`./app ${req.body.command}`);
 });
+app.post("/readdir", async function(req, res) {
+  fs.readdirAsync(req.body.path)
+  .then(data=>{
+    res.send(data)
+  })
+  .catch(err=>{
+    return res.send({error: err.message});
+  })
+});
 app.listen(3000);
 
 
