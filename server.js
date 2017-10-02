@@ -1,27 +1,26 @@
-const redis = require('redis');
-const Promise = require('bluebird');
-var zlib = require('zlib');
-Promise.promisifyAll(redis.RedisClient.prototype);
-Promise.promisifyAll(redis.Multi.prototype);
-const fs = Promise.promisifyAll(require('fs'));
-const client = redis.createClient({ return_buffers: true });
 const cp = require('child_process');
+var express = require("express");
+var serveStatic = require("serve-static");
 const path = require('path');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
+var bodyParser = require("body-parser");
 
-const Server = function () {
-  setInterval(async _ => {
-    const redisResult = await client.lpopAsync('server');
-    const parseResult = redisResult ? JSON.parse(redisResult) : redisResult;
-    if (parseResult === null) return;
-    if (parseResult.action === 'launch') this.launch(parseResult.command);
-    if (parseResult.action === 'download') this.download(parseResult.download);
-  }, 500);
-};
+var app = express();
+app.use(serveStatic(path.join(__dirname, "out")));
+app.use(bodyParser.json());
+ 
+app.get("/download/latest", async function(req, res) {
+  const sessions = await fs.readdirAsync("out");
+  const session = path.resolve("out/", sessions.sort().pop());
+  let sessionsFiles = getFiles(session, sessions.sort().pop() + "/");
+  res.send(sessionsFiles);
+});
+app.post("/launch", async function(req, res) {
+  cp.exec(`./app ${req.body.command}`);
+});
+app.listen(3000);
 
-Server.prototype.launch = function (command) {
-  cp.exec(`./app ${command}`);
-  console.log('launch:', command);
-};
 
 function getFiles (pathdir, parent = '', root = 'true') {
   let files = fs.readdirSync(pathdir).map(docs => {
@@ -30,10 +29,7 @@ function getFiles (pathdir, parent = '', root = 'true') {
       parent += path.basename(absolute) + '/';
       return getFiles(absolute, parent, false);
     }
-    return {
-      path: parent + docs,
-      content: fs.readFileSync(absolute, 'utf8')
-    };
+    return { path: parent + docs };
   });
   if (root) {
     files = flatten(files);
@@ -47,13 +43,3 @@ function flatten (arr) {
     );
   }, []);
 }
-
-Server.prototype.download = async function (id) {
-  const sessions = await fs.readdirAsync('out');
-  const sessionToZip = path.resolve('out/', sessions.sort().pop());
-  let files = getFiles(sessionToZip);
-  files = zlib.deflateSync(JSON.stringify(files), { level: 9 });
-  console.log('send !');
-  await client.lpushAsync('downloadResponse', files);
-};
-const server = new Server();
