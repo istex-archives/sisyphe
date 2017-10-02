@@ -37,7 +37,8 @@ const options = {
   configDir,
   inputPath,
   numCPUs: program.thread || numCPUs,
-  now
+  now,
+  outputPath: path.resolve(`./out`, now.toString() + '-' + program.corpusname)
 };
 
 let workers = require(path.resolve(__dirname, 'src', 'worker.json')).workers;
