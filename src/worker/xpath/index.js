@@ -18,6 +18,7 @@ var redisClient;
 
 sisypheXpath.init = function (options = { corpusname: 'default' }) {
   this.options = options;
+  this.outputPath = options.outputPath || path.resolve('out', 'no-output-specified');
   this.isInspected = (options && options.isInspected) || false;
   config.debug = config.hasOwnProperty('debug') ? config.debug : false;
   config.redisDB = config.redisDB || 1;
@@ -78,8 +79,8 @@ sisypheXpath.finalJob = function (done) {
   }
 
   let fullXpaths = new Set(),
-    outputPath = path.join('xpaths', this.options.corpusname),
-    outputFile = path.join(outputPath, `xpaths-${Date.now().toString()}.csv`);
+    outputPath = path.join(this.outputPath, 'xpaths'),
+    outputFile = path.join(outputPath, `xpaths.csv`);
   // When no more data in queue, sisyphe will execute it
   redisClient = redisClient || redis.createClient(`//${redisHost}:${redisPort}`, { db: config.redisDB });
 
