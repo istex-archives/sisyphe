@@ -19,7 +19,17 @@ app.get("/download/latest", async function(req, res) {
 app.post("/launch", async function(req, res) {
   cp.exec(`./app ${req.body.command}`);
 });
-app.listen(3000);
+app.post("/readdir", async function(req, res) {
+  fs.readdirAsync(req.body.path)
+  .then(data=>{
+    res.send(data)
+  })
+  .catch(err=>{
+    return res.send({error: err.message});
+  })
+});
+console.log('listen to port 3264')
+app.listen(3264);
 
 
 function getFiles (pathdir, parent = '', root = 'true') {
