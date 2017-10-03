@@ -53,7 +53,7 @@ const sisyphe = {};
 sisyphe.init = async function (workers) {
   this.workers = workers;
   await client.flushallAsync();
-  await client.hmsetAsync('monitoring', 'start', Date.now(), 'workers', JSON.stringify(workers));
+  await client.hmsetAsync('monitoring', 'start', Date.now(), 'workers', JSON.stringify(workers), 'corpusname', program.corpusname);
   this.enterprise = Object.create(Manufactory);
   this.enterprise.init(options);
   this.workers.map(worker => {
