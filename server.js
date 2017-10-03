@@ -28,7 +28,8 @@ app.post("/readdir", async function(req, res) {
     return res.send({error: err.message});
   })
 });
-app.listen(3000);
+console.log('listen to port 3264')
+app.listen(3264);
 
 
 function getFiles (pathdir, parent = '', root = 'true') {
