@@ -9,7 +9,12 @@ var bodyParser = require("body-parser");
 var app = express();
 app.use(serveStatic(path.join(__dirname, "out")));
 app.use(bodyParser.json());
- 
+
+app.get("/workers", function(req, res) {
+  const workers = require('./src/worker.json');
+  res.json(workers);
+});
+
 app.get("/download/latest", async function(req, res) {
   const sessions = await fs.readdirAsync("out");
   const session = path.resolve("out/", sessions.sort().pop());
