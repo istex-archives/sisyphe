@@ -21,7 +21,11 @@ app.get("/download/latest", async function(req, res) {
   let sessionsFiles = getFiles(session, sessions.sort().pop() + "/");
   res.send(sessionsFiles);
 });
+app.get("/ping", function(req, res) {
+  res.send('pong');
+});
 app.post("/launch", async function(req, res) {
+  console.log('launch:' + req.body.command)
   cp.exec(`./app ${req.body.command}`);
 });
 app.post("/readdir", async function(req, res) {
