@@ -18,7 +18,7 @@ app.get("/workers", function(req, res) {
 app.get("/download/latest", async function(req, res) {
   const sessions = await fs.readdirAsync("out");
   const session = path.resolve("out/", sessions.sort().pop());
-  let sessionsFiles = getFiles(session, sessions.sort().pop() + "/");
+  let sessionsFiles = getFiles(session, session.split('/').pop() + "/");
   res.send(sessionsFiles);
 });
 app.get("/ping", function(req, res) {
@@ -27,6 +27,7 @@ app.get("/ping", function(req, res) {
 app.post("/launch", async function(req, res) {
   console.log('launch:' + req.body.command)
   cp.exec(`./app ${req.body.command}`);
+  res.send(true)
 });
 app.post("/readdir", async function(req, res) {
   fs.readdirAsync(req.body.path)
