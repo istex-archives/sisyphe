@@ -119,3 +119,29 @@ function appender(xs) {
     return xs;
   };
 }
+
+process.stdin.resume();
+
+let exit = false;
+async function exitHandler (options, err) {
+  if (!exit) {
+    await client.hmsetAsync('monitoring', 'end', Date.now());
+    exit = true;
+    process.exit(0);
+  }
+}
+
+//do something when app is closing
+process.on("exit", exitHandler.bind(null, { exit: true }));
+
+//catches ctrl+c event
+process.on("SIGINT", exitHandler.bind(null, { exit: true }));
+
+process.on("SIGTERM", exitHandler.bind(null, { exit: true }));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on("SIGUSR1", exitHandler.bind(null, { exit: true }));
+process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
+
+//catches uncaught exceptions
+process.on("uncaughtException", exitHandler.bind(null, { exit: true }));

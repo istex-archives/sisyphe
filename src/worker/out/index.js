@@ -3,7 +3,9 @@
 const sisypheOut = {};
 const Winston = require('winston');
 const mkdirp = require('mkdirp');
-
+process.on('exit', data=>{
+  console.log('lkjjlklkjkjlkljkjlkjlk')
+})
 sisypheOut.init = function (options) {
   this.outputPath = options.outputPath || 'out/no-output-specified';
   mkdirp.sync(this.outputPath);
