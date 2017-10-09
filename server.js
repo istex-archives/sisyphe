@@ -35,9 +35,17 @@ app.post('/stop', function (req, res) {
 });
 app.post('/launch', async function (req, res) {
   if (!sisyphe) {
-    console.log(`launch: ${req.body.command}`);
+    console.log('launch')
+    const command = req.body.command;
+    let commandArray = [];
+    if (command.name) commandArray.push("-n",command.name)
+    if (command.config) commandArray.push("-c", command.config);
+    if (command.disable) command.disable.map(worker => commandArray.push('-r',worker.name))
+    if (command.path) commandArray.push(command.path);
+    if (!command.debug) commandArray.push('-s');
+    console.log(`launch: ${commandArray}`);
     res.send(true);
-    sisyphe = cp.spawn(`./app`, req.body.command.split(' '));
+    sisyphe = cp.spawn(`./app`, commandArray);
     sisyphe.stdout.pipe(process.stdout);
     sisyphe.on('exit', _=>{
       sisyphe = null
