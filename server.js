@@ -37,7 +37,11 @@ app.post('/launch', async function (req, res) {
   if (!sisyphe) {
     console.log(`launch: ${req.body.command}`);
     res.send(true);
-    sisyphe = cp.exec(`./app ${req.body.command}`, (error, stdout, stderr) => (sisyphe = null));
+    sisyphe = cp.spawn(`./app`, req.body.command.split(' '));
+    sisyphe.stdout.pipe(process.stdout);
+    sisyphe.on('exit', _=>{
+      sisyphe = null
+    })
   } else {
     console.log('Already launch');
     res.send(false);

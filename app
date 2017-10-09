@@ -9,6 +9,7 @@ const Manufactory = require('./src/manufactory');
 const monitoring = require('./src/monitoring');
 const numCPUs = require('os').cpus().length;
 const redis = require('redis');
+const readline = require('readline')
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 const client = redis.createClient();
@@ -71,8 +72,8 @@ sisyphe.launch = async function () {
     dispatcher.on('result', msg => {
       if (!silent) {
         i++;
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
+        readline.clearLine(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0, null);
         process.stdout.write('├──── ' + dispatcher.patients[0].workerType + ' ==> ' + i.toString());
       }
     });
