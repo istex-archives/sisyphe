@@ -26,7 +26,9 @@ var objects = {
   'business': business
 };
 
-business.init();
+business.init({
+  "outputPath": "test/dataset/out"
+});
 
 /**
  * Test des fonctions de :
