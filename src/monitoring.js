@@ -4,6 +4,11 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
 const client = redis.createClient();
+
+/**
+ * Manage and dispatch all logs
+ * @constructor
+ */
 const monitoring = {
   log: {
     error: [],
@@ -12,6 +17,11 @@ const monitoring = {
   },
   workersError: []
 };
+/**
+ * Send a log in redis
+ * @param {String} type Type of the log (info, warning, etc...)
+ * @param {String} string Description of the log
+ */
 monitoring.updateLog = async function(type, string) {
   if (
     string.hasOwnProperty('message') &&
@@ -25,6 +35,10 @@ monitoring.updateLog = async function(type, string) {
   );
 };
 
+/**
+ * Format and send an error log in redis
+ * @param {String|Object} err Error to send in redis
+ */
 monitoring.updateError = async function(err) {
   const redisError = {
     message: 'Unknomwn error',
