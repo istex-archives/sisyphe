@@ -1,0 +1,40 @@
+{
+  "doTheJob": [{
+    "label": "Devrait traiter correctement le document",
+    "key": "SUCCESS",
+    "logs": "logs",
+    "result": {}
+  }, {
+    "label": "Devrait renvoyer l'erreur : ABSTRACTS_NOT_FOUND",
+    "key": "ABSTRACTS_NOT_FOUND",
+    "logs": "logs",
+    "result": {}
+  }, {
+    "label": "Devrait renvoyer l'erreur : ABSTRACT_DETECTED_LANG_NOT_FOUND",
+    "key": "ABSTRACT_DETECTED_LANG_NOT_FOUND",
+    "logs": "logs",
+    "result": {}
+  }, {
+    "label": "Devrait renvoyer l'erreur : CATEGORY_NOT_FOUND",
+    "key": "CATEGORY_NOT_FOUND",
+    "logs": "logs",
+    "result": {}
+  }],
+  "categorize": [{
+    "label": "Devrait renvoyer une ou plusieurs catégorie(s)",
+    "arguments": {
+      "path": "./test/dataset/in/corpus/SUCCESS.txt"
+    },
+    "result": {
+      "length": 4
+    }
+  }, {
+    "label": "Devrait renvoyer aucune catégorie",
+    "arguments": {
+      "path": "./test/dataset/in/corpus/CATEGORY_NOT_FOUND.txt"
+    },
+    "result": {
+      "length": 0
+    }
+  }]
+}
