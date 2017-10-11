@@ -47,6 +47,8 @@ Just take a coffee and wait , it will prevent you when it's done :)
 You should now have a file full of logs in `/yourcustomfolder/sisyphe/logs/sisyphe.log` (errors,info,duration..)
 
 For a control panel, go to [Sisyphe-monitor](https://github.com/istex/sisyphe-monitor)
+sisyphe has a server that allows to control it and to obtain more information on its execution.
+Simply run the server with `npm run server` to access these features
 
 
 ![Sisyphe-dashboard](./sisyphe-monitor.gif)
