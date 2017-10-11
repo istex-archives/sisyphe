@@ -2,11 +2,16 @@ const debounce = require('lodash').debounce;
 const Promise = require('bluebird');
 const EventEmitter = require('events');
 const Overseer = require('./overseer');
+/**
+ * Create Overseer, dispatch all task and manage life of Overseers
+ * @constructor
+ */
 const Dispatcher = Object.create(EventEmitter.prototype);
 
 /**
- * @param {any} task
- * @param {any} options
+ * @param {Task} task Interface to talk with redis
+ * @param {Object} options Options for dispatcher
+ * @param {Object} options.name Type of the worker
  * @returns {Dispatcher}
  */
 Dispatcher.init = function (task, options) {
@@ -22,7 +27,8 @@ Dispatcher.init = function (task, options) {
 };
 
 /**
- * @param {Overseer} overseer
+ * Add a patient to the queue and the list of Overseers
+ * @param {Overseer} overseer Overseer to add
  * @returns {Dispatcher}
  */
 Dispatcher.addPatient = function (overseer) {
@@ -43,7 +49,8 @@ Dispatcher.addPatient = function (overseer) {
 };
 
 /**
- * @param {Overseer} overseer
+ * Add an Overseer in th waiting queue
+ * @param {Overseer} overseer Overseer to add in the waiting queue
  * @returns {Dispatcher}
  */
 Dispatcher.addToWaitingQueue = function (overseer) {
@@ -52,7 +59,7 @@ Dispatcher.addToWaitingQueue = function (overseer) {
 };
 
 /**
- * @param {any} done callback (overseer)
+ * Return an overseer in the waiting queue
  * @returns {Promise}
  */
 Dispatcher.getPatient = function () {
@@ -67,6 +74,11 @@ Dispatcher.getPatient = function () {
   });
 };
 
+/**
+ * Loop to stop the dispatcher if there is no active and waiting tasks every 500ms
+ * @function
+ * @fires Dispatcher#stop
+ */
 Dispatcher.stillJobToDo = debounce(function () {
   this.tasks
     .getJobCounts()
@@ -79,6 +91,10 @@ Dispatcher.stillJobToDo = debounce(function () {
     });
 }, 500);
 
+/**
+ * Launch dispatcher 
+ * @return {Promise} resolve when dispatcher has finished all tasks
+ */
 Dispatcher.start = function () {
   return new Promise(resolve => {
     this.patients.map(overseer => {
@@ -110,12 +126,18 @@ Dispatcher.start = function () {
   });
 };
 
+/**
+ * Clean forks when finalJob is ending
+ */
 Dispatcher.killAllPatients = function () {
   this.patients.map(patient => {
-    // clean forks when finalJob is ending
     patient.fork.kill('SIGTERM');
   });
 };
+
+/**
+ * Launch the final function of an alive Overseer
+ */
 Dispatcher.final = function () {
   return this.patients
     .filter(patient => patient.fork.signalCode !== 'SIGSEGV')
@@ -123,6 +145,10 @@ Dispatcher.final = function () {
     .final();
 };
 
+/**
+ * Extract a dead patient of the list of Overseer, and resurect an other
+ * @param
+ */
 Dispatcher.exit = function (signal) {
   const deadPatient = this.extractDeadPatient();
   return this.resurrectPatient(deadPatient).then(() => {
