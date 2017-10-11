@@ -117,7 +117,6 @@ business.doTheJob = function(data, next) {
       }
 
       business.NOW = utils.dates.now(); // Date du jour formatée (string)
-      console.log(business.outputPath, documentId)
       // Construction de la structure de données pour le template
       let tpl = {
           "date": business.NOW,
