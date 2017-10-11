@@ -1,0 +1,25 @@
+{
+  "name": "nb",
+  "version": "1.0.0",
+  "description": "Module Sisyphe de catégorisation par méthode statistique: Bayésien Naïf",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -t 120000"
+  },
+  "keywords": [
+    ""
+  ],
+  "author": "",
+  "license": "GNU",
+  "dependencies": {
+    "async": "^2.0.1",
+    "auto-tu": "git+https://github.com/NicolasKieffer/auto-tu.git",
+    "cld": "^2.4.7",
+    "line-reader": "^0.4.0",
+    "minimist": "^1.2.0",
+    "mocha": "^3.2.0",
+    "nb-resources": "git+https://github.com/NicolasKieffer/nb-resources.git",
+    "process": "^0.11.3",
+    "worker-utils": "git+https://github.com/NicolasKieffer/worker-utils.git"
+  }
+}
