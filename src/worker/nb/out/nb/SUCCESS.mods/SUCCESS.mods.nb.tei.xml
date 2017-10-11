@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fichier générée le 11-10-2017 -->
+<!--  - v1.0.0 -  -->
+<TEI>
+  <standOff>
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title>Catégorisation de documents</title>
+          <respStmt>
+            <resp>enrichissement catégorisation </resp>
+            <name resp=""></name>
+          </respStmt>
+        </titleStmt>
+        <publicationStmt>
+          <authority>Inist-CNRS</authority>
+          <availability status="restricted">
+            <licence target="http:/creativecommons.org/licenses/by/4.0/">
+              <p>L’élément standOff de ce document est distribué sous licence Creative Commons 4.0 non transposée (CC BY 4.0)</p>
+              <p>Ce standOff a été créé dans le cadre du projet ISTEX – Initiative d’Excellence en Information Scientifique et Technique</p>
+            </licence>
+          </availability>
+        </publicationStmt>
+        <sourceDesc>
+          <biblStruct>
+            <idno type="ISTEX">SUCCESS.mods</idno>
+          </biblStruct>
+        </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+        <appInfo>
+          <application ident="" version="">
+            <label></label>
+          </application>
+        </appInfo>
+      </encodingDesc>
+      <revisionDesc>
+        <change when="2016-06-24" who="" xml:id="">catégorisation par approche statistique - Bayésien Naïf</change>
+      </revisionDesc>
+    </teiHeader>
+    <listAnnotation type="rd-nb">
+      <annotationBlock corresp="abstract" xmls="https/www.tei-c.org/ns/1.0">
+        <keywords change="#" resp="#" scheme="">
+          <term cert="0.651637563297372" key="STM" level="1">sciences appliquees, technologies et medecines</term>
+          <term cert="0.5541006144477459" key="001" level="2">sciences exactes et technologie</term>
+          <term cert="0.20272618300842637" key="001E" level="3">terre, ocean, espace</term>
+          <term cert="0.31605416143215126" key="001E02" level="4">geophysique externe</term>
+        </keywords>
+      </annotationBlock>
+    </listAnnotation>
+  </standOff>
+</TEI>
