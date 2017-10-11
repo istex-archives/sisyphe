@@ -147,7 +147,7 @@ Dispatcher.final = function () {
 
 /**
  * Extract a dead patient of the list of Overseer, and resurect an other
- * @param
+ * @param {String} signal Signal of the exit event
  */
 Dispatcher.exit = function (signal) {
   const deadPatient = this.extractDeadPatient();
@@ -161,6 +161,9 @@ Dispatcher.exit = function (signal) {
   });
 };
 
+/**
+ * Recreate an Overseer when an Overseer is dead
+ */
 Dispatcher.resurrectPatient = async function (deadPatient) {
   const newOverseer = await Object.create(Overseer).init(deadPatient.workerType, deadPatient.options);
   newOverseer.on('exit', (code, signal) => {
@@ -171,6 +174,10 @@ Dispatcher.resurrectPatient = async function (deadPatient) {
   this.addPatient(newOverseer);
 };
 
+/**
+ * Remove a crashed Overseer in list of Overseers
+ * @return {Overseer} A dead Overseer
+ */
 Dispatcher.extractDeadPatient = function () {
   let deadPatient;
   for (var i = 0; i < this.patients.length; i++) {

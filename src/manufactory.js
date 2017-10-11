@@ -4,10 +4,19 @@ const Task = require('./task');
 const Promise = require('bluebird');
 const os = require('os');
 
+/**
+ * Manage all Dispatchers. When a Dispatcher is finished, the next one is called
+ * @constructor 
+ */
 const Manufactory = {};
 
 /**
- * @param {Object} [options={ inputPath: '.', numCPUs: os.cpus().length }]
+ * @param {Object} options Options for dispatcher
+ * @param {String} options.corpusName Corpus name 
+ * @param {String} options.configDir Path to config
+ * @param {Number} options.numCPUs Number of cpu to use
+ * @param {Number} options.now Session start
+ * @param {String} options.outputPath Where to put results
  * @returns {Manufactory}
  */
 Manufactory.init = function (options = { inputPath: '.', numCPUs: os.cpus().length }) {
@@ -18,12 +27,19 @@ Manufactory.init = function (options = { inputPath: '.', numCPUs: os.cpus().leng
   return this;
 };
 
+/**
+ * Add name of the worker to the list of workers
+ * @param {String} worker Name of a Worker
+ * @return {Manufactory}
+ */
 Manufactory.addWorker = function (worker) {
+  console.log(worker)
   this.workers.push(worker);
   return this;
 };
 
 /**
+ * Initialize all dispatcher and put Overseers in it
  * @returns {Promise}
  */
 Manufactory.initializeWorkers = function () {
@@ -32,6 +48,9 @@ Manufactory.initializeWorkers = function () {
   });
 };
 
+/**
+ * Launch final job on all workers
+ */
 Manufactory.final = function () {
   return Promise.map(this.dispatchers, dispatcher => {
     return dispatcher.patients[0].final();
@@ -39,6 +58,7 @@ Manufactory.final = function () {
 };
 
 /**
+ * Launch the first Dispatcher and the other after the end of each
  * @returns {Promise}
  */
 Manufactory.start = function () {
@@ -50,6 +70,7 @@ Manufactory.start = function () {
 };
 
 /**
+ * Create a Dispatchers, Tasks and bind them
  * @returns {Manufactory}
  */
 Manufactory.createDispatchers = function () {
@@ -66,6 +87,7 @@ Manufactory.createDispatchers = function () {
 };
 
 /**
+ * For each Dispatcher, we create the number of CPU of Overseers
  * @returns {Promise}
  */
 Manufactory.createOverseersForDispatchers = function () {
@@ -81,6 +103,7 @@ Manufactory.createOverseersForDispatchers = function () {
 };
 
 /**
+ * Bind events to Dispatchers and manage the loop of the walker-fs
  * @returns {Manufactory}
  */
 Manufactory.bindDispatchers = function () {

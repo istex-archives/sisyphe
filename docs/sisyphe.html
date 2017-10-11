@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Index</title>
+	<title>Documentation Class: sisyphe</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -65,70 +65,332 @@
 		<div id="main">
 			
 
+	<h1 class="page-title">Class: sisyphe</h1>
+<section>
+
+<header>
+    
+        <h2>
+        sisyphe
+        </h2>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="sisyphe"><span class="type-signature"></span>new sisyphe()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        EntryPoint to Sisyphe
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
 	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
 	
 
 
 
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id=".init"><span class="type-signature">&lt;static> </span>init(workers)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Init Sisyphe and all components
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>workers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
 
 
 
+            
+            </td>
 
+            
 
+            
+
+            <td class="description last">Array with the name of workers</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
 
 
 
 	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".launch"><span class="type-signature">&lt;static> </span>launch()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Launch sisyphe
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
 	
 
 
 
+	
+
+	
+
+	
+
+	
+</dl>
 
 
-    <section class="readme-section">
-        <article><p><a href="https://travis-ci.org/istex/sisyphe"><img src="https://travis-ci.org/istex/sisyphe.svg?branch=master" alt="Build Status"></a>
-<a href="https://www.bithound.io/github/istex/sisyphe"><img src="https://www.bithound.io/github/istex/sisyphe/badges/score.svg" alt="bitHound Overall Score"></a></p>
-<p><img src="./logo-sisyphe.jpg" alt="sisyphe"></p>
-<h2>Sisyphe</h2><p>Sisyphe is a generic NodeJS recursive folder analyser terminal application &amp; a (<a href="https://github.com/lerna/lerna">lerna</a>) git <a href="https://github.com/babel/babel/blob/master/doc/design/monorepo.md">monorepo</a>.</p>
-<p><img src="./sisyphe.gif" alt="Sisyphe-pic"></p>
-<h3>Requirements</h3><p>Test with NodeJS@8.1, Redis@3.2.6 &amp; ElasticSearch@5.1.1 &amp; XMLStarlet@1.6.1(libxml2@2.9.4)</p>
-<h3>Install it</h3><ol>
-<li>Download the lastest Sisyphe version </li>
-<li>Just do : <code>npm install</code></li>
-<li>... that's it.</li>
-</ol>
-<h3>Test</h3><p><code>npm run test</code> will test sisyphe &amp; its workers</p>
-<h3>Help</h3><p><code>./app.js --help</code> Will output help</p>
-<h3>Options</h3><pre class="prettyprint source"><code>-V, --version            output the version number
--n, --corpusname &lt;name>  Corpus name
--c, --config-dir &lt;path>  Configuration folder path
--s, --silent             Silence output
--h, --help               output usage information</code></pre><h3>How it works ?</h3><p>Just start Sisyphe on a folder with any files in it.</p>
-<p><code>node app.js -c folderName ~/Documents/customfolder/corpus</code></p>
-<p>Sisyphe is now working in background with all your computer thread.
-Just take a coffee and wait , it will prevent you when it's done :)</p>
-<p>You should now have a file full of logs in <code>/yourcustomfolder/sisyphe/logs/sisyphe.log</code> (errors,info,duration..)</p>
-<p>For a control panel, go to <a href="https://github.com/istex/sisyphe-monitor">Sisyphe-monitor</a></p>
-<p><img src="./sisyphe-monitor.gif" alt="Sisyphe-dashboard"></p>
-<h3>Modules</h3><p>There is a list of default modules (focused on xml &amp; pdf).</p>
-<p>Those URL NEED to be updated when merge branch will be ok.</p>
-<ul>
-<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/filetype">Sisyphe-FILETYPE</a> Will detect mimetype,extension, corrupted files..</li>
-<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/pdf">Sisyphe-PDF</a> Will get info from PDF (version, author, meta...)</li>
-<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/xml">Sisyphe-XML</a> Will check if it's wellformed, valid-dtd's, get elements from balises ...</li>
-<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/xpath">Sisyphe-XPATH</a>  Will generate a complete list of xpaths from submitted folder</li>
-<li><a href="https://github.com/istex/sisyphe/tree/master/src/worker/out">Sisyphe-OUT</a> Will export data to json file &amp; ElasticSearch database</li>
-</ul>
-<h3>Developpement on worker</h3><p>When you work on worker, just:</p>
-<ul>
-<li>Commit your changes as easy</li>
-<li>Do a <code>npm run updated</code> (to check what worker has changed)</li>
-<li>Do a <code>npm run publish</code> (it will ask you to change version of module worker &amp; publish it to github)</li>
-</ul></article>
-    </section>
+    
 
+    
 
+    
 
+    
+
+    
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
