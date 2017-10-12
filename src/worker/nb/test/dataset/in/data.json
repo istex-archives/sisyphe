@@ -1,0 +1,74 @@
+{
+  "SUCCESS": {
+    "corpusname": "test",
+    "startAt": 0,
+    "extension": ".xml",
+    "path": "./test/dataset/in/corpus/SUCCESS.mods.xml",
+    "name": "SUCCESS.mods.xml",
+    "size": 4332,
+    "mimetype": "application/xml",
+    "mimedetails": {
+      "encoding": "utf-8",
+      "complete": "XML 1.0 document, UTF-8 Unicode text, with very long lines"
+    },
+    "error": null,
+    "isWellFormed": true,
+    "level": "info",
+    "message": "",
+    "timestamp": "2012-12-21T12:12:12.000Z"
+  },
+  "ABSTRACTS_NOT_FOUND": {
+    "corpusname": "test",
+    "startAt": 0,
+    "extension": ".xml",
+    "path": "./test/dataset/in/corpus/ABSTRACTS_NOT_FOUND.mods.xml",
+    "name": "ABSTRACTS_NOT_FOUND.mods.xml",
+    "size": 4332,
+    "mimetype": "application/xml",
+    "mimedetails": {
+      "encoding": "utf-8",
+      "complete": "XML 1.0 document, UTF-8 Unicode text, with very long lines"
+    },
+    "error": null,
+    "isWellFormed": true,
+    "level": "info",
+    "message": "",
+    "timestamp": "2012-12-21T12:12:12.000Z"
+  },
+  "ABSTRACT_DETECTED_LANG_NOT_FOUND": {
+    "corpusname": "test",
+    "startAt": 0,
+    "extension": ".xml",
+    "path": "./test/dataset/in/corpus/ABSTRACT_DETECTED_LANG_NOT_FOUND.mods.xml",
+    "name": "ABSTRACT_DETECTED_LANG_NOT_FOUND.mods.xml",
+    "size": 4332,
+    "mimetype": "application/xml",
+    "mimedetails": {
+      "encoding": "utf-8",
+      "complete": "XML 1.0 document, UTF-8 Unicode text, with very long lines"
+    },
+    "error": null,
+    "isWellFormed": true,
+    "level": "info",
+    "message": "",
+    "timestamp": "2012-12-21T12:12:12.000Z"
+  },
+  "CATEGORY_NOT_FOUND": {
+    "corpusname": "test",
+    "startAt": 0,
+    "extension": ".xml",
+    "path": "./test/dataset/in/corpus/CATEGORY_NOT_FOUND.mods.xml",
+    "name": "CATEGORY_NOT_FOUND.mods.xml",
+    "size": 4332,
+    "mimetype": "application/xml",
+    "mimedetails": {
+      "encoding": "utf-8",
+      "complete": "XML 1.0 document, UTF-8 Unicode text, with very long lines"
+    },
+    "error": null,
+    "isWellFormed": true,
+    "level": "info",
+    "message": "",
+    "timestamp": "2012-12-21T12:12:12.000Z"
+  }
+}
