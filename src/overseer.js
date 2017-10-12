@@ -19,7 +19,6 @@ const Overseer = {};
  * @returns {Promise}
  */
 Overseer.init = function (workerType, options) {
-  console.log(workerType, options)
   this.workerType = workerType;
   this.options = options;
   this.fork = fork(path.join(__dirname, 'worker.js'));

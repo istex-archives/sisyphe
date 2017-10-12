@@ -22,7 +22,6 @@ var NB = require('./lib/nb.js'),
 
 // Command Line arguments
 var argv = parseArgs(process.argv.slice(2));
-console.log(argv);
 
 var nb = new NB(argv.proba),
   filename = path.basename(argv.input),

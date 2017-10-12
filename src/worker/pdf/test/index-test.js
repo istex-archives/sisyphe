@@ -16,10 +16,8 @@ const dataInput = {
 };
 
 beforeEach(function() {
-  console.log('init');
   return sisyphePdf.init();
 });
-
 
 describe('doTheJob', function () {
   it('should add some info about the PDF', function (done) {
@@ -46,6 +44,6 @@ describe('getPdfWordCount', function () {
     return sisyphePdf.getPdfWordCount(1).then((pdfWordCount) => {
       expect(pdfWordCount).to.be.a('number');
       expect(pdfWordCount).to.equal(574);
-    })
-  })
+    });
+  });
 });
