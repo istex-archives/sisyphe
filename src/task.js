@@ -1,4 +1,8 @@
 const Queue = require('bull');
+/**
+ * Interface between Sisyphe and Redis server
+ * @constructor
+ */
 const Task = {};
 
 /**

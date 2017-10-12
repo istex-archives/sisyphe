@@ -50,8 +50,16 @@ if(program.removeModule){
   });
 }
 
+/**
+ * EntryPoint to Sisyphe
+ * @constructor
+ */
 const sisyphe = {};
 
+/**
+ * Init Sisyphe and all components
+ * @param {Array.<String>} workers Array with the name of workers
+ */
 sisyphe.init = async function (workers) {
   this.workers = workers;
   await client.flushallAsync();
@@ -66,6 +74,9 @@ sisyphe.init = async function (workers) {
   if (!silent) console.log('┌ All workers have been initialized');
 };
 
+/**
+ * Launch sisyphe
+ */
 sisyphe.launch = async function () {
   this.enterprise.dispatchers.map(dispatcher => {
     let i = 0;

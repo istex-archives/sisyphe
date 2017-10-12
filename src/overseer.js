@@ -2,13 +2,24 @@ const fork = require('child_process').fork;
 const path = require('path');
 const Promise = require('bluebird');
 
+/**
+ * Container to manage a Worker (fork).
+ * @constructor 
+ */
 const Overseer = {};
 
 /**
- * @param {any} WorkerType
- * @returns Promise
+ * @param {String} workerType Name of the worker
+ * @param {Object} options Options for dispatcher
+ * @param {String} options.corpusName Corpus name 
+ * @param {String} options.configDir Path to config
+ * @param {Number} options.numCPUs Number of cpu to use
+ * @param {Number} options.now Session start
+ * @param {String} options.outputPath Where to put results
+ * @returns {Promise}
  */
 Overseer.init = function (workerType, options) {
+  console.log(workerType, options)
   this.workerType = workerType;
   this.options = options;
   this.fork = fork(path.join(__dirname, 'worker.js'));
@@ -37,6 +48,10 @@ Overseer.init = function (workerType, options) {
   });
 };
 
+/**
+ * Launch final job of the worker
+ * @return {Promise}
+ */
 Overseer.final = function () {
   const finalObj = {
     type: 'final'
@@ -57,8 +72,9 @@ Overseer.final = function () {
 };
 
 /**
+ * Send a job to the worker
  * @param {any} obj
- * @returns Promise
+ * @returns {Promise}
  */
 Overseer.send = function (obj) {
   const msg = {
