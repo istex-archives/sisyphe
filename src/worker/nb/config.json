@@ -1,0 +1,10 @@
+{
+  "lang": "en",
+  "cld": {
+    "code": "en",
+    "percent": 90
+  },
+  "probability": {
+    "min": 0.12
+  }
+}
