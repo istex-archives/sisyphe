@@ -51,20 +51,18 @@ sisypheXml.doTheJob = function (data, next) {
 
     // Load xml, return false if not-wellformed, true if wellformed
     let xmlFile = this.libxml.load(data.path);
-    let doctype = this.libxml.getDtd();
 
     if (!xmlFile) {
       data.isWellFormed = false;
       return data;
     }
 
+    let doctype = this.libxml.getDtd();
+
     // Reformat key for DTD to retro-compatible old sisyphe version
     if(doctype.externalId){ doctype.pubid = doctype.externalId; delete doctype.externalId; }
     if(doctype.systemId){ doctype.sysid = doctype.systemId; delete doctype.systemId; }
     data.doctype = doctype;
-    // [error, data.doctype] = await to(this.getDoctype(data.path));
-
-    // [data.error, xmlDom] = await to(this.getXmlDom(data.path));
 
     data.isWellFormed = true;
 
@@ -113,14 +111,14 @@ sisypheXml.getMetadataInfos = function (confObj, libxml) {
     // Select the first XPATH possibility
     if (Array.isArray(metadata.xpath)) {
       for (let i = 0; i < metadata.xpath.length; i++) {
-        metadata.xpath[i] = sisypheXml.formatXpaths(metadata.xpath,metadata.type);
+        metadata.xpath[i] = sisypheXml.formatXpaths(metadata.xpath[i],metadata.type);
         const itemElement = libxml.xpathSelect(metadata.xpath[i]);
-        if (itemElement) {
+        if (itemElement !== null && itemElement !== undefined) {
           metadata.element = itemElement;
+          metadata.value = itemElement;
           break;
         }
       }
-      metadata.element = metadata.element || [];
     } else {
       // string is special because we need all text in its child too
       metadata.xpath = sisypheXml.formatXpaths(metadata.xpath,metadata.type);
