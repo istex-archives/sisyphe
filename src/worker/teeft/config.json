@@ -1,0 +1,12 @@
+{
+  "id": "rd-teeft",
+  "label": "teeft",
+  "lang": "en",
+  "resp": {
+    "id": "istex-rd",
+    "label": "ISTEX-RD"
+  },
+  "resource": "brown",
+  "truncate": true,
+  "sort": true
+}

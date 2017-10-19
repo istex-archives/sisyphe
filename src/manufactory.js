@@ -33,7 +33,6 @@ Manufactory.init = function (options = { inputPath: '.', numCPUs: os.cpus().leng
  * @return {Manufactory}
  */
 Manufactory.addWorker = function (worker) {
-  console.log(worker)
   this.workers.push(worker);
   return this;
 };

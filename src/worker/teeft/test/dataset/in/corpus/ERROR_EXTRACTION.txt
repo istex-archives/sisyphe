@@ -1,0 +1,7 @@
+bring
+send
+buy
+take
+tell
+verify
+get
