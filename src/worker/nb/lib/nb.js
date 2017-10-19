@@ -4,17 +4,17 @@
 'use strict';
 
 /* Module Require */
-var fs = require('fs');
+const fs = require('fs');
 
 /* Exported objects */
 
 /* Tokenizer */
-var Tokenizer = function(lower) {
+const Tokenizer = function(lower) {
 
   // référence à this
-  var self = this;
+  let self = this;
 
-  var re = new RegExp('\\w+', 'gm');
+  const re = new RegExp('\\w+', 'gm');
 
   self.lower = lower || false;
 
@@ -29,10 +29,10 @@ var Tokenizer = function(lower) {
 };
 
 /* BayesData */
-var BayesData = function(name, pool) {
+const BayesData = function(name, pool) {
 
   // référence à this
-  var self = this;
+  let self = this;
 
   self.name = name || '';
   self.training = [];
@@ -44,10 +44,10 @@ var BayesData = function(name, pool) {
 };
 
 /* Bayes */
-var Bayes = function(min) {
+const Bayes = function(min) {
 
   // référence à this
-  var self = this;
+  let self = this;
 
   self.dataClass = BayesData;
   self.corpus = new self.dataClass('__Corpus__');
@@ -66,18 +66,18 @@ var Bayes = function(min) {
    * S = (1 + (P - Q) / (P + Q)) / 2
    */
   function robinson(probs) {
-    var nth = 1 / probs.length;
-    var _p = probs.reduce(function(pValue, cValue, i, array) {
+    const nth = 1 / probs.length;
+    const _p = probs.reduce(function(pValue, cValue, i, array) {
       return pValue * (1 - cValue[1]);
     }, 1);
-    var p = Math.pow(_p, nth);
-    var P = 1 - p;
-    var _q = probs.slice(1).reduce(function(pValue, cValue, i, array) {
+    const p = Math.pow(_p, nth);
+    const P = 1 - p;
+    const _q = probs.slice(1).reduce(function(pValue, cValue, i, array) {
       return pValue * cValue[1];
     }, probs[0][1]);
-    var q = Math.pow(_q, nth);
-    var Q = 1 - q;
-    var S = (P - Q) / (P + Q);
+    const q = Math.pow(_q, nth);
+    const Q = 1 - q;
+    const S = (P - Q) / (P + Q);
     return (1 + S) / 2;
   }
 
@@ -86,7 +86,7 @@ var Bayes = function(min) {
       self.buildCache();
       self.dirty = false;
     }
-    var data = JSON.stringify(self.cache);
+    const data = JSON.stringify(self.cache);
     fs.writeFile(path, data, function(err) {
       if (callback) {
         callback(err);
@@ -100,7 +100,7 @@ var Bayes = function(min) {
   };
 
   self.train = function(pool, item, uid) {
-    var tokens = self.getTokens(item);
+    const tokens = self.getTokens(item);
     if (!self.pools[pool]) {
       self.pools[pool] = new self.dataClass(pool);
     }
@@ -123,9 +123,9 @@ var Bayes = function(min) {
   };
 
   self._train = function(pool, tokens) {
-    var wc = 0;
-    for (var token in tokens) {
-      var count = pool.pool[tokens[token]] || 0;
+    const wc = 0;
+    for (let token in tokens) {
+      const count = pool.pool[tokens[token]] || 0;
       pool.pool[tokens[token]] = count + 1;
       count = self.corpus.pool[tokens[token]] || 0;
       self.corpus.pool[tokens[token]] = count + 1;
@@ -136,13 +136,13 @@ var Bayes = function(min) {
   };
 
   self.guess = function(msg) {
-    var tokens = self.getTokens(msg),
-      pools = self.poolProbs(),
-      probabilities = {},
+    const tokens = self.getTokens(msg),
+      pools = self.poolProbs();
+    let probabilities = {},
       probability = self.minProbability,
       category = undefined;
-    for (var k in pools) {
-      var p = self.getProbs(pools[k].pool, tokens);
+    for (let k in pools) {
+      const p = self.getProbs(pools[k].pool, tokens);
       if (Object.keys(p).length != 0) {
         probabilities[k] = self.combiner(p, k);
         if (probabilities[k] > probability) {
@@ -172,31 +172,31 @@ var Bayes = function(min) {
   self.buildCache = function() {
 
     self.cache = {};
-    for (var k in self.pools) {
+    for (let k in self.pools) {
       if (k == '__Corpus__') {
         continue;
       }
 
-      var poolCount = self.pools[k].tokenCount,
+      const poolCount = self.pools[k].tokenCount,
         themCount = Math.max(self.corpus.tokenCount - poolCount, 1);
       self.cache[k] = new self.dataClass(k);
 
-      for (var word in self.corpus.pool) {
+      for (let word in self.corpus.pool) {
         // pour chaque mot du corpus verifie si le pool contient ce mot
-        var thisCount = self.pools[k].pool[word];
+        const thisCount = self.pools[k].pool[word];
         if (thisCount == 0.0) {
           continue;
         }
-        var otherCount = self.corpus.pool[word] - thisCount;
-        var goodMetric;
+        const otherCount = self.corpus.pool[word] - thisCount;
+        let goodMetric;
 
         if (poolCount) {
           goodMetric = Math.min(1.0, otherCount / poolCount);
         } else {
           goodMetric = 1.0;
         }
-        var badMetric = Math.min(1.0, thisCount / themCount);
-        var f = badMetric / (goodMetric + badMetric);
+        const badMetric = Math.min(1.0, thisCount / themCount);
+        const f = badMetric / (goodMetric + badMetric);
 
         // SEUIL PROBABILITE
         if (Math.abs(f - 0.5) >= 0.1) {
@@ -211,8 +211,8 @@ var Bayes = function(min) {
    * extrait les probabilités de tokens ds message
    */
   self.getProbs = function(pool, words) {
-    var probs = [];
-    for (var k in words) {
+    const probs = [];
+    for (let k in words) {
       if (pool[words[k]]) {
         probs.push([words[k], pool[words[k]]]);
       }

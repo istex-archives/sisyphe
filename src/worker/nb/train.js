@@ -14,23 +14,23 @@
 */
 
 /* Module Require */
-var NB = require('./lib/nb.js'),
+const NB = require('./lib/nb.js'),
   parseArgs = require('minimist'),
   process = require('process'),
   path = require('path'),
   lineReader = require('line-reader');
 
 // Command Line arguments
-var argv = parseArgs(process.argv.slice(2));
+const argv = parseArgs(process.argv.slice(2));
 
-var nb = new NB(argv.proba),
+let nb = new NB(argv.proba),
   filename = path.basename(argv.input),
   separator = argv.separator || '\t';
 
 console.time('Train' + '-' + filename);
 // Lecture du fichier ligne par ligne
 lineReader.eachLine(argv.input, function(line, last) {
-  var data = line.split(separator);
+  let data = line.split(separator);
   nb.train(data[0], data[1]);
 
   if (last) {
