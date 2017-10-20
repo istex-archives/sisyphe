@@ -2,27 +2,27 @@
 
 'use strict';
 
-var pkg = require('../package.json'),
+const pkg = require('../package.json'),
   business = require('../index.js'),
   fs = require('fs'),
   async = require('async'),
   TU = require('auto-tu');
 
 // Données de test
-var data = require('./dataset/in/data.json'),
+const data = require('./dataset/in/data.json'),
   datasets = {
     'business': require('./dataset/in/test.business.json')
   };
 
 // Mapping indiquant quelle fonction de test et quelles données utiliser pour chaque fonction
-var wrappers = {
+const wrappers = {
   'business': {
     'doTheJob': testOf_doTheJob,
     'categorize': testOf_categorize
   }
 };
 
-var objects = {
+const objects = {
   'business': business
 };
 
@@ -54,7 +54,7 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 function testOf_doTheJob(fn, item, cb) {
   return fn(data[item.key], function(err, res) {
     item.result.include = business.LOGS[item.key]; // Contiendra la valeur de l'erreur attendu
-    var value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // Contiendra la valeur renvoyer par le module
+    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // Contiendra la valeur renvoyer par le module
     return cb(value);
   });
 }

@@ -4,7 +4,7 @@
 "use strict";
 
 /* Module Require */
-let utils = require("worker-utils"),
+const utils = require("worker-utils"),
   cld = require("cld"),
   async = require("async"),
   fs = require("fs"),
@@ -16,7 +16,6 @@ let utils = require("worker-utils"),
 let business = {
   "resources": require("nb-resources")
 };
-
 
 business.init = function(options = {
   corpusname: "default"
@@ -40,7 +39,7 @@ business.doTheJob = function(data, next) {
   }
 
   // Variables d"erreurs et de logs
-  data.nb = {
+  data[pkg.name] = {
     errors: [],
     logs: []
   };
@@ -52,7 +51,7 @@ business.doTheJob = function(data, next) {
 
     // Lecture impossible
     if (err) {
-      data.nb.errors.push(err);
+      data[pkg.name].errors.push(err);
       return next(null, data);
     }
 
@@ -63,13 +62,13 @@ business.doTheJob = function(data, next) {
 
     // Abstract introuvable malgrès la détection de langue
     if (!abstract) {
-      data.nb.logs.push(documentId + "\t" + business.LOGS.ABSTRACT_TAG_LANG_NOT_FOUND);
+      data[pkg.name].logs.push(documentId + "\t" + business.LOGS.ABSTRACT_TAG_LANG_NOT_FOUND);
       abstracts = $("abstract").map(function(i, el) {
         return $(el).text();
       }).get();
       // Abstracts introuvables
       if (!abstracts.length) {
-        data.nb.logs.push(documentId + "\t" + business.LOGS.ABSTRACTS_NOT_FOUND);
+        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.ABSTRACTS_NOT_FOUND);
         return next(null, data);
       }
     }
@@ -89,13 +88,13 @@ business.doTheJob = function(data, next) {
       });
     }, function(err) {
       if (err) {
-        data.nb.errors.push(err);
+        data[pkg.name].errors.push(err);
         return next(null, data);
       }
 
       // Abstract introuvable malgrès la détection de langue
       if (!abstract) {
-        data.nb.logs.push(documentId + "\t" + business.LOGS.ABSTRACT_DETECTED_LANG_NOT_FOUND);
+        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.ABSTRACT_DETECTED_LANG_NOT_FOUND);
         return next(null, data);
       }
 
@@ -108,11 +107,11 @@ business.doTheJob = function(data, next) {
         errors = result.errors;
 
       // Si une ou plusieur erreur de verbalisation ont eu lieu, écriture dans les logs
-      if (errors.length) data.nb.logs.push(documentId + "\t" + business.LOGS.VERBALIZATION_NOT_FOUND + " (" + result.errors.join(",") + ")");
+      if (errors.length) data[pkg.name].logs.push(documentId + "\t" + business.LOGS.VERBALIZATION_NOT_FOUND + " (" + result.errors.join(",") + ")");
 
       // Aucune catégorie déduite
       if (!categories.length) {
-        data.nb.logs.push(documentId + "\t" + business.LOGS.CATEGORY_NOT_FOUND);
+        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.CATEGORY_NOT_FOUND);
         return next(null, data);
       }
 
@@ -145,7 +144,7 @@ business.doTheJob = function(data, next) {
       }, function(err) {
         if (err) {
           // Lecture/Écriture impossible
-          data.nb.errors.push(err);
+          data[pkg.name].errors.push(err);
           return next(null, data);
         }
 
@@ -164,7 +163,7 @@ business.doTheJob = function(data, next) {
         });
 
         // Tout s"est bien passé
-        data.nb.logs.push(documentId + "\t" + business.LOGS.SUCCESS + output.filename);
+        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.SUCCESS + output.filename);
         return next(null, data);
       });
     });

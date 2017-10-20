@@ -10,8 +10,12 @@ Sisyphe is a generic NodeJS recursive folder analyser terminal application & a (
 ![Sisyphe-pic](./sisyphe.gif)
 
 ### Requirements
-Test with NodeJS@8.1, Redis@3.2.6 & ElasticSearch@5.1.1 & XMLStarlet@1.6.1(libxml2@2.9.4)
+Test with NodeJS@8.1, Redis@3.2.6 & XMLStarlet@1.6.1(libxml2@2.9.4)
 
+Example to run a quick local redis thanks to docker:
+```bash
+docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
+```
 
 ### Install it
 
