@@ -3,7 +3,7 @@
 /* jslint indent: 2 */
 'use strict';
 
-let Backbone = require('backbone');
+const Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
 
