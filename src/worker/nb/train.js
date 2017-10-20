@@ -1,7 +1,7 @@
 /* global module */
 /* jslint node: true */
 /* jslint indent: 2 */
-'use strict';
+"use strict";
 
 /*
   Option précisant la RAM allouée
@@ -14,30 +14,30 @@
 */
 
 /* Module Require */
-const NB = require('./lib/nb.js'),
-  parseArgs = require('minimist'),
-  process = require('process'),
-  path = require('path'),
-  lineReader = require('line-reader');
+const NB = require("./lib/nb.js"),
+  parseArgs = require("minimist"),
+  process = require("process"),
+  path = require("path"),
+  lineReader = require("line-reader");
 
 // Command Line arguments
 const argv = parseArgs(process.argv.slice(2));
 
-let nb = new NB(argv.proba),
+const nb = new NB(argv.proba, true),
   filename = path.basename(argv.input),
-  separator = argv.separator || '\t';
+  separator = argv.separator || "\t";
 
-console.time('Train' + '-' + filename);
+console.time("Train" + "-" + filename);
 // Lecture du fichier ligne par ligne
 lineReader.eachLine(argv.input, function(line, last) {
-  let data = line.split(separator);
+  const data = line.split(separator);
   nb.train(data[0], data[1]);
 
   if (last) {
-    console.timeEnd('Train' + '-' + filename);
-    console.time('Save' + '-' + filename);
+    console.timeEnd("Train" + "-" + filename);
+    console.time("Save" + "-" + argv.output);
     nb.save(argv.output, function(err) {
-      console.timeEnd('Save' + '-' + filename);
+      console.timeEnd("Save" + "-" + argv.output);
     });
   }
 });
