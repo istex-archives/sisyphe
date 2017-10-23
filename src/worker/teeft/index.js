@@ -82,7 +82,7 @@ worker.doTheJob = function(data, next) {
 
     // Lecture impossible
     if (err) {
-      data[pkg.name].errors.push(err);
+      data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
 
