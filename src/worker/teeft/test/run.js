@@ -2,7 +2,7 @@
 'use strict';
 
 let pkg = require('../package.json'),
-  business = require('../index.js'),
+  worker = require('../index.js'),
   Tagger = require('../lib/tagger.js'),
   lexicon = require('../lib/lexicon.js'),
   DefaultFilter = require('../lib/defaultfilter.js'),
@@ -23,7 +23,7 @@ let tagger = new Tagger(lexicon),
 // Données de test
 let data = require('./dataset/in/data.json'),
   datasets = {
-    'business': require('./dataset/in/test.business.json'),
+    'worker': require('./dataset/in/test.worker.json'),
     'tagger': require('./dataset/in/test.tagger.json'),
     'filter': require('./dataset/in/test.filter.json'),
     'extractor': require('./dataset/in/test.extractor.json')
@@ -31,7 +31,7 @@ let data = require('./dataset/in/data.json'),
 
 // Mapping indiquant quelle fonction de test et quelles données utiliser pour chaque fonction
 let wrappers = {
-  'business': {
+  'worker': {
     'doTheJob': testOf_doTheJob,
     'index': testOf_index,
     'tokenize': null,
@@ -52,19 +52,19 @@ let wrappers = {
 };
 
 let objects = {
-  'business': business,
+  'worker': worker,
   'tagger': tagger,
   'filter': filter,
   'extractor': extractor
 };
 
-business.init({
+worker.init({
   "outputPath": "./test/dataset/out/"
 });
 
 /**
  * Test des fonctions de :
- *   - business :
+ *   - worker :
  *     - doTheJob()
  *     - tokenize()
  *     - translateTag()
@@ -91,12 +91,12 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 
 /**
  * Fonction de test à appliquée pour :
- * - business.doTheJob()
+ * - worker.doTheJob()
  */
 function testOf_doTheJob(fn, item, cb) {
   let docObject = data[item.key];
   return fn(docObject, function(err, res) {
-    item.result.include = business.LOGS[item.key]; // Contiendra la valeur de l'erreur attendu
+    item.result.include = worker.LOGS[item.key]; // Contiendra la valeur de l'erreur attendu
     let value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // Contiendra la valeur renvoyer par le module
     return cb(value);
   });
@@ -104,7 +104,7 @@ function testOf_doTheJob(fn, item, cb) {
 
 /**
  * Fonction de test à appliquée pour :
- * - business.index()
+ * - worker.index()
  */
 function testOf_index(fn, item, cb) {
   fs.readFile(item.arguments.path, 'utf-8', function(err, res) {
@@ -116,7 +116,7 @@ function testOf_index(fn, item, cb) {
 
 /**
  * Fonction de test à appliquée pour :
- * - business.translateTag()
+ * - worker.translateTag()
  */
 function testOf_translateTag(fn, item, cb) {
   // Récupération de tous les tags présents dans le lexicon
