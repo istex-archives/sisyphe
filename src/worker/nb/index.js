@@ -137,7 +137,7 @@ worker.doTheJob = (data, next) => {
 
       // Récupération du fragment de TEI
       utils.enrichments.write({
-        "template": path.join(worker.resources.template),
+        "template": worker.resources.template,
         "data": tpl,
         "output": output
       }, function(err) {
