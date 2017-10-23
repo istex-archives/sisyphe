@@ -13,13 +13,13 @@ const utils = require("worker-utils"),
   pkg = require("./package.json"),
   NB = require("./lib/nb.js");
 
-let business = {
+const business = {
   "resources": require("nb-resources")
 };
 
-business.init = function(options = {
+business.init = (options = {
   corpusname: "default"
-}) {
+}) => {
   business.outputPath = options.outputPath || path.join("out/", pkg.name);
   /* Constantes */
   business.LOGS = { // Logs des différents cas possibles (et gérés par le module)
@@ -32,7 +32,7 @@ business.init = function(options = {
   };
 }
 
-business.doTheJob = function(data, next) {
+business.doTheJob = (data, next) => {
   // Vérification du type de fichier
   if (data.mimetype !== "application/xml" || !data.isWellFormed) {
     return next(null, data);
@@ -44,7 +44,7 @@ business.doTheJob = function(data, next) {
     logs: []
   };
 
-  let documentId = path.basename(data.name, ".xml");
+  const documentId = path.basename(data.name, ".xml");
 
   // Lecture du fichier MODS
   fs.readFile(data.path, "utf-8", function(err, modsStr) {
@@ -56,9 +56,9 @@ business.doTheJob = function(data, next) {
     }
 
     // Récupération de l"ISSN
-    let $ = utils.XML.load(modsStr),
-      abstract = $("abstract[lang=\"" + config.lang + "\"]").text(),
-      abstracts = [];
+    const $ = utils.XML.load(modsStr),
+      abstract = $("abstract[lang=\"" + config.lang + "\"]").text();
+    let abstracts = [];
 
     // Abstract introuvable malgrès la détection de langue
     if (!abstract) {
@@ -99,11 +99,11 @@ business.doTheJob = function(data, next) {
       }
 
       // Résultat de la catégorisation
-      let result = business.categorize(abstract);
+      const result = business.categorize(abstract);
 
 
       // Récupération des catégories et des erreurs de verbalisation
-      let categories = result.categories,
+      const categories = result.categories,
         errors = result.errors;
 
       // Si une ou plusieur erreur de verbalisation ont eu lieu, écriture dans les logs
@@ -117,7 +117,7 @@ business.doTheJob = function(data, next) {
 
       business.NOW = utils.dates.now(); // Date du jour formatée (string)
       // Construction de la structure de données pour le template
-      let tpl = {
+      const tpl = {
           "date": business.NOW,
           "module": config, // Infos sur la configuration du module
           "pkg": pkg, // Infos sur le module
@@ -149,7 +149,7 @@ business.doTheJob = function(data, next) {
         }
 
         // Création de l"objet enrichement représentant l"enrichissement produit
-        let enrichment = {
+        const enrichment = {
           "path": path.join(output.directory, output.filename),
           "extension": "tei",
           "original": false,
@@ -175,12 +175,12 @@ business.doTheJob = function(data, next) {
  * @param {string} text Texte à classer
  * @return {array} Tableau contenant les catégories calculées
  */
-business.categorize = function(text) {
+business.categorize = (text) => {
   // Instanciation d"un Bayésien Naïf
-  let nb = new NB(config.probability.min),
+  const nb = new NB(config.probability.min),
     categories = [],
-    errors = [],
-    training = business.resources.trainings.entry,
+    errors = [];
+  let training = business.resources.trainings.entry,
     level = 0,
     next = true;
   // Guess de la catégorie tant qu"un entrainement est dispo
@@ -189,7 +189,7 @@ business.categorize = function(text) {
     let result = nb.guess(text); // Estimation de la catégorie
     if (result.category) {
       // Verbalisation du code
-      let verbalization = business.resources.verbalization[result.category];
+      const verbalization = business.resources.verbalization[result.category];
       if (!verbalization) errors.push(result.category);
       // Ajout du résultat à la liste
       categories.push({

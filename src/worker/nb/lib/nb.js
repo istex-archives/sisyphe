@@ -10,11 +10,8 @@ const fs = require('fs');
 
 /* Tokenizer */
 const Tokenizer = function(lower) {
-
-  // référence à this
-  let self = this;
-
-  const re = new RegExp('\\w+', 'gm');
+  const self = this,
+    re = new RegExp('\\w+', 'gm');
 
   self.lower = lower || false;
 
@@ -28,11 +25,12 @@ const Tokenizer = function(lower) {
   return self;
 };
 
+
+
 /* BayesData */
 const BayesData = function(name, pool) {
 
-  // référence à this
-  let self = this;
+  const self = this;
 
   self.name = name || '';
   self.training = [];
@@ -44,10 +42,30 @@ const BayesData = function(name, pool) {
 };
 
 /* Bayes */
-const Bayes = function(min) {
+const Bayes = function(min, lower = false) {
 
-  // référence à this
-  let self = this;
+  const self = this;
+  /*
+   * calcule la probabilité (méthode Robinson)
+   * P = 1 - prod(1 - p) ^ (1 / n)
+   * Q = 1 - prod(p) ^ (1 / n)
+   * S = (1 + (P - Q) / (P + Q)) / 2
+   */
+  self.robinson = function(probs) {
+    const nth = 1 / probs.length,
+      _p = probs.reduce(function(pValue, cValue, i, array) {
+        return pValue * (1 - cValue[1]);
+      }, 1),
+      p = Math.pow(_p, nth),
+      P = 1 - p,
+      _q = probs.slice(1).reduce(function(pValue, cValue, i, array) {
+        return pValue * cValue[1];
+      }, probs[0][1]),
+      q = Math.pow(_q, nth),
+      Q = 1 - q,
+      S = (P - Q) / (P + Q);
+    return (1 + S) / 2;
+  }
 
   self.dataClass = BayesData;
   self.corpus = new self.dataClass('__Corpus__');
@@ -56,30 +74,8 @@ const Bayes = function(min) {
   self.trainCount = 0;
   self.dirty = true;
   self.minProbability = min || 0;
-  self._tokenizer = new Tokenizer();
-  self.combiner = robinson;
-
-  /*
-   * calcule la probabilité (méthode Robinson)
-   * P = 1 - prod(1 - p) ^ (1 / n)
-   * Q = 1 - prod(p) ^ (1 / n)
-   * S = (1 + (P - Q) / (P + Q)) / 2
-   */
-  function robinson(probs) {
-    const nth = 1 / probs.length;
-    const _p = probs.reduce(function(pValue, cValue, i, array) {
-      return pValue * (1 - cValue[1]);
-    }, 1);
-    const p = Math.pow(_p, nth);
-    const P = 1 - p;
-    const _q = probs.slice(1).reduce(function(pValue, cValue, i, array) {
-      return pValue * cValue[1];
-    }, probs[0][1]);
-    const q = Math.pow(_q, nth);
-    const Q = 1 - q;
-    const S = (P - Q) / (P + Q);
-    return (1 + S) / 2;
-  }
+  self._tokenizer = new Tokenizer(lower);
+  self.combiner = self.robinson;
 
   self.save = function(path, callback) {
     if (self.dirty) {
@@ -123,9 +119,9 @@ const Bayes = function(min) {
   };
 
   self._train = function(pool, tokens) {
-    const wc = 0;
+    let wc = 0;
     for (let token in tokens) {
-      const count = pool.pool[tokens[token]] || 0;
+      let count = pool.pool[tokens[token]] || 0;
       pool.pool[tokens[token]] = count + 1;
       count = self.corpus.pool[tokens[token]] || 0;
       self.corpus.pool[tokens[token]] = count + 1;
