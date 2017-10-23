@@ -13,13 +13,12 @@ const utils = require("worker-utils"),
   pkg = require("./package.json"),
   NB = require("./lib/nb.js");
 
-const worker = {
-  "resources": require("nb-resources")
-};
+const worker = {};
 
 worker.init = (options = {
   corpusname: "default"
 }) => {
+  worker.resources = require("nb-resources");
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   /* Constantes */
   worker.LOGS = { // Logs des différents cas possibles (et gérés par le module)
