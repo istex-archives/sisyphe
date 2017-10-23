@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fichier générée le 23-10-2017 -->
+<!-- multicat - v1.0.0 - sm-wos-scopus -->
+<TEI>
+  <standOff>
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title>Catégorisation de documents</title>
+          <respStmt>
+            <resp>enrichissement catégorisation ISTEX-RD</resp>
+            <name resp="istex-rd">ISTEX-RD</name>
+          </respStmt>
+        </titleStmt>
+        <publicationStmt>
+          <authority>Inist-CNRS</authority>
+          <availability status="restricted">
+            <licence target="http://creativecommons.org/licenses/by/4.0/">
+              <p>L’élément standOff de ce document est distribué sous licence Creative Commons 4.0 non transposée (CC BY 4.0)</p>
+              <p>Ce standOff a été créé dans le cadre du projet ISTEX – Initiative d’Excellence en Information Scientifique et Technique</p>
+            </licence>
+          </availability>
+        </publicationStmt>
+        <sourceDesc>
+          <biblStruct>
+            <idno type="ISTEX">SUCCESS.mods</idno>
+          </biblStruct>
+        </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+        <appInfo>
+          <application ident="rd-multicat" version="">
+            <label>multicat</label>
+          </application>
+        </appInfo>
+        <classDecl>
+          <taxonomy xml:id="wos">
+            <bibl>Web of Science (WoS) service d’information universitaire en ligne de la société ISI – Institute for Scientific Information de Thomson Scientific.<ptr target="https://wos-category.data.istex.fr"/></bibl>
+          </taxonomy>
+          <taxonomy xml:id="science-metrix">
+            <bibl>Science-Metrix, entreprise indépendante basée aux Etats-Unis et au Canada spécialisée en évaluation des activités liées à la science et à la technologie.<ptr target="https://sciencemetrix-category.data.istex.fr"/></bibl>
+          </taxonomy>
+          <taxonomy xml:id="scopus">
+            <bibl>Scopus, base de données transdisciplinaire lancée par l'éditeur scientifique Elsevier.<ptr target="https://scopus-category.data.istex.fr"/></bibl>
+          </taxonomy>
+        </classDecl>
+      </encodingDesc>
+      <revisionDesc>
+        <change when="2016-06-24" who="istex-rd" xml:id="rd-multicat">catégorisation par appariement</change>
+      </revisionDesc>
+    </teiHeader>
+    <listAnnotation type="rd-multicat">
+      <annotationBlock xmls="https//www.tei-c.org/ns/1.0">
+        <keywords change="#rd-multicat" resp="#istex-rd" scheme="#wos">
+          <term level="1">social science</term>
+          <term level="2">transportation</term>
+        </keywords>
+        <keywords change="#rd-multicat" resp="#istex-rd" scheme="#wos">
+          <term level="1">science</term>
+          <term level="2">transportation science &amp; technology</term>
+          <term level="2">engineering, civil</term>
+        </keywords>
+        <keywords change="#rd-multicat" resp="#istex-rd" scheme="#science-metrix">
+          <term level="1">economic &amp; social sciences</term>
+          <term level="2">economics &amp; business</term>
+          <term level="3">logistics &amp; transportation</term>
+        </keywords>
+        <keywords change="#rd-multicat" resp="#istex-rd" scheme="#scopus">
+          <term level="1">Social Sciences</term>
+          <term level="2">Social Sciences</term>
+          <term level="3">Transportation</term>
+        </keywords>
+        <keywords change="#rd-multicat" resp="#istex-rd" scheme="#scopus">
+          <term level="1">Social Sciences</term>
+          <term level="2">Social Sciences</term>
+          <term level="3">Development</term>
+        </keywords>
+        <keywords change="#rd-multicat" resp="#istex-rd" scheme="#scopus">
+          <term level="1">Physical Sciences</term>
+          <term level="2">Engineering</term>
+          <term level="3">Civil and Structural Engineering</term>
+        </keywords>
+      </annotationBlock>
+    </listAnnotation>
+  </standOff>
+</TEI>
