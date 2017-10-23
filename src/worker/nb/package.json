@@ -9,7 +9,7 @@
   "keywords": [
     ""
   ],
-  "author": "",
+  "author": "NicolasKieffer",
   "license": "GNU",
   "dependencies": {
     "async": "^2.0.1",
