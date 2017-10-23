@@ -3,10 +3,10 @@
 /* jslint indent: 2 */
 'use strict';
 
-let Tagger = function(lexicon) {
+const Tagger = function(lexicon) {
 
   // référence à this
-  let self = this;
+  const self = this;
 
   self.lexicon = Object.create(null, {});
 
@@ -23,7 +23,7 @@ let Tagger = function(lexicon) {
   self.tag = function(terms) {
     let result = [];
     for (let i = 0; i < terms.length; i++) {
-      let term = terms[i],
+      const term = terms[i],
         tag = (self.lexicon[term]) ? self.lexicon[term] : 'NND';
       result.push({
         term: term,

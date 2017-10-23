@@ -3,7 +3,7 @@
 /* jslint indent: 2 */
 'use strict';
 
-let Backbone = require('backbone'),
+const Backbone = require('backbone'),
   extend = require('util')._extend;
 
 module.exports = Backbone.Model.extend({
@@ -20,12 +20,12 @@ module.exports = Backbone.Model.extend({
   },
 
   call: function(text) {
-    let terms = this.get('tagger').call(text);
+    const terms = this.get('tagger').call(text);
     return this.extract(terms);
   },
 
   extract: function(taggedTerms) {
-    let terms = {
+    const terms = {
         _add: function(norm) {
           if (!this[norm]) {
             this[norm] = {
@@ -80,7 +80,7 @@ module.exports = Backbone.Model.extend({
     let result = {};
     delete terms._add;
     for (word in terms) {
-      let occur = terms[word].frequency,
+      const occur = terms[word].frequency,
         strength = word.split(" ").length;
       if (this.get('filter').call(occur, strength)) {
         result[word] = {

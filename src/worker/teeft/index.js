@@ -4,7 +4,7 @@
 "use strict";
 
 /* Module Require */
-let utils = require("worker-utils"),
+const utils = require("worker-utils"),
   pkg = require("./package.json"),
   config = require("./config.json"),
   fs = require("fs"),
@@ -75,7 +75,7 @@ worker.doTheJob = function(data, next) {
     logs: []
   };
 
-  let documentId = path.basename(data.name, ".xml");
+  const documentId = path.basename(data.name, ".xml");
 
   // Lecture du fichier TXT
   fs.readFile(data.path, "utf-8", function(err, txt) {
@@ -100,7 +100,7 @@ worker.doTheJob = function(data, next) {
      *   statistics: {} // Toutes les statistiques sur le texte
      * }
      */
-    let text = worker.index(txt);
+    const text = worker.index(txt);
 
     // S"il n"y a aucun tokens dans tout le texte, arrêt des traitements en cours
     if (text.tokens.length === 0) {
@@ -133,7 +133,7 @@ worker.doTheJob = function(data, next) {
     }
 
     // Construction de la structure de données pour le templates
-    let tpl = {
+    const tpl = {
         "date": worker.NOW,
         "module": config, // Infos sur la configuration du module
         "pkg": worker.resources.pkg, // Infos sur le module
@@ -191,10 +191,10 @@ worker.doTheJob = function(data, next) {
  * @return {Array} Liste des termes nettoyés
  */
 worker.tokenize = function(text) {
-  let words = text.split(/\s/g),
-    result = [];
+  const words = text.split(/\s/g);
+  let result = [];
   for (let i = 0; i < words.length; i++) {
-    let term = words[i].toLowerCase();
+    const term = words[i].toLowerCase();
     // Now, a word can be preceded or succeeded by symbols, so let"s
     // split those out
     let match;
@@ -238,12 +238,12 @@ worker.translateTag = function(tag) {
  * @return {Array} Liste de termes filtrés
  */
 worker.sanitize = function(terms) {
-  let result = [],
-    invalid = worker.tagger.tag(worker.SEPARATOR)[0];
+  let result = [];
+  const invalid = worker.tagger.tag(worker.SEPARATOR)[0];
   for (let i = 0; i < terms.length; i++) {
     let value = invalid;
     if (terms[i].term.length >= worker.MIN_LENGTH) {
-      let na = terms[i].term.match(worker.NOT_ALPHANUMERIC),
+      const na = terms[i].term.match(worker.NOT_ALPHANUMERIC),
         d = terms[i].term.match(worker.DIGIT);
       if ((!na || na.length <= worker.MAX_NOT_ALPHANUMERIC) && (!d || d.length < worker.MAX_DIGIT) && (!worker.resources.stopwords[terms[i].stem])) {
         value = terms[i];
@@ -262,12 +262,12 @@ worker.sanitize = function(terms) {
 worker.lemmatize = function(terms) {
   let result = [];
   for (let i = 0; i < terms.length; i++) {
-    let trslTag = worker.translateTag(terms[i].tag),
-      lemma = terms[i].term;
+    const trslTag = worker.translateTag(terms[i].tag);
+    let lemma = terms[i].term;
 
     // Si la traduction est possible
     if (trslTag) {
-      let _lemma = worker.lemmatizer.lemmas(terms[i].term, trslTag);
+      const _lemma = worker.lemmatizer.lemmas(terms[i].term, trslTag);
       if (_lemma.length > 0) {
         lemma = _lemma[_lemma.length - 1][0]; // Récupération du terme lemmatizé
       }
@@ -282,9 +282,28 @@ worker.lemmatize = function(terms) {
   return result;
 };
 
+/**
+ * Compare deux objets entre eux en fonction de leur propriété "specificity"
+ * @param {Object} a Objet a
+ * @return {Object} b Objet b
+ */
+worker.compare = function(a, b) {
+  if (a.specificity > b.specificity)
+    return -1;
+  else if (a.specificity < b.specificity)
+    return 1;
+  else
+    return 0;
+};
+
+/**
+ * Index du text
+ * @param {String} data Données à indexer, sous forme de chaîne de caractères
+ * @return {Object} Retourne une représentation du text indexé
+ */
 worker.index = function(data) {
-  // Représentation d"un texte par défaut
-  let text = {
+  // Représentation d'un texte par défaut
+  const text = {
     "keywords": [], // Mots clés du texte
     "extraction": { // Extraction sur tout le texte
       "terms": {},
@@ -348,7 +367,7 @@ worker.index = function(data) {
   for (let i = 0; i < text.extraction.keys.length; i++) {
 
     // Clé du term dans text.extraction.terms
-    let key = text.extraction.keys[i];
+    const key = text.extraction.keys[i];
 
     // Fréquence maximale pour ce texte
     if (text.statistics.frequencies.max < text.extraction.terms[key].frequency) {
@@ -366,10 +385,10 @@ worker.index = function(data) {
   for (let i = 0; i < text.extraction.keys.length; i++) {
 
     // Clé du term dans text.extraction.terms
-    let key = text.extraction.keys[i];
+    const key = text.extraction.keys[i];
 
     // Valeur de la pondération du terme qui dépend de sa "représentativité" dans le vocabulaire (dictionnary.json)
-    let weighting = worker.resources.dictionary[key] || dValue;
+    const weighting = worker.resources.dictionary[key] || dValue;
 
     // Specificité = (fréquence d"apparition du terme) / (pondération)
     text.extraction.terms[key].specificity = ((text.extraction.terms[key].frequency / text.statistics.frequencies.total) / weighting);
@@ -384,7 +403,7 @@ worker.index = function(data) {
   for (let i = 0; i < text.extraction.keys.length; i++) {
 
     // Clé du term dans text.extraction.terms
-    let key = text.extraction.keys[i];
+    const key = text.extraction.keys[i];
 
     text.extraction.terms[key].specificity /= text.statistics.specificities.max;
     text.statistics.specificities.avg += text.extraction.terms[key].specificity;
@@ -400,7 +419,7 @@ worker.index = function(data) {
   for (let i = 0; i < text.extraction.keys.length; i++) {
 
     // Clé du term dans text.extraction.terms
-    let key = text.extraction.keys[i];
+    const key = text.extraction.keys[i];
 
     if (!config.truncate || (text.extraction.terms[key].specificity >= text.statistics.specificities.avg)) {
       text.extraction.terms[key].term = key;
@@ -410,16 +429,7 @@ worker.index = function(data) {
 
   // Si le résultat doit être trié
   if (config.sort) {
-    function compare(a, b) {
-      if (a.specificity > b.specificity)
-        return -1;
-      else if (a.specificity < b.specificity)
-        return 1;
-      else
-        return 0;
-    }
-
-    text.keywords = text.keywords.sort(compare);
+    text.keywords = text.keywords.sort(worker.compare);
   }
   return text;
 };
