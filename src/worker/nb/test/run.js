@@ -2,7 +2,7 @@
 "use strict";
 
 const pkg = require("../package.json"),
-  business = require("../index.js"),
+  worker = require("../index.js"),
   fs = require("fs"),
   async = require("async"),
   TU = require("auto-tu");
@@ -10,28 +10,28 @@ const pkg = require("../package.json"),
 // Données de test
 const data = require("./dataset/in/data.json"),
   datasets = {
-    "business": require("./dataset/in/test.business.json")
+    "worker": require("./dataset/in/test.worker.json")
   };
 
 // Mapping indiquant quelle fonction de test et quelles données utiliser pour chaque fonction
 const wrappers = {
-  "business": {
+  "worker": {
     "doTheJob": testOf_doTheJob,
     "categorize": testOf_categorize
   }
 };
 
 const objects = {
-  "business": business
+  "worker": worker
 };
 
-business.init({
+worker.init({
   "outputPath": "test/dataset/out"
 });
 
 /**
  * Test des fonctions de :
- *   - business :
+ *   - worker :
  *     - doTheJob()
  */
 // Pour chaque clé
@@ -48,11 +48,11 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 
 /**
  * Fonction de test à appliquée pour :
- * - business.doTheJob()
+ * - worker.doTheJob()
  */
 function testOf_doTheJob(fn, item, cb) {
   return fn(data[item.key], function(err, res) {
-    item.result.include = business.LOGS[item.key]; // Contiendra la valeur de l'erreur attendu
+    item.result.include = worker.LOGS[item.key]; // Contiendra la valeur de l'erreur attendu
     const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // Contiendra la valeur renvoyer par le module
     return cb(value);
   });
@@ -60,7 +60,7 @@ function testOf_doTheJob(fn, item, cb) {
 
 /**
  * Fonction de test à appliquée pour :
- * - business.categorize()
+ * - worker.categorize()
  */
 function testOf_categorize(fn, item, cb) {
   fs.readFile(item.arguments.path, "utf-8",
