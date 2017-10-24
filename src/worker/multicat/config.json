@@ -1,0 +1,9 @@
+{
+  "id": "rd-multicat",
+  "label": "multicat",
+  "resp": {
+    "id": "istex-rd",
+    "label": "ISTEX-RD"
+  },
+  "resources": "sm-wos-scopus"
+}

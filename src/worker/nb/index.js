@@ -13,16 +13,15 @@ const utils = require("worker-utils"),
   pkg = require("./package.json"),
   NB = require("./lib/nb.js");
 
-const business = {
-  "resources": require("nb-resources")
-};
+const worker = {};
 
-business.init = (options = {
+worker.init = (options = {
   corpusname: "default"
 }) => {
-  business.outputPath = options.outputPath || path.join("out/", pkg.name);
+  worker.resources = require("nb-resources");
+  worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   /* Constantes */
-  business.LOGS = { // Logs des différents cas possibles (et gérés par le module)
+  worker.LOGS = { // Logs des différents cas possibles (et gérés par le module)
     "SUCCESS": "TEI file created at ",
     "ABSTRACTS_NOT_FOUND": "Abstracts not found",
     "ABSTRACT_TAG_LANG_NOT_FOUND": "Abstract with correct tag lang not found",
@@ -32,7 +31,7 @@ business.init = (options = {
   };
 }
 
-business.doTheJob = (data, next) => {
+worker.doTheJob = (data, next) => {
   // Vérification du type de fichier
   if (data.mimetype !== "application/xml" || !data.isWellFormed) {
     return next(null, data);
@@ -51,7 +50,7 @@ business.doTheJob = (data, next) => {
 
     // Lecture impossible
     if (err) {
-      data[pkg.name].errors.push(err);
+      data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
 
@@ -62,13 +61,13 @@ business.doTheJob = (data, next) => {
 
     // Abstract introuvable malgrès la détection de langue
     if (!abstract) {
-      data[pkg.name].logs.push(documentId + "\t" + business.LOGS.ABSTRACT_TAG_LANG_NOT_FOUND);
+      data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACT_TAG_LANG_NOT_FOUND);
       abstracts = $("abstract").map(function(i, el) {
         return $(el).text();
       }).get();
       // Abstracts introuvables
       if (!abstracts.length) {
-        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.ABSTRACTS_NOT_FOUND);
+        data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACTS_NOT_FOUND);
         return next(null, data);
       }
     }
@@ -94,12 +93,12 @@ business.doTheJob = (data, next) => {
 
       // Abstract introuvable malgrès la détection de langue
       if (!abstract) {
-        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.ABSTRACT_DETECTED_LANG_NOT_FOUND);
+        data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACT_DETECTED_LANG_NOT_FOUND);
         return next(null, data);
       }
 
       // Résultat de la catégorisation
-      const result = business.categorize(abstract);
+      const result = worker.categorize(abstract);
 
 
       // Récupération des catégories et des erreurs de verbalisation
@@ -107,18 +106,18 @@ business.doTheJob = (data, next) => {
         errors = result.errors;
 
       // Si une ou plusieur erreur de verbalisation ont eu lieu, écriture dans les logs
-      if (errors.length) data[pkg.name].logs.push(documentId + "\t" + business.LOGS.VERBALIZATION_NOT_FOUND + " (" + result.errors.join(",") + ")");
+      if (errors.length) data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.VERBALIZATION_NOT_FOUND + " (" + result.errors.join(",") + ")");
 
       // Aucune catégorie déduite
       if (!categories.length) {
-        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.CATEGORY_NOT_FOUND);
+        data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.CATEGORY_NOT_FOUND);
         return next(null, data);
       }
 
-      business.NOW = utils.dates.now(); // Date du jour formatée (string)
+      worker.NOW = utils.dates.now(); // Date du jour formatée (string)
       // Construction de la structure de données pour le template
       const tpl = {
-          "date": business.NOW,
+          "date": worker.NOW,
           "module": config, // Infos sur la configuration du module
           "pkg": pkg, // Infos sur le module
           "document": { // Infos sur le document
@@ -128,7 +127,7 @@ business.doTheJob = (data, next) => {
         },
         // Récupération du directory & filename de l"ouput
         output = utils.files.createPath({
-          outputPath: business.outputPath,
+          outputPath: worker.outputPath,
           id: documentId,
           type: "enrichments",
           label: pkg.name,
@@ -138,13 +137,13 @@ business.doTheJob = (data, next) => {
 
       // Récupération du fragment de TEI
       utils.enrichments.write({
-        "template": path.join(business.resources.template),
+        "template": worker.resources.template,
         "data": tpl,
         "output": output
       }, function(err) {
         if (err) {
           // Lecture/Écriture impossible
-          data[pkg.name].errors.push(err);
+          data[pkg.name].errors.push(err.toString());
           return next(null, data);
         }
 
@@ -163,7 +162,7 @@ business.doTheJob = (data, next) => {
         });
 
         // Tout s"est bien passé
-        data[pkg.name].logs.push(documentId + "\t" + business.LOGS.SUCCESS + output.filename);
+        data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.SUCCESS + output.filename);
         return next(null, data);
       });
     });
@@ -175,12 +174,12 @@ business.doTheJob = (data, next) => {
  * @param {string} text Texte à classer
  * @return {array} Tableau contenant les catégories calculées
  */
-business.categorize = (text) => {
+worker.categorize = (text) => {
   // Instanciation d"un Bayésien Naïf
   const nb = new NB(config.probability.min),
     categories = [],
     errors = [];
-  let training = business.resources.trainings.entry,
+  let training = worker.resources.trainings.entry,
     level = 0,
     next = true;
   // Guess de la catégorie tant qu"un entrainement est dispo
@@ -189,19 +188,19 @@ business.categorize = (text) => {
     let result = nb.guess(text); // Estimation de la catégorie
     if (result.category) {
       // Verbalisation du code
-      const verbalization = business.resources.verbalization[result.category];
+      const verbalization = worker.resources.verbalization[result.category];
       if (!verbalization) errors.push(result.category);
       // Ajout du résultat à la liste
       categories.push({
         "code": result.category,
         "probability": result.probability,
-        "verbalization": business.resources.verbalization[result.category],
+        "verbalization": worker.resources.verbalization[result.category],
         "level": ++level // On augmente le niveau de catégorisation
       });
     }
-    next = business.resources.trainings.hasOwnProperty(result.category); // Si la clé du prochain entrainement existe => true, sinon false
+    next = worker.resources.trainings.hasOwnProperty(result.category); // Si la clé du prochain entrainement existe => true, sinon false
     if (next) {
-      training = business.resources.trainings[result.category]; // Définition du prochain entrainement
+      training = worker.resources.trainings[result.category]; // Définition du prochain entrainement
     }
   }
   return {
@@ -210,4 +209,4 @@ business.categorize = (text) => {
   };
 };
 
-module.exports = business;
+module.exports = worker;
