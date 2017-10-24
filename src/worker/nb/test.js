@@ -33,7 +33,8 @@ console.time("Test" + "-" + filename);
 // Lecture du fichier ligne par ligne
 lineReader.eachLine(argv.input, function(line, last) {
   const data = line.split(separator);
-  let res = data[0] + ";" + nb.categorize(data[1].toLowerCase()).categories.map((el) => {
+  // let res = data[0] + ";" + nb.categorize(data[1].toLowerCase()).categories.map((el) => {
+  let res = data[0] + ";" + nb.categorize(data[1]).categories.map((el) => {
     return el.code + ";" + el.probability + ";";
   });
   results.push(JSON.stringify(res));

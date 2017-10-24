@@ -31,6 +31,7 @@ console.time("Train" + "-" + filename);
 // Lecture du fichier ligne par ligne
 lineReader.eachLine(argv.input, function(line, last) {
   const data = line.split(separator);
+  // nb.train(data[0], data[1].toLowerCase());
   nb.train(data[0], data[1]);
 
   if (last) {
