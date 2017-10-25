@@ -17,7 +17,7 @@ worker.init = (options = {
 }) => {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
 
-  worker.resources = require("multicat-resources");
+  worker.resources = worker.load(path.join(configDir, configFilename));
   /* Constantes */
   worker.NOW = utils.dates.now(); // Date du jour formatée (String)
   worker.LOGS = { // Logs des différents cas possibles (et gérés par le module)
@@ -122,13 +122,13 @@ worker.doTheJob = function(data, next) {
         "mime": "application/tei+xml"
       };
 
-      // Sauvegarde de l"enrichissement dans le data
+      // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
         "enrichment": enrichment,
         "label": config.label
       });
 
-      // Tout s"est bien passé
+      // All clear
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.SUCCESS + output.filename);
       return next(null, data);
     });
@@ -136,16 +136,16 @@ worker.doTheJob = function(data, next) {
 };
 
 /**
- * Retourne les catégories associés à un Identifier pour une Table donnée
- * @param {String} identifier Identifier à tester
- * @param {String} table Table à tester
- * @return {Array} Tableau contenant les catégories associées à l'Identifier pour cette Table
+ * Return each categories of a given Idenfier for a given table
+ * @param {String} identifier Identifier of a docObject
+ * @param {String} table Identifier of a table
+ * @return {Array} An array containing all categories associated with this identifier for this table
  */
 worker.categorize = function(identifier, table) {
   let result = [];
   if (worker.resources.tables.hasOwnProperty(table) && worker.resources.tables[table].hasOwnProperty(identifier)) {
-    const values = worker.resources.tables[table][identifier]; // Contient la liste des catégories rattachées à l"Identifier
-    // Ajout de la catégorie à la liste
+    const values = worker.resources.tables[table][identifier]; // All categegories associated with this identifier
+    // Add category to the list
     if (values) {
       result.push({
         "id": table,
@@ -153,7 +153,20 @@ worker.categorize = function(identifier, table) {
       });
     };
   }
+  return result;
+};
 
+/**
+ * Load all resources needed in this module
+ * @param {String} filename Path of sisyphe config file
+ * @return {Object} An object containing all the data loaded
+ */
+worker.load = (filename) => {
+  const result = require(filename);
+  for (let i = 0; i < result.categorizations.length; i++) {
+    result.tables[result.categorizations[i].id] = require(path.join(__dirname, result.categorizations[i].file));
+  }
+  result.template = fs.readFileSync(result.template, 'utf-8');
   return result;
 };
 
