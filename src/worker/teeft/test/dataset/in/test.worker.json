@@ -1,0 +1,105 @@
+{
+  "doTheJob": [{
+    "label": "Devrait traiter correctement le document",
+    "key": "SUCCESS",
+    "logs": "logs",
+    "result": {}
+  }, {
+    "label": "Devrait renvoyer l'erreur : ERROR_EXTRACTION",
+    "key": "ERROR_EXTRACTION",
+    "logs": "logs",
+    "result": {}
+  }, {
+    "label": "Devrait renvoyer l'erreur : ERROR_TOKENIZATION",
+    "key": "ERROR_TOKENIZATION",
+    "logs": "logs",
+    "result": {}
+  }],
+  "index": [{
+    "label": "Devrait renvoyer des mots clés",
+    "arguments": {
+      "path": "./test/dataset/in/corpus/SUCCESS.txt"
+    },
+    "result": {
+      "not": true,
+      "length": 0
+    }
+  }, {
+    "label": "Ne devrait pas renvoyer de mots clés (ERROR_EXTRACTION)",
+    "arguments": {
+      "path": "./test/dataset/in/corpus/ERROR_EXTRACTION.txt"
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Ne devrait pas renvoyer de mots clés (ERROR_TOKENIZATION)",
+    "arguments": {
+      "path": "./test/dataset/in/corpus/ERROR_TOKENIZATION.txt"
+    },
+    "result": {
+      "length": 0
+    }
+  }],
+  "tokenize": [{
+    "label": "Devrait renvoyer 12 tokens",
+    "arguments": "This is a test, so why did you read it?",
+    "result": {
+      "length": 12
+    }
+  }, {
+    "label": "Devrait renvoyer un Array vide",
+    "arguments": "",
+    "result": {
+      "length": 0
+    }
+  }],
+  "translateTag": [{
+    "label": "Devrait gérer tous les cas possibles du lexicon",
+    "arguments": "",
+    "result": {
+      "length": 5
+    }
+  }],
+  "sanitize": [{
+    "label": "Devrait renvoyer un tableau contenant 4 séparateurs",
+    "arguments": [{
+      "term": "this",
+      "tag": "DT"
+    }, {
+      "term": "is",
+      "tag": "VBZ"
+    }, {
+      "term": "a",
+      "tag": "DT"
+    }, {
+      "term": "test",
+      "tag": "NN"
+    }],
+    "result": {
+      "lengh": 4
+    }
+  }, {
+    "label": "Devrait renvoyer un tableau vide",
+    "arguments": [],
+    "result": {
+      "lengh": 0
+    }
+  }],
+  "lemmatize": [{
+    "label": "Devrait renvoyer un tableau contenant une élément",
+    "arguments": [{
+      "term": "this",
+      "tag": "DT"
+    }],
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait renvoyer un tableau vide",
+    "arguments": [],
+    "result": {
+      "lengh": 0
+    }
+  }]
+}

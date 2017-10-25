@@ -1,7 +1,7 @@
 {
-  "name": "nb",
+  "name": "multicat",
   "version": "1.0.0",
-  "description": "Module Sisyphe de catégorisation par méthode statistique: Bayésien Naïf",
+  "description": "Module Sisyphe de catégorisation par méthode par appariemment",
   "main": "index.js",
   "scripts": {
     "test": "mocha -t 120000"
@@ -12,12 +12,8 @@
   "dependencies": {
     "async": "^2.5.0",
     "auto-tu": "git+https://github.com/NicolasKieffer/auto-tu.git",
-    "cld": "^2.4.7",
-    "line-reader": "^0.4.0",
-    "minimist": "^1.2.0",
     "mocha": "^3.5.3",
-    "nb-resources": "git+https://github.com/NicolasKieffer/nb-resources.git",
-    "process": "^0.11.3",
+    "multicat-resources": "git+https://github.com/NicolasKieffer/multicat-resources.git",
     "worker-utils": "git+https://github.com/NicolasKieffer/worker-utils.git"
   }
 }

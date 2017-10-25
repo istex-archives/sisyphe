@@ -1,28 +1,28 @@
 /* global __dirname, require, process, it */
-"use strict";
 
-const pkg = require("../package.json"),
-  worker = require("../index.js"),
-  fs = require("fs"),
-  async = require("async"),
-  TU = require("auto-tu");
+'use strict';
+
+const pkg = require('../package.json'),
+  worker = require('../index.js'),
+  async = require('async'),
+  TU = require('auto-tu');
 
 // Données de test
-const data = require("./dataset/in/data.json"),
+const data = require('./dataset/in/data.json'),
   datasets = {
-    "worker": require("./dataset/in/test.worker.json")
+    'worker': require('./dataset/in/test.worker.json')
   };
 
 // Mapping indiquant quelle fonction de test et quelles données utiliser pour chaque fonction
 const wrappers = {
-  "worker": {
-    "doTheJob": testOf_doTheJob,
-    "categorize": testOf_categorize
+  'worker': {
+    'doTheJob': testOf_doTheJob,
+    'categorize': testOf_categorize
   }
 };
 
 const objects = {
-  "worker": worker
+  'worker': worker
 };
 
 worker.init({
@@ -37,7 +37,7 @@ worker.init({
 // Pour chaque clé
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
-    description: pkg.name + "/index.js",
+    description: pkg.name + '/index.js',
     root: key,
     object: objects[key],
     dataset: datasets[key],
@@ -63,9 +63,5 @@ function testOf_doTheJob(fn, item, cb) {
  * - worker.categorize()
  */
 function testOf_categorize(fn, item, cb) {
-  fs.readFile(item.arguments.path, "utf-8",
-    function(err, res) {
-      if (err) throw err;
-      cb(fn(res).categories);
-    });
+  cb(fn(item.arguments.identifier, item.arguments.table));
 }

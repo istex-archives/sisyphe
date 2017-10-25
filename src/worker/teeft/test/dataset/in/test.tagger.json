@@ -1,0 +1,21 @@
+{
+  "tag": [{
+    "label": "Devrait renvoyer un tableau contenant 4 éléments",
+    "arguments": ["this","is","a","test"],
+    "result": {
+      "lengh": 4
+    }
+  },{
+    "label": "Devrait renvoyer un tableau vide",
+    "arguments": [],
+    "result": {
+      "lengh": 0
+    }
+  },{
+    "label": "Devrait renvoyer un tableau contenant 2 éléments (constructor, prototype)",
+    "arguments": ["constructor", "prototype"],
+    "result": {
+      "lengh": 2
+    }
+  }]
+}

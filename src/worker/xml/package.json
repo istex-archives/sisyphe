@@ -1,6 +1,6 @@
 {
   "name": "xml",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Get the XML informations",
   "main": "index.js",
   "scripts": {
@@ -10,14 +10,12 @@
   "license": "MIT",
   "dependencies": {
     "await-to-js": "^1.0.1",
-    "bluebird": "^3.5.0",
-    "get-doctype": "^1.0.1",
+    "bluebird": "^3.5.1",
     "lodash.clonedeep": "^4.5.0",
-    "xmldom": "git+https://github.com/rmeja/xmldom.git",
-    "xpath": "0.0.23"
+    "node-libxml": "^1.0.7"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^3.5.0"
+    "mocha": "^3.5.3"
   }
 }

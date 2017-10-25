@@ -1,0 +1,45 @@
+{
+  "configure": [{
+    "label": "Devrait renvoyer la valeur null",
+    "arguments": ["a", {}],
+    "values": [null, null],
+    "result": {
+      "equal": true
+    }
+  }, {
+    "label": "Devrait renvoyer un integer",
+    "arguments": [1, 2000, 100000],
+    "values": [1, 4, 7],
+    "result": {
+      "equal": true
+    }
+  }],
+  "call": [{
+    "label": "Devrait renvoyer true (par défaut)",
+    "arguments": {
+      "occur": 10,
+      "length": 1
+    },
+    "result": {
+      "equal": true
+    }
+  }, {
+    "label": "Devrait renvoyer true (par défaut)",
+    "arguments": {
+      "occur": 3,
+      "length": 2
+    },
+    "result": {
+      "equal": true
+    }
+  }, {
+    "label": "Devrait renvoyer false (par défaut)",
+    "arguments": {
+      "occur": 10,
+      "length": 1
+    },
+    "result": {
+      "equal": true
+    }
+  }]
+}

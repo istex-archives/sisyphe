@@ -1,0 +1,73 @@
+{
+  "doTheJob": [{
+    "label": "Devrait traiter correctement le document",
+    "key": "SUCCESS",
+    "logs": "logs",
+    "result": {}
+  }, {
+    "label": "Devrait renvoyer l'erreur : ISSN_NOT_FOUND",
+    "key": "ISSN_NOT_FOUND",
+    "logs": "logs",
+    "result": {}
+  }, {
+    "label": "Devrait renvoyer l'erreur : ISSN_DOES_NOT_MATCH",
+    "key": "ISSN_DOES_NOT_MATCH",
+    "logs": "logs",
+    "result": {}
+  }],
+  "categorize": [{
+    "label": "Devrait renvoyer une ou plusieurs catégorie(s) WoS",
+    "arguments": {
+      "identifier": "8756-971X",
+      "table": "wos"
+    },
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait renvoyer une ou plusieurs catégorie(s) Science Metrix",
+    "arguments": {
+      "identifier": "8756-971X",
+      "table": "science-metrix"
+    },
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait renvoyer une ou plusieurs catégorie(s) Scopus",
+    "arguments": {
+      "identifier": "8756-971X",
+      "table": "scopus"
+    },
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait renvoyer aucune catégorie WoS",
+    "arguments": {
+      "identifier": "invalid-issn",
+      "table": "wos"
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait renvoyer aucune catégorie Science Metrix",
+    "arguments": {
+      "identifier": "invalid-issn",
+      "table": "science-metrix"
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait renvoyer aucune catégorie Scopus",
+    "arguments": {
+      "identifier": "invalid-issn",
+      "table": "scopus"
+    },
+    "result": {
+      "length": 0
+    }
+  }]
+}
