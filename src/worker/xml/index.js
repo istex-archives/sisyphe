@@ -2,30 +2,26 @@
 
 const assert = require('assert'),
   path = require('path'),
-  DOMParser = require('xmldom').DOMParser,
-  xpath = require('xpath'),
+  fs = require('fs'),
+  Libxml = require('node-libxml'),
   Promise = require('bluebird'),
-  fs = Promise.promisifyAll(require('fs')),
-  exec = Promise.promisify(require('child_process').exec),
-  getDoctype = require('get-doctype'),
   cloneDeep = require('lodash.clonedeep');
-
-const xpathSelect = xpath.useNamespaces({ xml: 'http://www.w3.org/XML/1998/namespace' });
 
 function to (promise, errorExt) {
   return promise
-    .then(function (data) {
-      return [null, data];
-    })
-    .catch(function (err) {
-      if (errorExt) err = Object.assign(err, errorExt);
-      return [err];
-    });
+  .then(function (data) {
+    return [null, data];
+  })
+  .catch(function (err) {
+    if (errorExt) err = Object.assign(err, errorExt);
+    return [err];
+  });
 }
 
 const sisypheXml = {};
 
 sisypheXml.init = function (options) {
+  this.libxml = new Libxml();
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
   let confContents = fs.readdirSync(this.configDir);
   // We search the nearest config in configDir
@@ -41,7 +37,7 @@ sisypheXml.init = function (options) {
     const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
     this.conf = JSON.parse(dataConf);
     if (this.conf.hasOwnProperty('dtd') && Array.isArray(this.conf.dtd)) {
-      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(this.configDir, options.corpusname, 'dtd', dtd));
+      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(path.dirname(this.pathToConf), 'dtd', dtd));
     }
   }
   return this;
@@ -51,31 +47,39 @@ sisypheXml.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml') return next(null, data);
 
   (async () => {
-    let error, xmlDom, validationDTDResult;
+    let validationDTDResult;
 
-    [error, data.doctype] = await to(this.getDoctype(data.path));
+    // Load xml, return false if not-wellformed, true if wellformed
+    let xmlFile = this.libxml.load(data.path);
 
-    [data.error, xmlDom] = await to(this.getXmlDom(data.path));
-    if (data.error) {
+    if (!xmlFile) {
       data.isWellFormed = false;
       return data;
     }
 
+    let doctype = this.libxml.getDtd();
+
+    // Reformat key for DTD to retro-compatible old sisyphe version
+    if(doctype.externalId){ doctype.pubid = doctype.externalId; delete doctype.externalId; }
+    if(doctype.systemId){ doctype.sysid = doctype.systemId; delete doctype.systemId; }
+    data.doctype = doctype;
+
     data.isWellFormed = true;
 
-    if (!this.isConfExist) return data;
+    if (!this.isConfExist) { return data };
 
-    [data.error, validationDTDResult] = await to(this.validateAgainstDTD(data, this.dtdsPath));
-    if (data.error) {
+    let result = this.validateAgainstDTD(this.libxml, this.dtdsPath);
+    if (!result.isValid) {
       data.isValidAgainstDTD = false;
       return data;
     }
 
     data.isValidAgainstDTD = true;
-    data.validationDTDInfos = validationDTDResult;
+    data.validationDTDInfos = result.path;
+
     let metadatas;
     const conf = cloneDeep(this.conf);
-    [data.error, metadatas] = await to(this.getMetadataInfos(conf, xmlDom));
+    [data.error, metadatas] = await to(this.getMetadataInfos(conf, this.libxml));
     if (data.error) {
       return data;
     }
@@ -104,119 +108,28 @@ sisypheXml.doTheJob = function (data, next) {
     });
 };
 
-sisypheXml.getXmlDom = function (xmlFilePath) {
-  const error = new Error();
-  error.type = 'wellFormed';
-  error.list = {};
-  const errorHandle = function (wellFormedErrorObj) {
-    return function (level, msg, locator) {
-      wellFormedErrorObj[level] = {
-        message: msg,
-        locator
-      };
-    };
-  };
-
-  const parser = new DOMParser({
-    locator: {},
-    errorHandler: {
-      warning: errorHandle(error.list),
-      error: errorHandle(error.list),
-      fatalError: errorHandle(error.list)
-    }
-  });
-
-  return new Promise((resolve, reject) => {
-    fs.readFileAsync(xmlFilePath, 'utf8').then(xmlContent => {
-      const xmlDom = parser.parseFromString(xmlContent, 'application/xml');
-      if (Object.keys(error.list).length === 0) {
-        resolve(xmlDom);
-      } else {
-        reject(error);
-      }
-    });
-  });
-};
-
-sisypheXml.getDoctype = function (xmlFilePath) {
-  return new Promise((resolve, reject) => {
-    getDoctype.parseFile(xmlFilePath, (error, doctype) => {
-      if (error) {
-        error.type = 'doctype';
-        reject(error);
-      } else {
-        resolve(doctype);
-      }
-    });
-  });
-};
-
-sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
+sisypheXml.getMetadataInfos = function (confObj, libxml) {
   return Promise.map(confObj.metadata, metadata => {
     // Select the first XPATH possibility
     if (Array.isArray(metadata.xpath)) {
       for (let i = 0; i < metadata.xpath.length; i++) {
-        // string is special because we need all text in its child too
-        if (metadata.type === 'String') {
-          metadata.xpath[i] = `string(${metadata.xpath[i]})`;
-        }
-        const itemElement = xpathSelect(metadata.xpath[i], xmlDom);
-        if (itemElement.length) {
+        metadata.xpath[i] = sisypheXml.formatXpaths(metadata.xpath[i],metadata.type);
+        const itemElement = libxml.xpathSelect(metadata.xpath[i]);
+        if (itemElement !== null && itemElement !== undefined) {
           metadata.element = itemElement;
+          metadata.value = itemElement;
           break;
         }
       }
-      metadata.element = metadata.element || [];
     } else {
       // string is special because we need all text in its child too
-      if (metadata.type === 'string') {
-        metadata.xpath[i] = `string(${metadata.xpath})`;
-      }
-      metadata.element = xpathSelect(metadata.xpath, xmlDom);
-    }
-    if (metadata.hasOwnProperty('element')) {
-      if (metadata.type !== 'String') metadata.element.isEmpty = metadata.element.length;
-      if (metadata.element.isEmpty) {
-        metadata.element.hasFirstChild = metadata.element[0].hasOwnProperty('firstChild');
-      }
-      if (metadata.element.isEmpty && metadata.element.hasFirstChild) {
-        metadata.element.hasDataInFirstChild = metadata.element[0].firstChild.hasOwnProperty('data');
-      }
-
-      switch (metadata.type) {
-        case 'String':
-          if (metadata.element.length && typeof metadata.element === 'string') {
-            metadata.value = metadata.element;
-          } else if (
-            typeof metadata.element === 'object' &&
-            metadata.element[0] &&
-            metadata.element[0].firstChild &&
-            metadata.element[0].firstChild.data
-          ) {
-            metadata.value = metadata.element[0].firstChild.data;
-          }
-          break;
-        case 'Number':
-          if (
-            metadata.element.isEmpty &&
-            metadata.element.hasFirstChild &&
-            metadata.element.hasDataInFirstChild
-          ) {
-            metadata.value = metadata.element[0].firstChild.data;
-          }
-          break;
-        case 'Boolean':
-          metadata.value = !!metadata.element.length;
-          break;
-        case 'Count':
-          metadata.value = metadata.element.length;
-          break;
-        case 'Attribute':
-          if (metadata.element.length) metadata.value = metadata.element[0].value;
-          break;
+      metadata.xpath = sisypheXml.formatXpaths(metadata.xpath,metadata.type);
+      metadata.element = libxml.xpathSelect(metadata.xpath);
+      //we afect only if defined
+      if(metadata.element !== null && metadata.element !== undefined){
+        metadata.value = metadata.element;
       }
     }
-
     return metadata;
   }).map(metadata => {
     if (metadata.hasOwnProperty('regex') && metadata.hasOwnProperty('value')) {
@@ -227,39 +140,36 @@ sisypheXml.getMetadataInfos = function (confObj, xmlDom) {
   });
 };
 
-sisypheXml.validateAgainstDTD = function (docObj, arrayPathDTD) {
-  const DTDs = arrayPathDTD.slice();
-
-  function moveTo (array, old_index, new_index) {
-    array.splice(new_index, 0, array.splice(old_index, 1)[0]);
-    return array;
+//Normalize xpath types
+sisypheXml.formatXpaths = function (xpath,type) {
+  type = type.toLowerCase();
+  switch (type) {
+    case 'number':
+      return `number(${xpath})`;
+      break;
+    case 'boolean':
+      return `boolean(${xpath})`;
+      break;
+    case 'count':
+      return `count(${xpath})`;
+      break;
+    case 'string':
+    case 'attribute':
+    default:
+      return `string(${xpath})`;
+      break;
   }
+};
 
-  return new Promise((resolve, reject) => {
-    if (docObj.hasOwnProperty('doctype')) {
-      const dtdToValidateFirst = docObj.doctype.sysid;
-      const indexDtdToValidateFirst = DTDs.map(pathDtd => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
-      if (indexDtdToValidateFirst !== -1) moveTo(DTDs, indexDtdToValidateFirst, 0);
-    }
+sisypheXml.validateAgainstDTD = function (libxml, arrayPathDTD) {
 
-    (function loop (arrayDTD) {
-      if (arrayDTD.length) {
-        const dtd = arrayDTD.shift();
-        exec('xmlstarlet val -e -d ' + dtd + ' ' + docObj.path)
-          .then(stdout => {
-            resolve({ dtd, stdout });
-          })
-          .catch(() => {
-            loop(arrayDTD);
-          });
-      } else {
-        const error = new Error();
-        error.message = 'No DTD validate the xml file';
-        error.type = 'validation-dtd';
-        reject(error);
-      }
-    })(DTDs);
-  });
+  for( let i = 0; i < arrayPathDTD.length; i++){
+    let isValid = libxml.validateAgainstDtd(arrayPathDTD[i]);
+    // Valid we stop here
+    if(isValid) return { isValid : true, path: arrayPathDTD[i] };
+
+  }
+  return {isValid : false};
 };
 
 module.exports = sisypheXml;

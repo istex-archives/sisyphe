@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xpath xml:lang="FR">
+<to>
+    <my>
+        <infos>trezaqwx</infos>
+        <main><italic>N° </italic>trezaqwx <bold>end</bold></main>
+        <number>1234</number>
+        <title/>
+        <p>lorem ipsum dolor sit amet</p>
+        <p>lorem ipsum dolor sit amet</p>
+    </my>
+</to>
+</xpath>

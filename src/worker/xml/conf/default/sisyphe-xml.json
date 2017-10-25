@@ -5,6 +5,12 @@
       "regex": "^([a-z]{8})$",
       "type": "String",
       "xpath": "/xpath/to/my/infos"
+    },
+    {
+      "name": "someInfosOk",
+      "regex": "^([a-z]{6})$",
+      "type": "String",
+      "xpath": "/xpath/to/my/infos"
     }
   ],
   "dtd": ["mydoctype.dtd"]
