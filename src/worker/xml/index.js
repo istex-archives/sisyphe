@@ -37,7 +37,7 @@ sisypheXml.init = function (options) {
     const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
     this.conf = JSON.parse(dataConf);
     if (this.conf.hasOwnProperty('dtd') && Array.isArray(this.conf.dtd)) {
-      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(this.configDir, options.corpusname, 'dtd', dtd));
+      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(path.dirname(this.pathToConf), 'dtd', dtd));
     }
   }
   return this;
@@ -68,13 +68,15 @@ sisypheXml.doTheJob = function (data, next) {
 
     if (!this.isConfExist) { return data };
 
-    [data.error, validationDTDResult] = await to(this.validateAgainstDTD(this.libxml, data, this.dtdsPath));
-    if (data.error) {
+    let result = this.validateAgainstDTD(this.libxml, this.dtdsPath);
+    if (!result.isValid) {
       data.isValidAgainstDTD = false;
       return data;
     }
 
     data.isValidAgainstDTD = true;
+    data.validationDTDInfos = result.path;
+
     let metadatas;
     const conf = cloneDeep(this.conf);
     [data.error, metadatas] = await to(this.getMetadataInfos(conf, this.libxml));
@@ -159,35 +161,15 @@ sisypheXml.formatXpaths = function (xpath,type) {
   }
 };
 
-sisypheXml.validateAgainstDTD = function (libxml, data, arrayPathDTD) {
-  const DTDs = arrayPathDTD.slice();
+sisypheXml.validateAgainstDTD = function (libxml, arrayPathDTD) {
 
-  function moveTo (array, old_index, new_index) {
-    array.splice(new_index, 0, array.splice(old_index, 1)[0]);
-    return array;
+  for( let i = 0; i < arrayPathDTD.length; i++){
+    let isValid = libxml.validateAgainstDtd(arrayPathDTD[i]);
+    // Valid we stop here
+    if(isValid) return { isValid : true, path: arrayPathDTD[i] };
+
   }
-
-  return new Promise((resolve, reject) => {
-    if (data.hasOwnProperty('doctype')) {
-      const dtdToValidateFirst = data.doctype.sysid;
-      const indexDtdToValidateFirst = DTDs.map(pathDtd => path.basename(pathDtd)).indexOf(dtdToValidateFirst);
-      if (indexDtdToValidateFirst !== -1) moveTo(DTDs, indexDtdToValidateFirst, 0);
-    }
-
-    (function loop (arrayDTD) {
-      //if there is no more dtd to check
-      if (!arrayDTD.length) {
-        const error = new Error();
-        error.message = 'No DTD validate the xml file';
-        error.type = 'validation-dtd';
-        return reject(error);
-      }
-      const dtd = arrayDTD.shift();
-      let isValid = libxml.validateAgainstDtd(dtd);
-      if(isValid) { resolve({ dtd }); }
-      else { loop(arrayDTD); }
-    })(DTDs);
-  });
+  return {isValid : false};
 };
 
 module.exports = sisypheXml;
