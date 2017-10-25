@@ -1,6 +1,6 @@
 {
   "name": "xml",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Get the XML informations",
   "main": "index.js",
   "scripts": {
