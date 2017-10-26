@@ -115,7 +115,7 @@ sisypheXml.getMetadataInfos = function (confObj, libxml) {
       for (let i = 0; i < metadata.xpath.length; i++) {
         metadata.xpath[i] = sisypheXml.formatXpaths(metadata.xpath[i],metadata.type);
         const itemElement = libxml.xpathSelect(metadata.xpath[i]);
-        if (itemElement !== null && itemElement !== undefined) {
+        if (itemElement !== null && itemElement !== undefined && itemElement !== "") {
           metadata.element = itemElement;
           metadata.value = itemElement;
           break;
@@ -126,7 +126,7 @@ sisypheXml.getMetadataInfos = function (confObj, libxml) {
       metadata.xpath = sisypheXml.formatXpaths(metadata.xpath,metadata.type);
       metadata.element = libxml.xpathSelect(metadata.xpath);
       //we afect only if defined
-      if(metadata.element !== null && metadata.element !== undefined){
+      if(metadata.element !== null && metadata.element !== undefined && metadata.element !== ""){
         metadata.value = metadata.element;
       }
     }
