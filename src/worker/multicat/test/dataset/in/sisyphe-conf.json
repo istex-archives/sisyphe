@@ -1,0 +1,19 @@
+{
+  "multicat": {
+    "label": "rd-multicat",
+    "resp": {
+      "id": "istex-rd",
+      "label": "ISTEX-RD"
+    },
+    "resources": "test",
+    "categorizations": [{
+      "scheme": "test",
+      "identifier": "identifier[type=\"ISSN\"]",
+      "id": "test",
+      "file": "tables/test.json",
+      "label": "test"
+    }],
+    "tables": {},
+    "template": "fragment.tei.xml.tpl"
+  }
+}
