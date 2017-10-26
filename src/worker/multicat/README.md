@@ -1,213 +1,136 @@
-rd-multicat
+multicat
 ===============
 
-## Présentation ##
+## Summary ##
 
-Le module **rd-multicat** affecte à un `article` les différentes catégories liées à l'ISSN de son `journal` **(doit être positionné après : `li-2mods` ou ``oi-select``)**.
+**multicat** module search for identifier in an XML document and try to assign it some categories.
 
-### Fonctionnement ###
+## Ressources ##
 
-`rd-multicat` effectue ses traitements dans une fonction `doTheJob()` dédiée.
+### Template ###
 
-Le module effectue les opérations suivantes :
-  - Récupération en entrée d'un `docObject` (objet JSON avec un champ `idIstex`), ainsi que d'une callback `cb`.
-  - Récupération de l'ISSN de l'article (à partir de son fichier mods) puis affectation des catégories qui y sont associées.
-  - Création du fragment de TEI (si au moins une catégorie lui a été affectée).
-  - Renvoi des éventuelles erreurs en paramètre de la callback `cb`.
+Path to template file : `conf/fragment.tei.xml.tpl`
 
-## Utilisation ##
-
-### Ressources ###
-
-#### Path, config et template ####
-
-*Par défaut, toutes les ressources du module se trouvent dans le répertoire `resources/`*
-
-Pour que le module fonctionne correctement, il lui faut :
-  - Le chemin **relatif** de **chaque ressources** (fichiers/répertoires). *Obligatoirement dans le fichier `paths.json`*
-  - Les paramètres du module (le nom, la version, la langue...). *Par défaut dans le fichier `config.default.json`*
-  - Un fichier de template qui permet de générer le TEI. *Par défaut dans le fichier `fragment.tei.xml.tpl`*
-
-##### Template #####
-
-La variable *data* du fichier `index.js` contient toutes les données accessibles dans le template, soit :
-
+Data sent to the template are :
 ```js
-// Construction de la structure de données pour le template
-var data = {
-  'date': business.NOW,
-  'module': business.resources.config, // Infos sur la configuration du module
-  'document': { // Infos sur le document
-    'id': documentId,
-    'categories': categories
+// index.js l.78
+// Build the structure of the template
+const tpl = {
+    "date": worker.NOW, // Current date
+    "module": config, // Configuration of module
+    "pkg": pkg, // Infos on module packages
+    "document": { // Data of document
+      "id": documentId,
+      "categories": categories
+    },
+    categorizations: worker.resources.categorizations // Infos on used categorizations
   },
-  categorizations: business.resources.categorizations // Infos sur les catégorisations utilisées
-}
 ```
 
-Concrétement, les données seront sous la forme :
+Detailled :
+
+```json
+{ date: '26-10-2017',
+  module: 
+   { id: 'rd-multicat',
+     label: 'multicat',
+     resp: { id: 'istex-rd', label: 'ISTEX-RD' },
+     resources: 'sm-wos-scopus' },
+  pkg: 
+   { name: 'multicat',
+     version: '1.0.0',
+     description: 'Module Sisyphe de catégorisation par méthode par appariemment',
+     main: 'index.js',
+     scripts: { test: 'mocha -t 120000' },
+     keywords: [],
+     author: 'NicolasKieffer',
+     license: 'GNU',
+     dependencies: 
+      { async: '^2.5.0',
+        'auto-tu': 'git+https://github.com/NicolasKieffer/auto-tu.git',
+        mocha: '^3.5.3',
+        'worker-utils': 'git+https://github.com/NicolasKieffer/worker-utils.git' } },
+  document: 
+   { id: 'SUCCESS.mods',
+     categories: [ [Object], [Object], [Object] ] },
+  categorizations: 
+   [ { scheme: 'https://wos-category.data.istex.fr',
+       identifier: 'identifier[type="ISSN"]',
+       id: 'wos',
+       file: 'tables/wos.json',
+       label: 'Web of Science (WoS) service d’information universitaire en ligne de la société ISI – Institute for Scientific Information de Thomson Scientific.' },
+     { scheme: 'https://sciencemetrix-category.data.istex.fr',
+       identifier: 'identifier[type="ISSN"]',
+       id: 'science-metrix',
+       file: 'tables/science-metrix.json',
+       label: 'Science-Metrix, entreprise indépendante basée aux Etats-Unis et au Canada spécialisée en évaluation des activités liées à la science et à la technologie.' },
+     { scheme: 'https://scopus-category.data.istex.fr',
+       identifier: 'identifier[type="ISSN"]',
+       id: 'scopus',
+       file: 'tables/scopus.json',
+       label: 'Scopus, base de données transdisciplinaire lancée par l\'éditeur scientifique Elsevier.' } ] }
+```
+
+More infos about how to use tpl syntax at [documentation](https://github.com/raycmorgan/Mu)
+
+### Tables ###
+
+All `tables` will be stored (by default : `/conf/tables`). A configuration file (`/conf/sisyphe-conf.json`) list all infos about them like :
 
 ```json
 {
-  "date": "11-01-2017",
-  "module": {
-    "id": "rd-multicat",
-    "version": "1.0.1",
-    "label": "multicat",
+  "root": "conf",
+  "multicat": {
+    "label": "rd-multicat",
     "resp": {
       "id": "istex-rd",
       "label": "ISTEX-RD"
     },
-    "resources": "sm-wos"
-  },
-  "document": {
-    "id": "0000000000000000000000000000000000000000",
-    "categories": [{
+    "resources": "sm-wos-scopus",
+    "categorizations": [{
+      "scheme": "https://wos-category.data.istex.fr",
+      "identifier": "identifier[type=\"ISSN\"]",
       "id": "wos",
-      "values": [
-        [{
-          "level": 1,
-          "value": "SOCIAL SCIENCE"
-        }, {
-          "level": 2,
-          "value": "TRANSPORTATION"
-        }],
-        [{
-          "level": 1,
-          "value": "SCIENCE"
-        }, {
-          "level": 2,
-          "value": "TRANSPORTATION SCIENCE & TECHNOLOGY"
-        }, {
-          "level": 2,
-          "value": "ENGINEERING, CIVIL"
-        }]
-      ]
+      "file": "tables/wos.json",
+      "label": "Web of Science (WoS) service d’information universitaire en ligne de la société ISI – Institute for Scientific Information de Thomson Scientific."
     }, {
+      "scheme": "https://sciencemetrix-category.data.istex.fr",
+      "identifier": "identifier[type=\"ISSN\"]",
       "id": "science-metrix",
-      "values": [
-        [{
-          "level": 1,
-          "value": "ECONOMIC & SOCIAL SCIENCES"
-        }, {
-          "level": 2,
-          "value": "ECONOMICS & BUSINESS "
-        }, {
-          "level": 3,
-          "value": "LOGISTICS & TRANSPORTATION"
-        }]
-      ]
-    }]
-  },
-  "categorizations": [{
-    "scheme": "http://wos-category.lod.istex.fr",
-    "id": "wos",
-    "table": "wos.json",
-    "label": "Web of Science (WoS) service d’information universitaire en ligne de la société ISI – Institute for Scientific Information de Thomson Scientific."
-  }, {
-    "scheme": "http://sm-category.lod.istex.fr",
-    "id": "science-metrix",
-    "table": "science-metrix.json",
-    "label": "Science-Metrix, entreprise indépendante basée aux Etats-Unis et au Canada spécialisée en évaluation des activités liées à la science et à la technologie."
-  }]
+      "file": "tables/science-metrix.json",
+      "label": "Science-Metrix, entreprise indépendante basée aux Etats-Unis et au Canada spécialisée en évaluation des activités liées à la science et à la technologie."
+    }, {
+      "scheme": "https://scopus-category.data.istex.fr",
+      "identifier": "identifier[type=\"ISSN\"]",
+      "id": "scopus",
+      "file": "tables/scopus.json",
+      "label": "Scopus, base de données transdisciplinaire lancée par l'éditeur scientifique Elsevier."
+    }],
+    "tables": {},
+    "template": "fragment.tei.xml.tpl"
+  }
 }
 ```
 
-Exemple :
-
-  - Pour insérer la date dans le template, il faudra ajouter `{{date}}`.
-  - Pour insérer l'`id` du document, il faudra ajouter `{{document.id}} `.
-
-**Attention :** *Les valeurs des variables entre double accolades sont 'sanitizées'. Si l'on souhaite ajouter une valeur brute (exemple : url, symboles), il faut utiliser une triple accolades `{{{ maVariable }}}`.*
-
-Pour plus d'infos, voir la [documentation](https://github.com/raycmorgan/Mu) de mustache pour nodejs
-
-#### Tables de correspondances ####
-
-##### Catégorisations #####
-
-Toutes les `tables` de correspondances que le module doit utiliser seront stockées dans un répertoire (par défaut : `/resources/tables`). Un fichier doit lister les tables à utiliser (par défaut : `/resources/categorizations.json`) :
+Files of all `tables` (like `wos.json`) should be like :
 
 ```json
-[{
-  "scheme": "http://wos-category.lod.istex.fr",
-  "id": "wos",
-  "table": "wos.json",
-  "label": "Web of Science (WoS) service d’information universitaire en ligne de la société ISI – Institute for Scientific Information de Thomson Scientific."
-}, {
-  "scheme": "http://sm-category.lod.istex.fr",
-  "id": "science-metrix",
-  "table": "science-metrix.json",
-  "label": "Science-Metrix, entreprise indépendante basée aux Etats-Unis et au Canada spécialisée en évaluation des activités liées à la science et à la technologie."
-}]
+{
+  "0002-9483": [
+    [{
+      "level": 1,
+      "value": "SOCIAL SCIENCE"
+    }, {
+      "level": 2,
+      "value": "ANTHROPOLOGY"
+    }],
+    [{
+      "level": 1,
+      "value": "SCIENCE"
+    }, {
+      "level": 2,
+      "value": "EVOLUTIONARY BIOLOGY"
+    }]
+  ]
+}
 ```
-
-Chaque valeur du tableau est un objet représentant une table de correspondances. Ses attributs sont :
-  - `scheme` : le scheme de la table.
-  - `id` : l'identifiant de la balise *<taxonomy xml:id="">*.
-  - `table` : le nom du fichier (qui se trouve dans le répertoire des `tables`).
-  - `label`: le texte contenu dans la balise taxonomy.
-
-##### Tables de correspondances #####
-
-Il y a un fichier par `tables` de correspondances (ex : `wos.json`). Il doit être sous la forme :
-
-```json
-"0002-9483": [
-  [{
-    "level": 1,
-    "value": "SOCIAL SCIENCE"
-  }, {
-    "level": 2,
-    "value": "ANTHROPOLOGY"
-  }],
-  [{
-    "level": 1,
-    "value": "SCIENCE"
-  }, {
-    "level": 2,
-    "value": "EVOLUTIONARY BIOLOGY"
-  }]
-]
-```
-
-Chaque **clé** de l'objet est un **ISSN**, et chaque **valeur** est un **tableau de tableau d'objets** contenant :
-  - Chaque tableau est un regroupement de classes, chacune représentée par un objet de type :
-    - `level` : niveau de la classification.
-    - `value` : libellé de la classification.
-  
-De cette façon, on peut attribuer plusieurs classes (avec chacune différents niveaux) à chaque ISSN.
-
-## Annexes ##
-
-### Arborescence ###
-
-```
-.
-├── changelog.md                    // changelog
-├── index.js                        // point d'entrée, contenant la fonction doTheJob()
-├── newVersion                      // script de version
-├── node_modules                    // modules NPM
-│   └── ...
-├── package.json                    // packages
-├── README.md                       // readme
-├── resources                       // répertoire des ressources
-│   ├── categorizations.json            // catégorisations disponibles
-│   ├── config.default.json             // configuration du module
-│   ├── fragment.tei.xml.tpl            // template du fragment de TEI
-│   ├── paths.json                      // chemins utiles au module
-│   └── tables                          // répertoire des tables de correspondances
-│       └── ...
-└── test                            // répertoire des TU
-    ├── dataset                         // répertoire des données de test
-    │  └── ...
-    └── run.js                          // point d'entrée des TU
-```
-
-### Codes d'erreur ###
-
-Plage de codes : 0~99
-
-Code | Signification           | Note(s)
------|-------------------------|--------
-1    | Erreur lecture/écriture |
