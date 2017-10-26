@@ -1,6 +1,6 @@
 {
   "name": "multicat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Module Sisyphe de catégorisation par méthode par appariemment",
   "main": "index.js",
   "scripts": {
