@@ -12,86 +12,80 @@ const utils = require("worker-utils"),
 
 const worker = {};
 
-worker.init = (options = {
-  corpusname: "default"
-}) => {
-  worker.outputPath = options.outputPath || path.join("out/", pkg.name);
 
-  worker.resources = worker.load(path.join(configDir, configFilename));
-  /* Constantes */
-  worker.NOW = utils.dates.now(); // Date du jour formatée (String)
-  worker.LOGS = { // Logs des différents cas possibles (et gérés par le module)
+/**
+ * Init Function (called by sisyphe)
+ * @param {Object} options Options passed by sisyphe
+ * @return {undefined} Return undefined
+ */
+worker.init = function(options = {
+  corpusname: "default"
+}) {
+  worker.outputPath = options.outputPath || path.join("out/", pkg.name);
+  worker.resources = worker.load(options.configDir, options.config);
+  worker.NOW = utils.dates.now(); // Get the formated current date (String)
+  worker.LOGS = { // All logs available on this module
     "SUCCESS": "TEI file created at ",
     "IDENTIFIER_NOT_FOUND": "IDENTIFIER not found",
     "IDENTIFIER_DOES_NOT_MATCH": "IDENTIFIER does not match any category"
   };
 }
 
-/*
- ** ------------------------------------------------------------------------------
- ** Coeur du Code Métier
- ** ------------------------------------------------------------------------------
+/**
+ * Categorize a XML document (called by sisyphe)
+ * @param {Object} data data of the current docObject
+ * @param {Function} next Callback funtion
+ * @return {undefined} Asynchronous function
  */
 worker.doTheJob = function(data, next) {
-
-  // Vérification du type de fichier
+  // Check MIME type of file
   if (data.mimetype !== "application/xml" || !data.isWellFormed) {
     return next(null, data);
   }
-
-  // Variables d'erreurs et de logs
+  // Errors & logs
   data[pkg.name] = {
     errors: [],
     logs: []
   };
-
-  // Récupération des données utiles
+  // Get the filename (without extension)
   const documentId = path.basename(data.name, ".xml");
-
-  // Lecture du fichier MODS
+  // Read MODS file
   fs.readFile(data.path, "utf-8", function(err, modsStr) {
-
-    // Lecture impossible
+    // I/O Errors
     if (err) {
       data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
-
     // Récupération de l'identifier
     const $ = utils.XML.load(modsStr);
     let categories = [];
-
     for (let i = 0, l = worker.resources.categorizations.length; i < l; i++) {
-
       const identifier = $(worker.resources.categorizations[i].identifier).text();
-
-      // Identifier introuvable
+      // Identifier not found
       if (!identifier) {
         data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_NOT_FOUND);
         return next(null, data);
       }
-
-      // Récupération des catégories qui correspondent à l'identifier
+      // Get categories for this identifier
       categories = categories.concat(worker.categorize(identifier, worker.resources.categorizations[i].id));
     }
-    // Pas de catégorie correspondante
+    // If no categories were found
     if (!categories.length) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_DO_NOT_MATCH);
       return next(null, data);
     }
-
-    // Construction de la structure de données pour le template
+    // Build the structure of the template
     const tpl = {
-        "date": worker.NOW,
-        "module": config, // Infos sur la configuration du module
-        "pkg": pkg, // Infos sur la configuration du module
-        "document": { // Infos sur le document
+        "date": worker.NOW, // Current date
+        "module": config, // Configuration of module
+        "pkg": pkg, // Infos on module packages
+        "document": { // Data of document
           "id": documentId,
           "categories": categories
         },
-        categorizations: worker.resources.categorizations // Infos sur les catégorisations utilisées
+        categorizations: worker.resources.categorizations // Infos on used categorizations
       },
-      // Récupération du directory & filename de l"ouput
+      // Build path & filename of enrichment file
       output = utils.files.createPath({
         outputPath: worker.outputPath,
         id: documentId,
@@ -100,34 +94,29 @@ worker.doTheJob = function(data, next) {
         // extension: ["_", config.version, "_", config.training, ".tei.xml"].join(")
         extension: ".tei.xml"
       });
-
-    // Récupération du fragment de TEI
+    // Write enrichment data
     utils.enrichments.write({
       "template": worker.resources.template,
       "data": tpl,
       "output": output
     }, function(err) {
-
-      // Lecture/Écriture impossible
+      // I/O Error
       if (err) {
         data[pkg.name].errors.push(err.toString());
         return next(null, data);
       }
-
-      // Création de l"objet enrichement représentant l'enrichissement produit
+      // Create an Object representation of created enrichment
       const enrichment = {
         "path": path.join(output.directory, output.filename),
         "extension": "tei",
         "original": false,
         "mime": "application/tei+xml"
       };
-
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
         "enrichment": enrichment,
         "label": config.label
       });
-
       // All clear
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.SUCCESS + output.filename);
       return next(null, data);
@@ -158,15 +147,19 @@ worker.categorize = function(identifier, table) {
 
 /**
  * Load all resources needed in this module
- * @param {String} filename Path of sisyphe config file
+ * @param {String} configDir Path to the configuration directory
+ * @param {Object} config Object representation of sisyphe config file
  * @return {Object} An object containing all the data loaded
  */
-worker.load = (filename) => {
-  const result = require(filename);
-  for (let i = 0; i < result.categorizations.length; i++) {
-    result.tables[result.categorizations[i].id] = require(path.join(__dirname, result.categorizations[i].file));
+worker.load = (configDir, config) => {
+  const result = config[pkg.name],
+    folder = path.resolve(configDir, "../", "shared", pkg.name);
+  if (result) {
+    for (let i = 0; i < result.categorizations.length; i++) {
+      result.tables[result.categorizations[i].id] = require(path.join(folder, result.categorizations[i].file));
+    }
+    result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');
   }
-  result.template = fs.readFileSync(result.template, 'utf-8');
   return result;
 };
 
