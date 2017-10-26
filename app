@@ -110,7 +110,7 @@ sisyphe.launch = async function () {
 sisyphe.init(workers).then(() => {
   return sisyphe.launch();
 }).catch(err => {
-  // console.log(err);
+  console.log(err);
   monitoring.updateError(err);
 });
 

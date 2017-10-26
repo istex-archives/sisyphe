@@ -41,7 +41,7 @@ monitoring.updateLog = async function(type, string) {
  */
 monitoring.updateError = async function(err) {
   const redisError = {
-    message: 'Unknomwn error',
+    message: 'Unknown error',
     stack: '',
     infos: 'No information',
     time: Date.now()
