@@ -18,29 +18,100 @@
   "load": [{
     "label": "Devrait charger correctement les resources",
     "arguments": {
-      "config": {
-        "multicat": {
-          "label": "rd-multicat",
-          "resp": {
-            "id": "istex-rd",
-            "label": "ISTEX-RD"
-          },
-          "resources": "test",
-          "categorizations": [{
-            "scheme": "test",
-            "identifier": "identifier[type=\"ISSN\"]",
-            "id": "test",
-            "file": "tables/test.json",
-            "label": "test"
-          }],
-          "tables": {},
-          "template": "fragment.tei.xml.tpl"
-        }
-      },
-      "configDir": "./dataset/in/configDir"
+      "options": {
+        "config": {
+          "multicat": {
+            "label": "rd-multicat",
+            "resp": {
+              "id": "istex-rd",
+              "label": "ISTEX-RD"
+            },
+            "resources": "test",
+            "categorizations": [{
+              "scheme": "test",
+              "identifier": "identifier[type=\"ISSN\"]",
+              "id": "test",
+              "file": "tables/test.json",
+              "label": "test"
+            }],
+            "tables": {},
+            "template": "fragment.tpl",
+            "output": {
+              "extension": ".txt",
+              "mime": "text/plain",
+              "type": "enrichment"
+            },
+            "enrichment": {
+              "original": false,
+              "extension": "txt"
+            }
+          }
+        },
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
     },
     "result": {
       "length": 1
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config)",
+    "arguments": {
+      "options": {
+        "config": {},
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": {
+          "multicat": {
+            "label": "rd-multicat",
+            "resp": {
+              "id": "istex-rd",
+              "label": "ISTEX-RD"
+            },
+            "resources": "test",
+            "categorizations": [{
+              "scheme": "test",
+              "identifier": "identifier[type=\"ISSN\"]",
+              "id": "test",
+              "file": "tables/test.json",
+              "label": "test"
+            }],
+            "tables": {},
+            "template": "fragment.tpl",
+            "output": {
+              "extension": ".txt",
+              "mime": "text/plain",
+              "type": "enrichment"
+            },
+            "enrichment": {
+              "original": false,
+              "extension": "txt"
+            }
+          }
+        },
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config & sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": {},
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
     }
   }],
   "categorize": [{

@@ -1,0 +1,11 @@
+{
+  "label": "rd-multicat",
+  "resp": {
+    "id": "istex-rd",
+    "label": "ISTEX-RD"
+  },
+  "resources": "default",
+  "categorizations": [],
+  "tables": {},
+  "template": ""
+}

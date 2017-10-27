@@ -22,7 +22,7 @@ worker.init = function(options = {
   corpusname: "default"
 }) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
-  worker.resources = worker.load(options.configDir, options.config);
+  worker.resources = worker.load(options);
   worker.NOW = utils.dates.now(); // Get the formated current date (String)
   worker.LOGS = { // All logs available on this module
     "SUCCESS": "TEI file created at ",
@@ -38,8 +38,8 @@ worker.init = function(options = {
  * @return {undefined} Asynchronous function
  */
 worker.doTheJob = function(data, next) {
-  // Check MIME type of file
-  if (data.mimetype !== "application/xml" || !data.isWellFormed) {
+  // Check resources are correctly loaded & MIME type of file & file is well formed
+  if (!Object.keys(worker.resources.tables).length ||  data.mimetype !== "application/xml" || !data.isWellFormed) {
     return next(null, data);
   }
   // Errors & logs
@@ -89,11 +89,15 @@ worker.doTheJob = function(data, next) {
       output = utils.files.createPath({
         outputPath: worker.outputPath,
         id: documentId,
-        type: "enrichments",
+        type: worker.resources.output.type,
         label: pkg.name,
-        // extension: ["_", config.version, "_", config.training, ".tei.xml"].join(")
-        extension: ".tei.xml"
+        extension: worker.resources.output.extension
       });
+    // If no categories were found
+    if (!categories.length) {
+      data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_DO_NOT_MATCH);
+      return next(null, data);
+    }
     // Write enrichment data
     utils.enrichments.write({
       "template": worker.resources.template,
@@ -108,9 +112,9 @@ worker.doTheJob = function(data, next) {
       // Create an Object representation of created enrichment
       const enrichment = {
         "path": path.join(output.directory, output.filename),
-        "extension": "tei",
-        "original": false,
-        "mime": "application/tei+xml"
+        "extension": worker.resources.enrichment.extension,
+        "original": worker.resources.enrichment.original,
+        "mime": worker.resources.output.mime
       };
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
@@ -147,18 +151,19 @@ worker.categorize = function(identifier, table) {
 
 /**
  * Load all resources needed in this module
- * @param {String} configDir Path to the configuration directory
- * @param {Object} config Object representation of sisyphe config file
+ * @param {Object} options Options passed by sisyphe
  * @return {Object} An object containing all the data loaded
  */
-worker.load = (configDir, config) => {
-  const result = config[pkg.name],
-    folder = path.resolve(configDir, "../", "shared", pkg.name);
-  if (result) {
+worker.load = (options) => {
+  let result = options.config[pkg.name];
+  const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
+  if (folder && result) {
     for (let i = 0; i < result.categorizations.length; i++) {
       result.tables[result.categorizations[i].id] = require(path.join(folder, result.categorizations[i].file));
     }
     result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');
+  } else {
+    result = require("./conf/sisyphe-conf.json");
   }
   return result;
 };

@@ -34,7 +34,7 @@ const objects = {
 worker.init({
   "outputPath": "test/dataset/out",
   "config": require("./dataset/in/sisyphe-conf.json"),
-  "configDir": "test/dataset/in/configDir"
+  "sharedConfigDir": "test/dataset/in/shared"
 });
 
 /**
@@ -81,8 +81,6 @@ function testOf_categorize(fn, item, cb) {
  * - worker.load()
  */
 function testOf_load(fn, item, cb) {
-  const config = item.arguments.config,
-    configDir = path.resolve(__dirname, item.arguments.configDir),
-    value = fn(configDir, config);
+    const value = fn(item.arguments.options);
   return cb(Object.keys(value.tables));
 }
