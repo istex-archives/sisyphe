@@ -56,14 +56,11 @@ app.post("/changeBranch", function(req, res) {
   });
 });
 app.post("/pull", function(req, res) {
-  cp.exec(
-    `git pull origin ${req.body.currentBranch}`,
-    (error, stdout, stderr) => {
-      if (error) res.status(500).json(error);
-      else if (stderr) res.status(500).json(stderr);
-      else if (stdout) res.status(200).json(stdout);
-    }
-  );
+  gitManager.pull(req.body.branch).then(result=>{
+    res.status(200).json(result);
+  }).catch(err=>{
+    res.status(500).json(result)
+  })
 });
 app.get("/status", function(req, res) {
   gitManager.remote
