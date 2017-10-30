@@ -32,19 +32,19 @@ app.get("/sisypheVersions", function(req, res) {
   });
 });
 app.get("/branches", function(req, res) {
-  cp.exec("git branch", (error, stdout, stderr) => {
-    const result = {};
-    result.branches = stdout
-      .split("\n")
-      .map(branch => {
-        if (branch.charAt(0) == "*") {
-          branch = branch.split(" ")[1];
-          result.currentBranch = branch;
-        }
-        return branch.trim();
-      })
-      .filter(branch => branch !== "");
-    res.json(result);
+  Promise.join(
+    gitManager.local.branches(),
+    gitManager.remote.branches(),
+    gitManager.local.branch(),
+    (localBranchesName, remoteBranchesName, currentBranchName) => {
+      res.status(200).json({
+        localBranchesName,
+        remoteBranchesName,
+        currentBranchName
+      });
+    }
+  ).catch(err => {
+    res.status(500).json(err);
   });
 });
 
@@ -65,9 +65,9 @@ app.post("/pull", function(req, res) {
     }
   );
 });
-app.get("/isUpdate", function(req, res) {
-  gitManager
-    .isUpdate()
+app.get("/status", function(req, res) {
+  gitManager.remote
+    .status()
     .then(update => res.status(200).json(update))
     .catch(err => json.status(500).json({ err }));
 });
