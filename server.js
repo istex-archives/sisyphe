@@ -49,11 +49,14 @@ app.get("/branches", function(req, res) {
 });
 
 app.post("/changeBranch", function(req, res) {
-  cp.exec("git checkout " + req.body.branch.trim(), (error, stdout, stderr) => {
-    if (error) res.status(500).json(error);
-    else if (stderr) res.status(500).json(stderr);
-    else if (stdout) res.status(200).json(stdout);
-  });
+  gitManager.local
+    .checkout(req.body.branch.trim())
+    .then(result => {
+      res.status(200).json(result)
+    })
+    .catch(err => {
+      res.status(500).json(err)
+    });
 });
 app.post("/pull", function(req, res) {
   gitManager.remote
