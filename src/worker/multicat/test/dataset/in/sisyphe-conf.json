@@ -1,11 +1,13 @@
 {
   "multicat": {
-    "label": "rd-multicat",
-    "resp": {
-      "id": "istex-rd",
-      "label": "ISTEX-RD"
+    "module": {
+      "label": "rd-multicat",
+      "resp": {
+        "id": "istex-rd",
+        "label": "ISTEX-RD"
+      },
+      "resources": "test"
     },
-    "resources": "test",
     "categorizations": [{
       "scheme": "test",
       "identifier": "identifier[type=\"ISSN\"]",

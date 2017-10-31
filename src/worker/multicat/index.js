@@ -5,7 +5,6 @@
 
 /* Module Require */
 const utils = require("worker-utils"),
-  config = require("./config.json"),
   pkg = require("./package.json"),
   fs = require("fs"),
   path = require("path");
@@ -77,7 +76,7 @@ worker.doTheJob = function(data, next) {
     // Build the structure of the template
     const tpl = {
         "date": worker.NOW, // Current date
-        "module": config, // Configuration of module
+        "module": worker.resources.module, // Configuration of module
         "pkg": pkg, // Infos on module packages
         "document": { // Data of document
           "id": documentId,
@@ -119,7 +118,7 @@ worker.doTheJob = function(data, next) {
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
         "enrichment": enrichment,
-        "label": config.label
+        "label": worker.resources.module.label
       });
       // All clear
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.SUCCESS + output.filename);
