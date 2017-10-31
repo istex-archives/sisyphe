@@ -19,34 +19,7 @@
     "label": "Devrait charger correctement les resources",
     "arguments": {
       "options": {
-        "config": {
-          "multicat": {
-            "label": "rd-multicat",
-            "resp": {
-              "id": "istex-rd",
-              "label": "ISTEX-RD"
-            },
-            "resources": "test",
-            "categorizations": [{
-              "scheme": "test",
-              "identifier": "identifier[type=\"ISSN\"]",
-              "id": "test",
-              "file": "tables/test.json",
-              "label": "test"
-            }],
-            "tables": {},
-            "template": "fragment.tpl",
-            "output": {
-              "extension": ".txt",
-              "mime": "text/plain",
-              "type": "enrichment"
-            },
-            "enrichment": {
-              "original": false,
-              "extension": "txt"
-            }
-          }
-        },
+        "config": true,
         "sharedConfigDir": "./test/dataset/in/shared"
       }
     },
@@ -57,7 +30,7 @@
     "label": "Devrait charger les resources par défaut (no config)",
     "arguments": {
       "options": {
-        "config": {},
+        "config": null,
         "sharedConfigDir": "./test/dataset/in/shared"
       }
     },
@@ -68,34 +41,7 @@
     "label": "Devrait charger les resources par défaut (no sharedConfigDir)",
     "arguments": {
       "options": {
-        "config": {
-          "multicat": {
-            "label": "rd-multicat",
-            "resp": {
-              "id": "istex-rd",
-              "label": "ISTEX-RD"
-            },
-            "resources": "test",
-            "categorizations": [{
-              "scheme": "test",
-              "identifier": "identifier[type=\"ISSN\"]",
-              "id": "test",
-              "file": "tables/test.json",
-              "label": "test"
-            }],
-            "tables": {},
-            "template": "fragment.tpl",
-            "output": {
-              "extension": ".txt",
-              "mime": "text/plain",
-              "type": "enrichment"
-            },
-            "enrichment": {
-              "original": false,
-              "extension": "txt"
-            }
-          }
-        },
+        "config": true,
         "sharedConfigDir": ""
       }
     },
@@ -106,7 +52,7 @@
     "label": "Devrait charger les resources par défaut (no config & sharedConfigDir)",
     "arguments": {
       "options": {
-        "config": {},
+        "config": null,
         "sharedConfigDir": ""
       }
     },

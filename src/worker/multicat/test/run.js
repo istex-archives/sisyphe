@@ -12,6 +12,7 @@ const pkg = require("../package.json"),
 
 // Test dataset for each tested function
 const data = require("./dataset/in/data.json"),
+  originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
     "worker": require("./dataset/in/test.worker.json")
   };
@@ -33,7 +34,7 @@ const objects = {
 // Call of init function (shoulb be done by sisyphe usually)
 worker.init({
   "outputPath": "test/dataset/out",
-  "config": require("./dataset/in/sisyphe-conf.json"),
+  "config": JSON.parse(JSON.stringify(originalConfigTest)),
   "sharedConfigDir": "test/dataset/in/shared"
 });
 
@@ -81,6 +82,7 @@ function testOf_categorize(fn, item, cb) {
  * - worker.load()
  */
 function testOf_load(fn, item, cb) {
-    const value = fn(item.arguments.options);
+  item.arguments.options.config = (item.arguments.options.config) ? JSON.parse(JSON.stringify(originalConfigTest)) : {}; // If we need a config in this test, we will use the configTest
+  const value = fn(item.arguments.options);
   return cb(Object.keys(value.tables));
 }

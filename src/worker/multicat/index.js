@@ -86,11 +86,11 @@ worker.doTheJob = function(data, next) {
       },
       // Build path & filename of enrichment file
       output = utils.files.createPath({
-        outputPath: worker.outputPath,
-        id: documentId,
-        type: worker.resources.output.type,
-        label: pkg.name,
-        extension: worker.resources.output.extension
+        "outputPath": worker.outputPath,
+        "id": documentId,
+        "type": worker.resources.output.type,
+        "label": pkg.name,
+        "extension": worker.resources.output.extension
       });
     // If no categories were found
     if (!categories.length) {
