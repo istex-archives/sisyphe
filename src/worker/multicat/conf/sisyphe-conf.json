@@ -1,10 +1,12 @@
 {
-  "label": "rd-multicat",
-  "resp": {
-    "id": "istex-rd",
-    "label": "ISTEX-RD"
+  "module": {
+    "label": "rd-multicat",
+    "resp": {
+      "id": "istex-rd",
+      "label": "ISTEX-RD"
+    },
+    "resources": "default"
   },
-  "resources": "default",
   "categorizations": [],
   "tables": {},
   "template": ""
