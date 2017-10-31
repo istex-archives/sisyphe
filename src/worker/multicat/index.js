@@ -23,7 +23,6 @@ worker.init = function(options = {
 }) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
-  worker.NOW = utils.dates.now(); // Get the formated current date (String)
   worker.LOGS = { // All logs available on this module
     "SUCCESS": "TEI file created at ",
     "IDENTIFIER_NOT_FOUND": "IDENTIFIER not found",
@@ -56,7 +55,7 @@ worker.doTheJob = function(data, next) {
       data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
-    // Récupération de l'identifier
+    // Get the identifier in the MODS file
     const $ = utils.XML.load(modsStr);
     let categories = [];
     for (let i = 0, l = worker.resources.categorizations.length; i < l; i++) {
@@ -74,6 +73,7 @@ worker.doTheJob = function(data, next) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_DO_NOT_MATCH);
       return next(null, data);
     }
+    worker.NOW = utils.dates.now(); // Get the formated current date (String)
     // Build the structure of the template
     const tpl = {
         "date": worker.NOW, // Current date
