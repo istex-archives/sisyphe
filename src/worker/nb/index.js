@@ -116,6 +116,7 @@ worker.doTheJob = (data, next) => {
       const tpl = {
           "date": worker.NOW, // Current date
           "module": worker.resources.module, // Configuration of module
+          "parameters": worker.resources.parameters, // Launch parameters of module
           "pkg": pkg, // Infos on module packages
           "document": { // Data of document
             "id": documentId,
