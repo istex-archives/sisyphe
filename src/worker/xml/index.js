@@ -60,8 +60,8 @@ sisypheXml.doTheJob = function (data, next) {
     let doctype = this.libxml.getDtd();
 
     // Reformat key for DTD to retro-compatible old sisyphe version
-    if(doctype.externalId){ doctype.pubid = doctype.externalId; delete doctype.externalId; }
-    if(doctype.systemId){ doctype.sysid = doctype.systemId; delete doctype.systemId; }
+    if(doctype && doctype.hasOwnProperty('externalId')){ doctype.pubid = doctype.externalId; delete doctype.externalId; }
+    if(doctype && doctype.hasOwnProperty('systemId')){ doctype.sysid = doctype.systemId; delete doctype.systemId; }
     data.doctype = doctype;
 
     data.isWellFormed = true;
@@ -69,7 +69,7 @@ sisypheXml.doTheJob = function (data, next) {
     if (!this.isConfExist) { return data };
 
     let result = this.validateAgainstDTD(this.libxml, this.dtdsPath);
-    if (!result.isValid) {
+    if (result && result.hasOwnProperty('isValid') && !result.isValid) {
       data.isValidAgainstDTD = false;
       return data;
     }
