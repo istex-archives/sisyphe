@@ -9,6 +9,7 @@ const pkg = require("../package.json"),
 
 // Données de test
 const data = require("./dataset/in/data.json"),
+  originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
     "worker": require("./dataset/in/test.worker.json")
   };
@@ -17,7 +18,8 @@ const data = require("./dataset/in/data.json"),
 const wrappers = {
   "worker": {
     "doTheJob": testOf_doTheJob,
-    "categorize": testOf_categorize
+    "categorize": testOf_categorize,
+    "load": testOf_load
   }
 };
 
@@ -26,7 +28,9 @@ const objects = {
 };
 
 worker.init({
-  "outputPath": "test/dataset/out"
+  "outputPath": "test/dataset/out",
+  "config": JSON.parse(JSON.stringify(originalConfigTest)),
+  "sharedConfigDir": "test/dataset/in/shared"
 });
 
 /**
@@ -68,4 +72,14 @@ function testOf_categorize(fn, item, cb) {
       if (err) throw err;
       cb(fn(res).categories);
     });
+}
+
+/**
+ * Wrapper of :
+ * - worker.load()
+ */
+function testOf_load(fn, item, cb) {
+  item.arguments.options.config = (item.arguments.options.config) ? JSON.parse(JSON.stringify(originalConfigTest)) : {}; // If we need a config in this test, we will use the configTest
+  const value = fn(item.arguments.options);
+  return cb(Object.keys(value.trainings));
 }

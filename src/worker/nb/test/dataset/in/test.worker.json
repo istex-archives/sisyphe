@@ -20,13 +20,58 @@
     "logs": "logs",
     "result": {}
   }],
+  "load": [{
+    "label": "Devrait charger correctement les resources",
+    "arguments": {
+      "options": {
+        "config": true,
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
+    },
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config)",
+    "arguments": {
+      "options": {
+        "config": null,
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": true,
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config & sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": null,
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }],
   "categorize": [{
     "label": "Devrait renvoyer une ou plusieurs catégorie(s)",
     "arguments": {
       "path": "./test/dataset/in/corpus/SUCCESS.txt"
     },
     "result": {
-      "length": 4
+      "length": 1
     }
   }, {
     "label": "Devrait renvoyer aucune catégorie",

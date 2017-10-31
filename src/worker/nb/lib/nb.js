@@ -46,7 +46,7 @@ const Bayes = function(min, lower = false) {
 
   const self = this;
   /*
-   * calcule la probabilité (méthode Robinson)
+   * Calcul of probabilities (Robinson methodology)
    * P = 1 - prod(1 - p) ^ (1 / n)
    * Q = 1 - prod(p) ^ (1 / n)
    * S = (1 + (P - Q) / (P + Q)) / 2
