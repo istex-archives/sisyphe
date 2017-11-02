@@ -112,7 +112,6 @@ worker.doTheJob = (data, next) => {
       }
       worker.NOW = utils.dates.now(); // Date du jour formatée (string)
       // Build the structure of the template
-
       const tpl = {
           "date": worker.NOW, // Current date
           "module": worker.resources.module, // Configuration of module
@@ -131,7 +130,7 @@ worker.doTheJob = (data, next) => {
           "label": pkg.name,
           "extension": worker.resources.output.extension
         });
-        // Write enrichment data
+      // Write enrichment data
       utils.enrichments.write({
         "template": worker.resources.template,
         "data": tpl,
