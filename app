@@ -38,6 +38,7 @@ const silent = program.silent;
 const now = Date.now();
 const options = {
   corpusname: program.corpusname,
+  sharedConfigDir,
   configDir,
   configFilename,
   config,
