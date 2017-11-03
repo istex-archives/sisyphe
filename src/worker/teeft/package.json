@@ -15,7 +15,6 @@
     "backbone": "^1.3.3",
     "javascript-lemmatizer": "0.0.2",
     "mocha": "^3.5.3",
-    "teeft-resources": "git+https://github.com/NicolasKieffer/teeft-resources.git",
     "snowball-stemmers": "^0.6.0",
     "worker-utils": "git+https://github.com/NicolasKieffer/worker-utils.git"
   }
