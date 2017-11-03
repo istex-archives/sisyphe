@@ -30,12 +30,18 @@ if (program.corpusname === 'default' || program.configDir === 'none') {
 }
 
 const inputPath = path.resolve(program.args[0]);
+const configFilename = 'sisyphe-conf.json'; // standard name for a configuration file in sisyphe
 const configDir = program.configDir ? path.resolve(program.configDir) : null;
+const sharedConfigDir = configDir ? path.resolve(configDir, "../shared") : null; // stanard path for the shared configuration directory
+const config = configDir ? require(path.resolve(configDir, configFilename)) : null; // Object representation of sisyphe configuration (or null)
 const silent = program.silent;
 const now = Date.now();
 const options = {
   corpusname: program.corpusname,
+  sharedConfigDir,
   configDir,
+  configFilename,
+  config,
   inputPath,
   numCPUs: program.thread || numCPUs,
   now,

@@ -23,12 +23,13 @@ const sisypheXml = {};
 sisypheXml.init = function (options) {
   this.libxml = new Libxml();
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
+  this.configFilename = options.configFilename || 'sisyphe-conf.json';
   let confContents = fs.readdirSync(this.configDir);
   // We search the nearest config in configDir
   for (var folder of confContents) {
     let currPath = path.join(this.configDir, folder);
     if (fs.lstatSync(currPath).isDirectory() && options.corpusname.includes(folder)) {
-      this.pathToConf = path.resolve(this.configDir, folder, 'sisyphe-xml' + '.json');
+      this.pathToConf = path.resolve(this.configDir, folder, this.configFilename);
       break;
     }
   }

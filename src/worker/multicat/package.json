@@ -13,7 +13,6 @@
     "async": "^2.5.0",
     "auto-tu": "git+https://github.com/NicolasKieffer/auto-tu.git",
     "mocha": "^3.5.3",
-    "multicat-resources": "git+https://github.com/NicolasKieffer/multicat-resources.git",
     "worker-utils": "git+https://github.com/NicolasKieffer/worker-utils.git"
   }
 }

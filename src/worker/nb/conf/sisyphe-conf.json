@@ -1,0 +1,32 @@
+{
+  "parameters": {
+    "lang": "en",
+    "cld": {
+      "code": "en",
+      "percent": 90
+    },
+    "probability": {
+      "min": 0.12
+    }
+  },
+  "module": {
+    "label": "rd-nb",
+    "resp": {
+      "id": "istex-rd",
+      "label": "ISTEX-RD"
+    },
+    "resources": "default"
+  },
+  "trainings": {},
+  "verbalization": "",
+  "template": "",
+  "output": {
+    "extension": ".csv",
+    "mime": "text/csv",
+    "type": "enrichment"
+  },
+  "enrichment": {
+    "original": false,
+    "extension": "csv"
+  }
+}
