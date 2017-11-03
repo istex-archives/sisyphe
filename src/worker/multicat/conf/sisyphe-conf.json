@@ -9,5 +9,14 @@
   },
   "categorizations": [],
   "tables": {},
-  "template": ""
+  "template": "",
+  "output": {
+    "extension": ".csv",
+    "mime": "text/csv",
+    "type": "enrichment"
+  },
+  "enrichment": {
+    "original": false,
+    "extension": "csv"
+  }
 }

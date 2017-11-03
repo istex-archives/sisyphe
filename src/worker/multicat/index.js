@@ -11,15 +11,12 @@ const utils = require("worker-utils"),
 
 const worker = {};
 
-
 /**
  * Init Function (called by sisyphe)
  * @param {Object} options Options passed by sisyphe
  * @return {undefined} Return undefined
  */
-worker.init = function(options = {
-  corpusname: "default"
-}) {
+worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
   worker.LOGS = { // All logs available on this module
