@@ -41,21 +41,68 @@ An exemple of this module configuration (ISTEX conf here)
 }
 ```
 
-#### stopwords.json ####
+## Ressources ##
+
+### Template ###
+
+Data sent to the template are :
+```js
+// Build the structure of the template
+const tpl = {
+  "date": worker.NOW, // Current date
+  "module": worker.resources.module, // Configuration of module
+  "parameters": worker.resources.parameters, // Launch parameters of module
+  "pkg": pkg, // Infos on module packages
+  "document": { // Data of document
+    "id": documentId,
+    "terms": text.keywords
+  }
+};
+```
+
+Detailled view of data :
+
+```json{
+  "date": "03-11-2017",
+  "document": {
+    "id": "SUCCESS",
+    "terms": [...]
+  },
+  "module": {
+    "label": "rd-teeft",
+    "resources": "test",
+    "resp": {
+      "id": "istex-rd",
+      "label": "ISTEX-RD"
+    }
+  },
+  "parameters": {
+    "lang": "en",
+    "sort": true,
+    "truncate": true
+  },
+  "pkg": {...}
+}
+```
+
+More infos about how to use tpl syntax at [documentation](https://github.com/raycmorgan/Mu)
+
+
+### stopwords.json ###
 
 This file store all terms who need to be ignored.
 
 ```json
 {
-  "essay": true,
-  "second": true,
+  "it": true,
+  "the": true,
   "all": true
 }
 ```
 
 **Only *`stem`* of stopwords is writed in this file. In the `Sanitization` function, each term is *"stemmed"* before compare.**
 
-#### dictionary.json ####
+### dictionary.json ###
 
 This file store all weighted terms.
 
@@ -70,7 +117,7 @@ This file store all weighted terms.
 }
 ```
 
-### Indexation ###
+## Indexation ##
 
 There is 5 steps in indexation :
 
@@ -80,19 +127,19 @@ There is 5 steps in indexation :
   - `Sanitization` : "Clean" terms (clear stopwords, etc).
   - `Extraction` : Extract term for indexation depending on filters.
 
-#### Tokenization ####
+### Tokenization ###
 
 Used separators are all white spaces and punctuation.
 
-#### Tag ####
+### Tag ###
 
 A `token` is tagged by default like a Name.
 
-#### Lemmatization ####
+### Lemmatization ###
 
 `Tokens` are lemmatized depending on its tag.
 
-#### Sanitization ####
+### Sanitization ###
 
 At this step, only `tokens` who match with criteria of teeft are kept :
 
@@ -103,7 +150,7 @@ At this step, only `tokens` who match with criteria of teeft are kept :
 
 The others can't be indexed by teeft.
 
-#### Extraction ####
+### Extraction ###
 
 Once sanitization done, the extractor will try to regroup multi-terms when it's possible (noun + noun, adjective + noun, etc) and calculate somr statistics (frequency, specificity, etc).
 Only *terms* with specificity **above the average specificity**  are selected.
