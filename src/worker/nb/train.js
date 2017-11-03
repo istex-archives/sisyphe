@@ -4,13 +4,13 @@
 "use strict";
 
 /*
-  Option précisant la RAM allouée
+  Required option needed to allow more RAM
   --max-old-space-size = 8192
 
-  Paramètres :
-  --input       Chemin du fichier contenant les données
-  --output      Chemin du fichier de sortie du fichier d'entrainement (au format json)
-  --separator   Séparateur entre le label et le texte. Par défault c'est une tabulation. (exemple : --separator=";")
+  Parameters :
+  --input       Path to input data (txt file)
+  --output      Path to output data (json file)
+  --separator   Used separator between label and text. By default : a tabulation. (exemple : ---separator=";")
 */
 
 /* Module Require */
@@ -28,7 +28,7 @@ const nb = new NB(argv.proba, true),
   separator = argv.separator || "\t";
 
 console.time("Train" + "-" + filename);
-// Lecture du fichier ligne par ligne
+// Read each line of input file
 lineReader.eachLine(argv.input, function(line, last) {
   const data = line.split(separator);
   // nb.train(data[0], data[1].toLowerCase());

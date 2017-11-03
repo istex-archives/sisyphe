@@ -9,19 +9,20 @@ const utils = require("worker-utils"),
   async = require("async"),
   fs = require("fs"),
   path = require("path"),
-  config = require("./config.json"),
   pkg = require("./package.json"),
   NB = require("./lib/nb.js");
 
 const worker = {};
 
-worker.init = (options = {
-  corpusname: "default"
-}) => {
-  worker.resources = require("nb-resources");
+/**
+ * Init Function (called by sisyphe)
+ * @param {Object} options Options passed by sisyphe
+ * @return {undefined} Return undefined
+ */
+worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
-  /* Constantes */
-  worker.LOGS = { // Logs des différents cas possibles (et gérés par le module)
+  worker.resources = worker.load(options);
+  worker.LOGS = { // All logs available on this module
     "SUCCESS": "TEI file created at ",
     "ABSTRACTS_NOT_FOUND": "Abstracts not found",
     "ABSTRACT_TAG_LANG_NOT_FOUND": "Abstract with correct tag lang not found",
@@ -31,57 +32,57 @@ worker.init = (options = {
   };
 }
 
-worker.doTheJob = (data, next) => {
-  // Vérification du type de fichier
-  if (data.mimetype !== "application/xml" || !data.isWellFormed) {
+/**
+ * Categorize a XML document (called by sisyphe)
+ * @param {Object} data data of the current docObject
+ * @param {Function} next Callback funtion
+ * @return {undefined} Asynchronous function
+ */
+worker.doTheJob = function(data, next) {
+  // Check resources are correctly loaded & MIME type of file & file is well formed
+  if (!Object.keys(worker.resources.trainings).length ||  data.mimetype !== "application/xml" || !data.isWellFormed) {
     return next(null, data);
   }
-
-  // Variables d"erreurs et de logs
+  // Errors & logs
   data[pkg.name] = {
     errors: [],
     logs: []
   };
-
+  // Get the filename (without extension)
   const documentId = path.basename(data.name, ".xml");
-
-  // Lecture du fichier MODS
+  // Read MODS file
   fs.readFile(data.path, "utf-8", function(err, modsStr) {
-
-    // Lecture impossible
+    // I/O Errors
     if (err) {
       data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
-
-    // Récupération de l"ISSN
+    // Get the identifier in the MODS file
     const $ = utils.XML.load(modsStr),
-      abstract = $("abstract[lang=\"" + config.lang + "\"]").text();
+      abstract = $("abstract[lang=\"" + worker.resources.parameters.lang + "\"]").text();
     let abstracts = [];
-
-    // Abstract introuvable malgrès la détection de langue
+    // Abstract with the correct lang not found
     if (!abstract) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACT_TAG_LANG_NOT_FOUND);
       abstracts = $("abstract").map(function(i, el) {
         return $(el).text();
       }).get();
-      // Abstracts introuvables
+      // Can't get an abstract
       if (!abstracts.length) {
         data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACTS_NOT_FOUND);
         return next(null, data);
       }
     }
-
-    // Pour chaque abstract trouvé (sans la langue voulue)
+    // For each abstract with another language than that wanted
     async.eachSeries(abstracts, function(item, callback) {
       cld.detect(item, {
-        isHTML: false,
-        encodingHint: "UTF8",
+        "isHTML": false,
+        "encodingHint": "UTF8",
       }, function(err, result) {
         if (err) return callback(err);
         if (!result) return callback();
         if (result.reliable && result.languages.length) {
-          if (result.languages[0].percent >= config.cld.percent && result.languages[0].code === config.cld.code) abstract = item;
+          if (result.languages[0].percent >= worker.resources.parameters.cld.percent && result.languages[0].code === worker.resources.parameters.cld.code) abstract = item;
         }
         callback();
       });
@@ -90,78 +91,67 @@ worker.doTheJob = (data, next) => {
         data[pkg.name].errors.push(err);
         return next(null, data);
       }
-
-      // Abstract introuvable malgrès la détection de langue
+      // Abstract with the correct language not found after detection
       if (!abstract) {
         data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACT_DETECTED_LANG_NOT_FOUND);
         return next(null, data);
       }
-
-      // Résultat de la catégorisation
+      // Get result of the categorization
       const result = worker.categorize(abstract);
-
-
-      // Récupération des catégories et des erreurs de verbalisation
+      // Get catégories & verbalization errors
       const categories = result.categories,
         errors = result.errors;
-
-      // Si une ou plusieur erreur de verbalisation ont eu lieu, écriture dans les logs
+      // If there is one (or more) errors of verbalization, write it in logs
       if (errors.length) data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.VERBALIZATION_NOT_FOUND + " (" + result.errors.join(",") + ")");
-
-      // Aucune catégorie déduite
+      // If no categories were found
       if (!categories.length) {
         data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.CATEGORY_NOT_FOUND);
         return next(null, data);
       }
-
       worker.NOW = utils.dates.now(); // Date du jour formatée (string)
-      // Construction de la structure de données pour le template
+      // Build the structure of the template
       const tpl = {
-          "date": worker.NOW,
-          "module": config, // Infos sur la configuration du module
-          "pkg": pkg, // Infos sur le module
-          "document": { // Infos sur le document
+          "date": worker.NOW, // Current date
+          "module": worker.resources.module, // Configuration of module
+          "parameters": worker.resources.parameters, // Launch parameters of module
+          "pkg": pkg, // Infos on module packages
+          "document": { // Data of document
             "id": documentId,
             "categories": categories
           }
         },
-        // Récupération du directory & filename de l"ouput
+        // Build path & filename of enrichment file
         output = utils.files.createPath({
-          outputPath: worker.outputPath,
-          id: documentId,
-          type: "enrichments",
-          label: pkg.name,
-          // extension: ["_", config.version, "_", config.training, ".tei.xml"].join(")
-          extension: ".tei.xml"
+          "outputPath": worker.outputPath,
+          "id": documentId,
+          "type": worker.resources.output.type,
+          "label": pkg.name,
+          "extension": worker.resources.output.extension
         });
-
-      // Récupération du fragment de TEI
+      // Write enrichment data
       utils.enrichments.write({
         "template": worker.resources.template,
         "data": tpl,
         "output": output
       }, function(err) {
         if (err) {
-          // Lecture/Écriture impossible
+          // I/O Error
           data[pkg.name].errors.push(err.toString());
           return next(null, data);
         }
-
-        // Création de l"objet enrichement représentant l"enrichissement produit
+        // Create an Object representation of created enrichment
         const enrichment = {
           "path": path.join(output.directory, output.filename),
-          "extension": "tei",
-          "original": false,
-          "mime": "application/tei+xml"
+          "extension": worker.resources.enrichment.extension,
+          "original": worker.resources.enrichment.original,
+          "mime": worker.resources.output.mime
         };
-
-        // Sauvegarde de l"enrichissement dans le data
+        // Save enrichments in data
         data.enrichments = utils.enrichments.save(data.enrichments, {
           "enrichment": enrichment,
-          "label": config.label
+          "label": worker.resources.module.label
         });
-
-        // Tout s"est bien passé
+        // All clear
         data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.SUCCESS + output.filename);
         return next(null, data);
       });
@@ -170,43 +160,63 @@ worker.doTheJob = (data, next) => {
 };
 
 /**
- * Retourne les catégories calculées par le Bayésien Naïf
- * @param {string} text Texte à classer
- * @return {array} Tableau contenant les catégories calculées
+ * Return each categories guessed by Naive Bayesian
+ * @param {String} text Text to classify
+ * @return {Array} Array containing all categories
  */
-worker.categorize = (text) => {
-  // Instanciation d"un Bayésien Naïf
-  const nb = new NB(config.probability.min),
+worker.categorize = function(text) {
+  // Instance of a Naive Bayesian
+  const nb = new NB(worker.resources.parameters.probability.min),
     categories = [],
     errors = [];
   let training = worker.resources.trainings.entry,
     level = 0,
     next = true;
-  // Guess de la catégorie tant qu"un entrainement est dispo
+  // Guess the categories using trainings
   while (next) {
-    nb.load(training); // Estimation de la catégorie
-    let result = nb.guess(text); // Estimation de la catégorie
+    nb.load(training); // Loading the current categories
+    let result = nb.guess(text); // Guess the category
     if (result.category) {
-      // Verbalisation du code
+      // Verbalization of the guessed category
       const verbalization = worker.resources.verbalization[result.category];
       if (!verbalization) errors.push(result.category);
-      // Ajout du résultat à la liste
+      // Add the guessed result
       categories.push({
         "code": result.category,
         "probability": result.probability,
         "verbalization": worker.resources.verbalization[result.category],
-        "level": ++level // On augmente le niveau de catégorisation
+        "level": ++level // Increase the category level
       });
     }
-    next = worker.resources.trainings.hasOwnProperty(result.category); // Si la clé du prochain entrainement existe => true, sinon false
+    next = worker.resources.trainings.hasOwnProperty(result.category); // Check if there is an available next training
     if (next) {
-      training = worker.resources.trainings[result.category]; // Définition du prochain entrainement
+      training = worker.resources.trainings[result.category]; // Define the next training
     }
   }
   return {
     categories: categories,
     errors: errors
   };
+};
+
+/**
+ * Load all resources needed in this module
+ * @param {Object} options Options passed by sisyphe
+ * @return {Object} An object containing all the data loaded
+ */
+worker.load = function(options) {
+  let result = options.config[pkg.name];
+  const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
+  if (folder && result) {
+    for (let key in result.trainings) {
+      result.trainings[key] = require(path.join(folder, result.trainings[key]));
+    }
+    result.verbalization = require(path.join(folder, result.verbalization));
+    result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');
+  } else {
+    result = require("./conf/sisyphe-conf.json");
+  }
+  return result;
 };
 
 module.exports = worker;

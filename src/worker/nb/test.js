@@ -4,13 +4,13 @@
 "use strict";
 
 /*
-  Option précisant la RAM allouée
+  Required option needed to allow more RAM
   --max-old-space-size = 8192
 
-  Paramètres :
-  --input       Chemin du fichier contenant les données
-  --output      Chemin du fichier de sortie du fichier de test (au format json)
-  --separator   Séparateur entre le label et le texte. Par défault c'est une tabulation. (exemple : --separator=";")
+  Parameters :
+  --input       Path to input data (txt file)
+  --output      Path to output data (csv file)
+  --separator   Used separator between label and text. By default : a tabulation. (exemple : ---separator=";")
 */
 
 /* Module Require */
@@ -30,7 +30,7 @@ const filename = path.basename(argv.input),
 let results = [];
 
 console.time("Test" + "-" + filename);
-// Lecture du fichier ligne par ligne
+// Read each line of input file
 lineReader.eachLine(argv.input, function(line, last) {
   const data = line.split(separator);
   // let res = data[0] + ";" + nb.categorize(data[1].toLowerCase()).categories.map((el) => {

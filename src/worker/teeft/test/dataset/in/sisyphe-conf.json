@@ -1,0 +1,29 @@
+{
+  "teeft": {
+    "parameters": {
+      "lang": "en",
+      "truncate": true,
+      "sort": true
+    },
+    "module": {
+      "label": "rd-teeft",
+      "resp": {
+        "id": "istex-rd",
+        "label": "ISTEX-RD"
+      },
+      "resources": "test"
+    },
+    "template": "fragment.tpl",
+    "dictionary": "dictionary.json",
+    "stopwords": "stopwords.json",
+    "output": {
+      "extension": ".txt",
+      "mime": "text/plain",
+      "type": "enrichment"
+    },
+    "enrichment": {
+      "original": false,
+      "extension": "txt"
+    }
+  }
+}
