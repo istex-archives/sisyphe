@@ -19,9 +19,7 @@ const worker = {};
  * @param {Object} options Options passed by sisyphe
  * @return {undefined} Return undefined
  */
-worker.init = (options = {
-  corpusname: "default"
-}) => {
+worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
   worker.LOGS = { // All logs available on this module
@@ -40,7 +38,7 @@ worker.init = (options = {
  * @param {Function} next Callback funtion
  * @return {undefined} Asynchronous function
  */
-worker.doTheJob = (data, next) => {
+worker.doTheJob = function(data, next) {
   // Check resources are correctly loaded & MIME type of file & file is well formed
   if (!Object.keys(worker.resources.trainings).length ||  data.mimetype !== "application/xml" || !data.isWellFormed) {
     return next(null, data);
@@ -166,7 +164,7 @@ worker.doTheJob = (data, next) => {
  * @param {String} text Text to classify
  * @return {Array} Array containing all categories
  */
-worker.categorize = (text) => {
+worker.categorize = function(text) {
   // Instance of a Naive Bayesian
   const nb = new NB(worker.resources.parameters.probability.min),
     categories = [],
@@ -206,7 +204,7 @@ worker.categorize = (text) => {
  * @param {Object} options Options passed by sisyphe
  * @return {Object} An object containing all the data loaded
  */
-worker.load = (options) => {
+worker.load = function(options) {
   let result = options.config[pkg.name];
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
