@@ -62,7 +62,8 @@ const tpl = {
 
 Detailled view of data :
 
-```json{
+```json
+{
   "date": "03-11-2017",
   "document": {
     "id": "SUCCESS",
