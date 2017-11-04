@@ -1,6 +1,6 @@
 {
   "name": "nb",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Module Sisyphe de catégorisation par méthode statistique: Bayésien Naïf",
   "main": "index.js",
   "scripts": {

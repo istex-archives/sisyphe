@@ -1,77 +1,138 @@
-const cp = require('child_process');
-var express = require('express');
-var serveStatic = require('serve-static');
-const path = require('path');
-const Promise = require('bluebird');
-const fs = Promise.promisifyAll(require('fs'));
-var bodyParser = require('body-parser');
-const { spawn } = require('child_process');
+const cp = require("child_process");
+var express = require("express");
+var serveStatic = require("serve-static");
+const path = require("path");
+const Promise = require("bluebird");
+const fs = Promise.promisifyAll(require("fs"));
+var bodyParser = require("body-parser");
+const { spawn } = require("child_process");
+const GitManager = require("gitmanager");
+const gitManager = new GitManager();
 let sisyphe = null;
 var app = express();
-app.use(serveStatic(path.join(__dirname, 'out')));
+app.use(serveStatic(path.join(__dirname, "out")));
 app.use(bodyParser.json());
 
-app.get('/workers', function (req, res) {
-  const workers = require('./src/worker.json');
+app.get("/workers", function(req, res) {
+  const workers = require("./src/worker.json");
   res.json(workers);
 });
 
-app.get('/download/latest', async function (req, res) {
-  const sessions = await fs.readdirAsync('out');
-  const session = path.resolve('out/', sessions.sort().pop());
-  let sessionsFiles = getFiles(session, session.split('/').pop() + '/');
+app.get("/sisypheVersions", function(req, res) {
+  const listWorkers = require("./src/worker.json").workers;
+  const modulesVersion = listWorkers.map(name => {
+    return {
+      name,
+      version: require("./src/worker/" + name + "/package.json").version
+    };
+  });
+  res.status(200).json({
+    version: require("./package").version,
+    modules: modulesVersion
+  });
+});
+app.get("/branches", function(req, res) {
+  Promise.join(
+    gitManager.local.branches(),
+    gitManager.remote.branches(),
+    gitManager.local.branch(),
+    (localBranchesName, remoteBranchesName, currentBranchName) => {
+      res.status(200).json({
+        localBranchesName,
+        remoteBranchesName,
+        currentBranchName
+      });
+    }
+  ).catch(err => {
+    res.status(500).json(err);
+  });
+});
+
+app.post("/changeBranch", function(req, res) {
+  gitManager.local
+    .checkout(req.body.branch.trim())
+    .then(result => {
+      res.status(200).json(result)
+    })
+    .catch(err => {
+      res.status(500).json(err)
+    });
+});
+app.post("/pull", function(req, res) {
+  gitManager.remote
+    .pull(req.body.branch)
+    .then(result => {
+      res.status(200).json(result);
+    })
+    .catch(err => {
+      res.status(500).json(result);
+    });
+});
+app.get("/status", function(req, res) {
+  gitManager.remote
+    .status()
+    .then(update => res.status(200).json(update))
+    .catch(err => json.status(500).json({ err }));
+});
+
+app.get("/download/latest", async function(req, res) {
+  const sessions = await fs.readdirAsync("out");
+  const session = path.resolve("out/", sessions.sort().pop());
+  let sessionsFiles = getFiles(session, session.split("/").pop() + "/");
   res.send(sessionsFiles);
 });
-app.get('/ping', function (req, res) {
-  res.send('pong');
+app.get("/ping", function(req, res) {
+  res.send("pong");
 });
-app.post('/stop', function (req, res) {
+app.post("/stop", function(req, res) {
   if (sisyphe) {
-    sisyphe.kill('SIGTERM');
+    sisyphe.kill("SIGTERM");
     sisyphe = null;
   }
 
-  res.send('stop');
+  res.send("stop");
 });
-app.post('/launch', async function (req, res) {
+app.post("/launch", async function(req, res) {
   if (!sisyphe) {
-    console.log('launch')
+    console.log("launch");
     const command = req.body.command;
     let commandArray = [];
-    if (command.name) commandArray.push("-n",command.name)
+    if (command.name) commandArray.push("-n", command.name);
     if (command.config) commandArray.push("-c", command.config);
-    if (command.disable) command.disable.map(worker => commandArray.push('-r',worker.name))
+    if (command.disable)
+      command.disable.map(worker => commandArray.push("-r", worker.name));
     if (command.path) commandArray.push(command.path);
-    if (!command.debug) commandArray.push('-s');
+    if (!command.debug) commandArray.push("-s");
     console.log(`launch: ${commandArray}`);
     res.send(true);
     sisyphe = cp.spawn(`./app`, commandArray);
     sisyphe.stdout.pipe(process.stdout);
-    sisyphe.on('exit', _=>{
-      sisyphe = null
-    })
+    sisyphe.on("exit", _ => {
+      sisyphe = null;
+    });
   } else {
-    console.log('Already launch');
+    console.log("Already launch");
     res.send(false);
   }
 });
-app.post('/readdir', async function (req, res) {
-  fs.readdirAsync(req.body.path)
-  .then(data => {
-    res.send(data);
-  })
-  .catch(err => {
-    return res.send({error: err.message});
-  });
+app.post("/readdir", async function(req, res) {
+  fs
+    .readdirAsync(req.body.path)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      return res.send({ error: err.message });
+    });
 });
-console.log('listen to port 3264');
+console.log("listen to port 3264");
 app.listen(3264);
 
-function getFiles (pathdir, parent = '', root = 'true') {
+function getFiles(pathdir, parent = "", root = "true") {
   let files = fs.readdirSync(pathdir).map(docs => {
     const absolute = path.resolve(pathdir, docs);
     if (fs.lstatSync(absolute).isDirectory()) {
-      parent += path.basename(absolute) + '/';
+      parent += path.basename(absolute) + "/";
       return getFiles(absolute, parent, false);
     }
     return { path: parent + docs };
@@ -81,8 +142,8 @@ function getFiles (pathdir, parent = '', root = 'true') {
   }
   return files;
 }
-function flatten (arr) {
-  return arr.reduce(function (flat, toFlatten) {
+function flatten(arr) {
+  return arr.reduce(function(flat, toFlatten) {
     return flat.concat(
       Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
     );
