@@ -25,7 +25,7 @@
     "template": "fragment.tpl",
     "output": {
       "extension": ".txt",
-      "mime": "text/plain",
+      "mimetype": "text/plain",
       "type": "enrichment"
     },
     "enrichment": {

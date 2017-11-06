@@ -18,7 +18,7 @@
   "template": "",
   "output": {
     "extension": ".txt",
-    "mime": "text/txt",
+    "mimetype": "text/txt",
     "type": "enrichment"
   },
   "enrichment": {
