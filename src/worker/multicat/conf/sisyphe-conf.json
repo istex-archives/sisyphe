@@ -1,4 +1,10 @@
 {
+  "parameters": {
+    "input": {
+      "mimetype": "application/xml",
+      "extension": ".xml"
+    }
+  },
   "module": {
     "label": "rd-multicat",
     "resp": {
@@ -11,12 +17,12 @@
   "tables": {},
   "template": "",
   "output": {
-    "extension": ".csv",
-    "mime": "text/csv",
+    "extension": ".txt",
+    "mime": "text/txt",
     "type": "enrichment"
   },
   "enrichment": {
     "original": false,
-    "extension": "csv"
+    "extension": "txt"
   }
 }

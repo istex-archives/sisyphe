@@ -1,5 +1,11 @@
 {
   "multicat": {
+    "parameters": {
+      "input": {
+        "mimetype": "application/xml",
+        "extension": ".xml"
+      }
+    },
     "module": {
       "label": "rd-multicat",
       "resp": {
