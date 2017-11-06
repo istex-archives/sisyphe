@@ -1,43 +1,54 @@
-/* global __dirname, require, process, it */
+/* global module */
+/* jslint node: true */
+/* jslint indent: 2 */
+"use strict";
 
-'use strict';
+/* Module Require */
+const pkg = require("../package.json"),
+  worker = require("../index.js"),
+  path = require("path"),
+  async = require("async"),
+  TU = require("auto-tu");
 
-const pkg = require('../package.json'),
-  worker = require('../index.js'),
-  async = require('async'),
-  TU = require('auto-tu');
-
-// Données de test
-const data = require('./dataset/in/data.json'),
+// Test dataset for each tested function
+const data = require("./dataset/in/data.json"),
+  originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
-    'worker': require('./dataset/in/test.worker.json')
+    "worker": require("./dataset/in/test.worker.json")
   };
 
-// Mapping indiquant quelle fonction de test et quelles données utiliser pour chaque fonction
+// Wrappers used for each tested function
 const wrappers = {
-  'worker': {
-    'doTheJob': testOf_doTheJob,
-    'categorize': testOf_categorize
+  "worker": {
+    "doTheJob": testOf_doTheJob,
+    "categorize": testOf_categorize,
+    "load": testOf_load
   }
 };
 
+// Tested object (only functions are "automatically" tested)
 const objects = {
-  'worker': worker
+  "worker": worker
 };
 
+// Call of init function (shoulb be done by sisyphe usually)
 worker.init({
-  "outputPath": "test/dataset/out"
+  "outputPath": "test/dataset/out",
+  "config": JSON.parse(JSON.stringify(originalConfigTest)),
+  "sharedConfigDir": "test/dataset/in/shared"
 });
 
 /**
- * Test des fonctions de :
+ * Test of functions of :
  *   - worker :
  *     - doTheJob()
+ *     - categorize()
+ *     - load()
  */
-// Pour chaque clé
+// Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
-    description: pkg.name + '/index.js',
+    description: pkg.name + "/index.js",
     root: key,
     object: objects[key],
     dataset: datasets[key],
@@ -47,21 +58,31 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 });
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
  * - worker.doTheJob()
  */
 function testOf_doTheJob(fn, item, cb) {
   return fn(data[item.key], function(err, res) {
-    item.result.include = worker.LOGS[item.key]; // Contiendra la valeur de l'erreur attendu
-    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // Contiendra la valeur renvoyer par le module
+    item.result.include = worker.LOGS[item.key]; // will contain the expected value
+    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // will contain the returned value
     return cb(value);
   });
 }
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
  * - worker.categorize()
  */
 function testOf_categorize(fn, item, cb) {
-  cb(fn(item.arguments.identifier, item.arguments.table));
+  return cb(fn(item.arguments.identifier, item.arguments.table));
+}
+
+/**
+ * Wrapper of :
+ * - worker.load()
+ */
+function testOf_load(fn, item, cb) {
+  item.arguments.options.config = (item.arguments.options.config) ? JSON.parse(JSON.stringify(originalConfigTest)) : {}; // If we need a config in this test, we will use the configTest
+  const value = fn(item.arguments.options);
+  return cb(Object.keys(value.tables));
 }

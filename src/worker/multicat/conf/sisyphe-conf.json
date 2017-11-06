@@ -1,0 +1,22 @@
+{
+  "module": {
+    "label": "rd-multicat",
+    "resp": {
+      "id": "istex-rd",
+      "label": "ISTEX-RD"
+    },
+    "resources": "default"
+  },
+  "categorizations": [],
+  "tables": {},
+  "template": "",
+  "output": {
+    "extension": ".csv",
+    "mime": "text/csv",
+    "type": "enrichment"
+  },
+  "enrichment": {
+    "original": false,
+    "extension": "csv"
+  }
+}

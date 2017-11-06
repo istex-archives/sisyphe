@@ -15,29 +15,56 @@
     "logs": "logs",
     "result": {}
   }],
+  "load": [{
+    "label": "Devrait charger correctement les resources",
+    "arguments": {
+      "options": {
+        "config": true,
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
+    },
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config)",
+    "arguments": {
+      "options": {
+        "config": null,
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": true,
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config & sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": null,
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }],
   "categorize": [{
-    "label": "Devrait renvoyer une ou plusieurs catégorie(s) WoS",
+    "label": "Devrait renvoyer une ou plusieurs catégorie(s)",
     "arguments": {
-      "identifier": "8756-971X",
-      "table": "wos"
-    },
-    "result": {
-      "length": 1
-    }
-  }, {
-    "label": "Devrait renvoyer une ou plusieurs catégorie(s) Science Metrix",
-    "arguments": {
-      "identifier": "8756-971X",
-      "table": "science-metrix"
-    },
-    "result": {
-      "length": 1
-    }
-  }, {
-    "label": "Devrait renvoyer une ou plusieurs catégorie(s) Scopus",
-    "arguments": {
-      "identifier": "8756-971X",
-      "table": "scopus"
+      "identifier": "0049-4488",
+      "table": "test"
     },
     "result": {
       "length": 1
@@ -46,25 +73,7 @@
     "label": "Devrait renvoyer aucune catégorie WoS",
     "arguments": {
       "identifier": "invalid-issn",
-      "table": "wos"
-    },
-    "result": {
-      "length": 0
-    }
-  }, {
-    "label": "Devrait renvoyer aucune catégorie Science Metrix",
-    "arguments": {
-      "identifier": "invalid-issn",
-      "table": "science-metrix"
-    },
-    "result": {
-      "length": 0
-    }
-  }, {
-    "label": "Devrait renvoyer aucune catégorie Scopus",
-    "arguments": {
-      "identifier": "invalid-issn",
-      "table": "scopus"
+      "table": "test"
     },
     "result": {
       "length": 0

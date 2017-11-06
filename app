@@ -1,15 +1,17 @@
 #!/usr/bin/env node
+
 "use strict";
 
-const bluebird = require('bluebird');
-const program = require('commander');
-const pkg = require('./package.json');
-const path = require('path');
-const Manufactory = require('./src/manufactory');
-const monitoring = require('./src/monitoring');
-const numCPUs = require('os').cpus().length;
-const redis = require('redis');
-const readline = require('readline')
+const bluebird = require('bluebird'),
+  program = require('commander'),
+  pkg = require('./package.json'),
+  path = require('path'),
+  fs = require('fs'),
+  Manufactory = require('./src/manufactory'),
+  monitoring = require('./src/monitoring'),
+  numCPUs = require('os').cpus().length,
+  redis = require('redis'),
+  readline = require('readline');
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 const client = redis.createClient();
@@ -29,13 +31,30 @@ if (program.corpusname === 'default' || program.configDir === 'none') {
   process.exit(0);
 }
 
-const inputPath = path.resolve(program.args[0]);
-const configDir = program.configDir ? path.resolve(program.configDir) : null;
-const silent = program.silent;
-const now = Date.now();
-const options = {
+let pathToConf;
+const inputPath = path.resolve(program.args[0]),
+  configFilename = 'sisyphe-conf.json', // standard name for a configuration file in sisyphe
+  configDir = program.configDir ? path.resolve(program.configDir) : null,
+  confContents = fs.readdirSync(configDir);
+// We search the nearest config in configDir
+for (let folder of confContents) {
+  let currPath = path.join(configDir, folder);
+  if (fs.lstatSync(currPath).isDirectory() && program.corpusname.includes(folder)) {
+    pathToConf = path.resolve(configDir, folder, configFilename);
+    break;
+  }
+}
+const sharedConfigDir = configDir ? path.resolve(configDir, "shared") : null, // stanard path for the shared configuration directory
+  config = pathToConf ? require(pathToConf) : null, // Object representation of sisyphe configuration (or null)
+  silent = program.silent,
+  now = Date.now(),
+  options = {
   corpusname: program.corpusname,
+  sharedConfigDir,
   configDir,
+  pathToConf,
+  configFilename,
+  config,
   inputPath,
   numCPUs: program.thread || numCPUs,
   now,
@@ -44,8 +63,8 @@ const options = {
 
 let workers = require(path.resolve(__dirname, 'src', 'worker.json')).workers;
 // remove unwanted module
-if(program.removeModule){
-  workers = workers.filter(obj=>{
+if (program.removeModule) {
+  workers = workers.filter(obj => {
     return !program.removeModule.includes(obj);
   });
 }
@@ -60,7 +79,7 @@ const sisyphe = {};
  * Init Sisyphe and all components
  * @param {Array.<String>} workers Array with the name of workers
  */
-sisyphe.init = async function (workers) {
+sisyphe.init = async function(workers) {
   this.workers = workers;
   await client.flushallAsync();
   await client.hmsetAsync('monitoring', 'start', Date.now(), 'workers', JSON.stringify(workers), 'corpusname', program.corpusname);
@@ -77,7 +96,7 @@ sisyphe.init = async function (workers) {
 /**
  * Launch sisyphe
  */
-sisyphe.launch = async function () {
+sisyphe.launch = async function() {
   this.enterprise.dispatchers.map(dispatcher => {
     let i = 0;
     dispatcher.on('result', msg => {
@@ -88,7 +107,7 @@ sisyphe.launch = async function () {
         process.stdout.write('├──── ' + dispatcher.patients[0].workerType + ' ==> ' + i.toString());
       }
     });
-    dispatcher.on('stop', async () => {
+    dispatcher.on('stop', async() => {
       const currentWorker = dispatcher.patients[0].workerType;
       const lastWorker = this.workers[this.workers.length - 1];
       if (!silent) process.stdout.write(' ==> ' + currentWorker + ' has finished\n');
@@ -110,15 +129,15 @@ sisyphe.launch = async function () {
 sisyphe.init(workers).then(() => {
   return sisyphe.launch();
 }).catch(err => {
-  // console.log(err);
+  console.log(err);
   monitoring.updateError(err);
 });
 
 // Continue sisyphe if an unknown error is happening
-process.on('uncaughtException', function (err) {
+process.on('uncaughtException', function(err) {
   console.log('Sisyphe-core-error: An uncaughtException happened : ', err, 'error');
 });
-process.on('unhandledRejection', function (err) {
+process.on('unhandledRejection', function(err) {
   console.log('Sisyphe-core-error: An uncaughtException happened : ', err, 'error');
 });
 
@@ -126,7 +145,7 @@ process.on('unhandledRejection', function (err) {
 // Uses to filter workers
 function appender(xs) {
   xs = xs || [];
-  return function (x) {
+  return function(x) {
     xs.push(x);
     return xs;
   };
@@ -135,7 +154,7 @@ function appender(xs) {
 process.stdin.resume();
 
 let exit = false;
-async function exitHandler (options, err) {
+async function exitHandler(options, err) {
   if (!exit) {
     await client.hmsetAsync('monitoring', 'end', Date.now());
     exit = true;
@@ -144,16 +163,28 @@ async function exitHandler (options, err) {
 }
 
 //do something when app is closing
-process.on("exit", exitHandler.bind(null, { exit: true }));
+process.on("exit", exitHandler.bind(null, {
+  exit: true
+}));
 
 //catches ctrl+c event
-process.on("SIGINT", exitHandler.bind(null, { exit: true }));
+process.on("SIGINT", exitHandler.bind(null, {
+  exit: true
+}));
 
-process.on("SIGTERM", exitHandler.bind(null, { exit: true }));
+process.on("SIGTERM", exitHandler.bind(null, {
+  exit: true
+}));
 
 // catches "kill pid" (for example: nodemon restart)
-process.on("SIGUSR1", exitHandler.bind(null, { exit: true }));
-process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
+process.on("SIGUSR1", exitHandler.bind(null, {
+  exit: true
+}));
+process.on("SIGUSR2", exitHandler.bind(null, {
+  exit: true
+}));
 
 //catches uncaught exceptions
-process.on("uncaughtException", exitHandler.bind(null, { exit: true }));
+process.on("uncaughtException", exitHandler.bind(null, {
+  exit: true
+}));

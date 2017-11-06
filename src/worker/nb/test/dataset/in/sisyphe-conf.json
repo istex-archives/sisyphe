@@ -1,0 +1,36 @@
+{
+  "nb": {
+    "parameters": {
+      "lang": "en",
+      "cld": {
+        "code": "en",
+        "percent": 90
+      },
+      "probability": {
+        "min": 0.12
+      }
+    },
+    "module": {
+      "label": "rd-nb",
+      "resp": {
+        "id": "istex-rd",
+        "label": "ISTEX-RD"
+      },
+      "resources": "test"
+    },
+    "trainings": {
+      "entry": "trainings/test.json"
+    },
+    "verbalization": "verbalization.json",
+    "template": "fragment.tpl",
+    "output": {
+      "extension": ".txt",
+      "mime": "text/plain",
+      "type": "enrichment"
+    },
+    "enrichment": {
+      "original": false,
+      "extension": "txt"
+    }
+  }
+}

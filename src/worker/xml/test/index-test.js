@@ -20,11 +20,15 @@ const docWithBadDoctypeInXml = Object.assign({path: __dirname + '/data/test-bad-
 const docWithNotWellFormedXml = Object.assign({path: __dirname + '/data/test-not-wellformed.xml'}, baseDoc);
 const docWithUnknownDoctype = Object.assign({path: __dirname + '/data/test-unknown-doctype.xml'}, baseDoc);
 const docWithNotValidXml = Object.assign({path: __dirname + '/data/test-not-valid-dtd.xml'}, baseDoc);
+const configDir = path.resolve(__dirname, '../conf')
+const corpusname = 'default'
+const pathToConf = path.resolve(configDir, corpusname, "sisyphe-conf.json");
+const config = require(pathToConf);
 
 
 describe('doTheJob', function () {
   const testSisypheXml = Object.create(sisypheXml);
-  testSisypheXml.init({configDir: path.resolve(__dirname, '../conf'), corpusname: 'default'});
+  testSisypheXml.init({configDir, corpusname, config, pathToConf});
 
   it('should add some info about a wellformed XML and valid DTD', function (done) {
     testSisypheXml.doTheJob(doc, (error, docOutput) => {

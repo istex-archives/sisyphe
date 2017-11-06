@@ -3,6 +3,7 @@
 const assert = require('assert'),
   path = require('path'),
   fs = require('fs'),
+  pkg = require('./package.json'),
   Libxml = require('node-libxml'),
   Promise = require('bluebird'),
   cloneDeep = require('lodash.clonedeep');
@@ -23,21 +24,12 @@ const sisypheXml = {};
 sisypheXml.init = function (options) {
   this.libxml = new Libxml();
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
-  let confContents = fs.readdirSync(this.configDir);
-  // We search the nearest config in configDir
-  for (var folder of confContents) {
-    let currPath = path.join(this.configDir, folder);
-    if (fs.lstatSync(currPath).isDirectory() && options.corpusname.includes(folder)) {
-      this.pathToConf = path.resolve(this.configDir, folder, 'sisyphe-xml' + '.json');
-      break;
-    }
-  }
-  this.isConfExist = this.pathToConf && fs.existsSync(this.pathToConf);
-  if (this.isConfExist) {
-    const dataConf = fs.readFileSync(this.pathToConf, 'utf8');
-    this.conf = JSON.parse(dataConf);
+  this.configFilename = options.configFilename || 'sisyphe-conf.json';
+  this.isConfExist = options.config && options.config.hasOwnProperty(pkg.name);
+  if (this.isConfExist && options.pathToConf) {
+    this.conf = options.config[pkg.name];
     if (this.conf.hasOwnProperty('dtd') && Array.isArray(this.conf.dtd)) {
-      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(path.dirname(this.pathToConf), 'dtd', dtd));
+      this.dtdsPath = this.conf.dtd.map(dtd => path.resolve(path.dirname(options.pathToConf), 'dtd', dtd));
     }
   }
   return this;
@@ -60,8 +52,8 @@ sisypheXml.doTheJob = function (data, next) {
     let doctype = this.libxml.getDtd();
 
     // Reformat key for DTD to retro-compatible old sisyphe version
-    if(doctype.externalId){ doctype.pubid = doctype.externalId; delete doctype.externalId; }
-    if(doctype.systemId){ doctype.sysid = doctype.systemId; delete doctype.systemId; }
+    if(doctype && doctype.hasOwnProperty('externalId')){ doctype.pubid = doctype.externalId; delete doctype.externalId; }
+    if(doctype && doctype.hasOwnProperty('systemId')){ doctype.sysid = doctype.systemId; delete doctype.systemId; }
     data.doctype = doctype;
 
     data.isWellFormed = true;
@@ -69,7 +61,7 @@ sisypheXml.doTheJob = function (data, next) {
     if (!this.isConfExist) { return data };
 
     let result = this.validateAgainstDTD(this.libxml, this.dtdsPath);
-    if (!result.isValid) {
+    if (result && result.hasOwnProperty('isValid') && !result.isValid) {
       data.isValidAgainstDTD = false;
       return data;
     }
