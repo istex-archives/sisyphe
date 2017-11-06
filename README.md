@@ -10,7 +10,7 @@ Sisyphe is a generic NodeJS recursive folder analyser terminal application & a (
 ![Sisyphe-pic](./sisyphe.gif)
 
 ### Requirements
-Test with NodeJS@8.1, Redis@3.2.6 & XMLStarlet@1.6.1(libxml2@2.9.4)
+Test with NodeJS@8.X, Redis@3.2.6
 
 Example to run a quick local redis thanks to docker:
 ```bash
@@ -61,11 +61,14 @@ Simply run the server with `npm run server` to access these features
 There is a list of default modules (focused on xml & pdf).
 
 Those URL NEED to be updated when merge branch will be ok.
-- [Sisyphe-FILETYPE](https://github.com/istex/sisyphe/tree/master/src/worker/filetype) Will detect mimetype,extension, corrupted files..
-- [Sisyphe-PDF](https://github.com/istex/sisyphe/tree/master/src/worker/pdf) Will get info from PDF (version, author, meta...)
-- [Sisyphe-XML](https://github.com/istex/sisyphe/tree/master/src/worker/xml) Will check if it's wellformed, valid-dtd's, get elements from balises ...
-- [Sisyphe-XPATH](https://github.com/istex/sisyphe/tree/master/src/worker/xpath)  Will generate a complete list of xpaths from submitted folder
-- [Sisyphe-OUT](https://github.com/istex/sisyphe/tree/master/src/worker/out) Will export data to json file & ElasticSearch database
+- [FILETYPE](https://github.com/istex/sisyphe/tree/master/src/worker/filetype) Will detect mimetype,extension, corrupted files..
+- [PDF](https://github.com/istex/sisyphe/tree/master/src/worker/pdf) Will get info from PDF (version, author, meta...)
+- [XML](https://github.com/istex/sisyphe/tree/master/src/worker/xml) Will check if it's wellformed, valid-dtd's, get elements from balises ...
+- [XPATH](https://github.com/istex/sisyphe/tree/master/src/worker/xpath)  Will generate a complete list of xpaths from submitted folder
+- [OUT](https://github.com/istex/sisyphe/tree/master/src/worker/out) Will export data to json file & ElasticSearch database
+- [NB](https://github.com/istex/sisyphe/tree/master/src/worker/nb) Try to assing some categories to an XML document by using its abstract
+- [MULTICAT](https://github.com/istex/sisyphe/tree/master/src/worker/multicat) Try to assing some categories to an XML document by using its identifiers
+- [TEEFT](https://github.com/istex/sisyphe/tree/master/src/worker/teeft) Will extract keywords of a fulltext
 
 
 ### Developpement on worker
