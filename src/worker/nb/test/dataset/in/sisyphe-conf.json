@@ -1,6 +1,10 @@
 {
   "nb": {
     "parameters": {
+      "input": {
+        "mimetype": "application/xml",
+        "extension": ".xml"
+      },
       "lang": "en",
       "cld": {
         "code": "en",
@@ -25,7 +29,7 @@
     "template": "fragment.tpl",
     "output": {
       "extension": ".txt",
-      "mime": "text/plain",
+      "mimetype": "text/plain",
       "type": "enrichment"
     },
     "enrichment": {
