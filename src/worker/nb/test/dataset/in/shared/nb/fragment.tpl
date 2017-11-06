@@ -3,7 +3,7 @@ Fichier générée le {{date}}
 
 Parameters :
   - input : (target file)
-    - mimetype : {{{parameters.input.mime}}}
+    - mimetype : {{{parameters.input.mimetype}}}
     - extension : {{{parameters.input.extension}}}
   - language : {{parameters.lang}} 
   - cld : {{parameters.cld.code}} ({{parameters.cld.percent}}) 
