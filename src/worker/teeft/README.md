@@ -3,7 +3,7 @@ teeft
 
 ## Summary ##
 
-**teeft** module index a fulltext.
+**teeft** module extracts keywords of a fulltext.
 
 ## Configuration ##
 
