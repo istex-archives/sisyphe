@@ -378,7 +378,7 @@ worker.index = function(data) {
  * @param {Object} options Options passed by sisyphe
  * @return {Object} An object containing all the data loaded
  */
-worker.load = (options) => {
+worker.load = function(options) {
   let result = options.config[pkg.name];
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
