@@ -1,5 +1,11 @@
 {
   "multicat": {
+    "parameters": {
+      "input": {
+        "mimetype": "application/xml",
+        "extension": ".xml"
+      }
+    },
     "module": {
       "label": "rd-multicat",
       "resp": {
@@ -19,7 +25,7 @@
     "template": "fragment.tpl",
     "output": {
       "extension": ".txt",
-      "mime": "text/plain",
+      "mimetype": "text/plain",
       "type": "enrichment"
     },
     "enrichment": {
