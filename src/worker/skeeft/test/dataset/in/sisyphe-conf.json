@@ -8,6 +8,17 @@
       "lang": "en",
       "truncate": true,
       "sort": true,
+      "selectors": {
+        "title": "title",
+        "segments": [
+          "abstract",
+          "introduction",
+          "methods_and_materials",
+          "results",
+          "discussion"
+        ]
+      },
+      "criterion": "frequency",
       "filters": {
         "title": {
           "minOccur": 1,

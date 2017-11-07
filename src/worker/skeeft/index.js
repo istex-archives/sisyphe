@@ -77,19 +77,7 @@ worker.doTheJob = function(data, next) {
       return next(null, data);
     }
     // Get the terms exrated by skeeft
-    const terms = worker.index(
-      modsStr, {
-        title: "title",
-        segments: [
-          "abstract",
-          "introduction",
-          "methods_and_materials",
-          "results",
-          "discussion"
-        ]
-      },
-      "frequency"
-    );
+    const terms = worker.index(modsStr, worker.resources.parameters.selectors, worker.resources.parameters.criterion);
     // If there is no term extracted
     if (terms.length === 0) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_TERMS);

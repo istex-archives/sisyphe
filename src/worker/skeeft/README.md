@@ -20,6 +20,17 @@ An exemple of this module configuration (ISTEX conf here)
       "lang": "en",
       "truncate": true,
       "sort": true,
+      "selectors": {
+        "title": "title",
+        "segments": [
+          "abstract",
+          "introduction",
+          "methods_and_materials",
+          "results",
+          "discussion"
+        ]
+      },
+      "criterion": "frequency",
       "filters": {
         "title": {
           "minOccur": 1,
@@ -107,47 +118,7 @@ Detailled view of data :
     },
     "resource": "teeft"
   },
-  "parameters": {
-    "input": {
-      "mimetype": "application/xml",
-      "extension": ".xml"
-    },
-    "lang": "en",
-    "truncate": true,
-    "sort": true,
-    "filters": {
-      "title": {
-        "minOccur": 1,
-        "noLimitStrength": 2,
-        "lengthSteps": {
-          "values": [],
-          "min": {
-            "lim": 1,
-            "value": 1
-          },
-          "max": {
-            "lim": 1,
-            "value": 1
-          }
-        }
-      },
-      "fulltext": {
-        "minOccur": 1,
-        "noLimitStrength": 2,
-        "lengthSteps": {
-          "values": [],
-          "min": {
-            "lim": 1,
-            "value": 1
-          },
-          "max": {
-            "lim": 1,
-            "value": 1
-          }
-        }
-      }
-    }
-  },
+  "parameters": { ... },
   "pkg": { ... },
   "document": {
     "id": "SUCCESS",
