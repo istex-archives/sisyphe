@@ -43,7 +43,7 @@ worker.init = function(options) {
   worker.SPECIFIC_TERM = new RegExp(/^([^a-zA-Z0-9]*|[!\-;:,.?]*)(\w+)([^a-zA-Z0-9]*|[!\-;:,.?]*)$/g); // RegExp of a term between punctuation
   worker.SEPARATOR = "#"; // Char separator
   worker.LOGS = { // All logs available on this module
-    "SUCCESS": "TEI file created at ",
+    "SUCCESS": "File created at ",
     "ERROR_EXTRACTION": "Extracted terms not found",
     "ERROR_VALIDATION": "Valid terms not found",
     "ERROR_LEMMATIZATION": "Lemmatized terms not found",

@@ -23,7 +23,7 @@ worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
   worker.LOGS = { // All logs available on this module
-    "SUCCESS": "TEI file created at ",
+    "SUCCESS": "File created at ",
     "ABSTRACTS_NOT_FOUND": "Abstracts not found",
     "ABSTRACT_TAG_LANG_NOT_FOUND": "Abstract with correct tag lang not found",
     "ABSTRACT_DETECTED_LANG_NOT_FOUND": "Abstract with correct detected lang not found",

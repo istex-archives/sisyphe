@@ -20,7 +20,7 @@ worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
   worker.LOGS = { // All logs available on this module
-    "SUCCESS": "TEI file created at ",
+    "SUCCESS": "File created at ",
     "IDENTIFIER_NOT_FOUND": "IDENTIFIER not found",
     "IDENTIFIER_DOES_NOT_MATCH": "IDENTIFIER does not match any category"
   };
