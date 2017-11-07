@@ -3,7 +3,7 @@ skeeft
 
 ## Summary ##
 
-**skeeft** module extracts keywords of a fulltext by using teeft algorithm and text structuration.
+**skeeft** module extract keywords of a structured fulltext by using teeft algorithm and text structuration.
 
 ## Configuration ##
 
