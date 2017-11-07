@@ -1,0 +1,63 @@
+{
+  "skeeft": {
+    "parameters": {
+      "input": {
+        "mimetype": "application/xml",
+        "extension": ".xml"
+      },
+      "lang": "en",
+      "truncate": true,
+      "sort": true,
+      "filters": {
+        "title": {
+          "minOccur": 1,
+          "noLimitStrength": 2,
+          "lengthSteps": {
+            "values": [],
+            "min": {
+              "lim": 1,
+              "value": 1
+            },
+            "max": {
+              "lim": 1,
+              "value": 1
+            }
+          }
+        },
+        "fulltext": {
+          "minOccur": 1,
+          "noLimitStrength": 2,
+          "lengthSteps": {
+            "values": [],
+            "min": {
+              "lim": 1,
+              "value": 1
+            },
+            "max": {
+              "lim": 1,
+              "value": 1
+            }
+          }
+        }
+      }
+    },
+    "module": {
+      "label": "rd-skeeft",
+      "resp": {
+        "id": "istex-rd",
+        "label": "ISTEX-RD"
+      },
+      "resource": "teeft"
+    },
+    "template": "fragment.tpl",
+    "output": {
+      "extension": ".txt",
+      "mime": "text/plain",
+      "type": "enrichment"
+    },
+    "enrichment": {
+      "original": false,
+      "extension": "txt"
+    }
+  }
+}
