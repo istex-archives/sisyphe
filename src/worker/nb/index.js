@@ -58,9 +58,9 @@ worker.doTheJob = function(data, next) {
       return next(null, data);
     }
     // Get the identifier in the MODS file
-    const $ = utils.XML.load(modsStr),
+    const $ = utils.XML.load(modsStr);
+    let abstracts = [],
       abstract = $("abstract[lang=\"" + worker.resources.parameters.lang + "\"]").text();
-    let abstracts = [];
     // Abstract with the correct lang not found
     if (!abstract) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACT_TAG_LANG_NOT_FOUND);
