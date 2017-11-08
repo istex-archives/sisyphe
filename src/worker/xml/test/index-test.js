@@ -86,8 +86,7 @@ describe('doTheJob', function () {
       expect(docOutput.isWellFormed).to.be.a('boolean');
       expect(docOutput).to.have.property('isValidAgainstDTD');
       expect(docOutput.isValidAgainstDTD).to.be.false;
-      // Waiting node-libxml to return errors
-      //expect(docOutput).to.have.property('error');
+      expect(docOutput).to.have.property('validationErrors');
       done();
     });
   })
@@ -102,7 +101,11 @@ describe('getMetadataInfos', function () {
           "regex": "^([a-z]{8})$",
           "type": "String",
           "xpath": "/xpath/to/my/infos"
-        }, {
+        },{
+          "name": "multipleAttributesP",
+          "type": "Attribute",
+          "xpath": "//p//@someattribute"
+        },{
           "name": "substring",
           "regex": "\bwelcome\b/i",
           "type": "String",
@@ -171,9 +174,10 @@ describe('getMetadataInfos', function () {
         }
       ]
     };
-    const libxml = new Libxml();
-    const isWellformed = libxml.load('test/data/test-getxpaths.xml');
-    return sisypheXml.getMetadataInfos(confObjInput, libxml).map((metadata) => {
+    const libxml = new Libxml(true);
+    const isWellformed = libxml.loadXml('test/data/test-getxpaths.xml');
+    return sisypheXml.getMetadataInfos(confObjInput, libxml)
+    .map((metadata) => {
       expect(metadata).to.have.property('name');
       expect(metadata).to.have.property('type');
       if (metadata.hasOwnProperty('regex')) {
@@ -191,6 +195,9 @@ describe('getMetadataInfos', function () {
       if (metadata.hasOwnProperty('value') && metadata.type === 'Attribute') {
         expect(metadata.value).to.be.a('string');
       }
+    }).then(function(){
+      libxml.freeXml();
+      libxml.clearAll();
     })
   })
 });

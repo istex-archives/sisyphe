@@ -22,7 +22,8 @@ function to (promise, errorExt) {
 const sisypheXml = {};
 
 sisypheXml.init = function (options) {
-  this.libxml = new Libxml();
+  // Libxml is in manual memory management, because sisyphe does not want to freeup memory object automaticaly
+  this.libxml = new Libxml(true);
   this.configDir = options.configDir || path.resolve(__dirname, 'conf');
   this.configFilename = options.configFilename || 'sisyphe-conf.json';
   this.isConfExist = options.config && options.config.hasOwnProperty(pkg.name);
@@ -39,13 +40,14 @@ sisypheXml.doTheJob = function (data, next) {
   if (data.mimetype !== 'application/xml') return next(null, data);
 
   (async () => {
-    let validationDTDResult;
-
     // Load xml, return false if not-wellformed, true if wellformed
-    let xmlFile = this.libxml.load(data.path);
+    let xmlFile = this.libxml.loadXml(data.path);
 
     if (!xmlFile) {
       data.isWellFormed = false;
+      // Attentio, syntax is differen wellformedError:wellformedErrors 😖
+      data.wellFormedErrors = (this.libxml.wellformedErrors && this.libxml.wellformedErrors.length) ? this.libxml.wellformedErrors : null;
+      // Important, free xml C memory & JS Objects
       return data;
     }
 
@@ -63,6 +65,9 @@ sisypheXml.doTheJob = function (data, next) {
     let result = this.validateAgainstDTD(this.libxml, this.dtdsPath);
     if (result && result.hasOwnProperty('isValid') && !result.isValid) {
       data.isValidAgainstDTD = false;
+      // we set validation Error only if there are somes.
+      data.validationErrors = (this.libxml.validationErrors && this.libxml.validationErrors.length) ? this.libxml.validationErrors : null;
+      // Important, free xml & dtd C memory & JS Objects
       return data;
     }
 
@@ -93,9 +98,14 @@ sisypheXml.doTheJob = function (data, next) {
   })()
     .then(data => {
       if (data.error) data.error = JSON.stringify(data.error);
+      // Important, free xml & dtd C memory & JS Objects
+      // this.libxml.freeDtd();
+      this.libxml.freeXml();
       next(null, data);
     })
     .catch(error => {
+      // this.libxml.freeDtd();
+      this.libxml.freeXml();
       next(error);
     });
 };
@@ -163,5 +173,9 @@ sisypheXml.validateAgainstDTD = function (libxml, arrayPathDTD) {
   }
   return {isValid : false};
 };
+
+// sisypheXml.finalJob = function () {
+//   this.libxml.clearAll();
+// };
 
 module.exports = sisypheXml;

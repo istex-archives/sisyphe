@@ -1,27 +1,29 @@
+//Overseer
 const fork = require('child_process').fork;
 const path = require('path');
 const Promise = require('bluebird');
 
 /**
  * Container to manage a Worker (fork).
- * @constructor 
+ * @constructor
  */
 const Overseer = {};
 
 /**
  * @param {String} workerType Name of the worker
  * @param {Object} options Options for dispatcher
- * @param {String} options.corpusName Corpus name 
+ * @param {String} options.corpusName Corpus name
  * @param {String} options.configDir Path to config
  * @param {Number} options.numCPUs Number of cpu to use
  * @param {Number} options.now Session start
  * @param {String} options.outputPath Where to put results
  * @returns {Promise}
  */
-Overseer.init = function (workerType, options) {
+Overseer.init = function (workerType, options, nbFork) {
   this.workerType = workerType;
   this.options = options;
-  this.fork = fork(path.join(__dirname, 'worker.js'));
+  let execOptions = options.debugMod ? {execArgv: [`--inspect-brk=${(options.debugPort || 9444) + nbFork}`] } : {execArgv: []};
+  this.fork = fork(path.join(__dirname, 'worker.js'), execOptions);
   this.dataProcessing = {};
   this.on = this.fork.on.bind(this.fork);
   const initObj = {
