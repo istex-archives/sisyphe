@@ -23,7 +23,7 @@ Overseer.init = function (workerType, options, nbFork) {
   this.workerType = workerType;
   this.options = options;
   // check of casted value if important too
-  let execOptions = (this.options && this.options.hasOwnProperty('debugMod') && this.options.hasOwnProperty('debugPort') && this.options.debugMod && this.options.debugPort))
+  let execOptions = (this.options && this.options.hasOwnProperty('debugMod') && this.options.hasOwnProperty('debugPort') && this.options.debugMod && this.options.debugPort)
     ? {execArgv: [`--inspect-brk=${(options.debugPort || 9444) + nbFork}`] }
     : {execArgv: []};
   this.fork = fork(path.join(__dirname, 'worker.js'), execOptions);
