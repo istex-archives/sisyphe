@@ -22,7 +22,7 @@ const Overseer = {};
 Overseer.init = function (workerType, options, nbFork) {
   this.workerType = workerType;
   this.options = options;
-  let execOptions = options.debugMod ? {execArgv: [`--inspect-brk=${(options.debugPort || 9444) + nbFork}`] } : {execArgv: []};
+  let execOptions = (this.options && this.options.hasOwnProperty('debugMod') && this.options.hasOwnProperty('debugPort')) ? {execArgv: [`--inspect-brk=${(options.debugPort || 9444) + nbFork}`] } : {execArgv: []};
   this.fork = fork(path.join(__dirname, 'worker.js'), execOptions);
   this.dataProcessing = {};
   this.on = this.fork.on.bind(this.fork);
