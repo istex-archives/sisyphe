@@ -12,7 +12,7 @@
     "await-to-js": "^1.0.1",
     "bluebird": "^3.5.1",
     "lodash.clonedeep": "^4.5.0",
-    "node-libxml": "^2.1.2"
+    "node-libxml": "^3.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
