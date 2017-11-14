@@ -1,5 +1,9 @@
 {
   "parameters": {
+    "input": {
+      "mimetype": "application/xml",
+      "extension": ".xml"
+    },
     "lang": "en",
     "cld": {
       "code": "en",
@@ -21,12 +25,12 @@
   "verbalization": "",
   "template": "",
   "output": {
-    "extension": ".csv",
-    "mime": "text/csv",
+    "extension": ".txt",
+    "mimetype": "text/plain",
     "type": "enrichment"
   },
   "enrichment": {
     "original": false,
-    "extension": "csv"
+    "extension": "txt"
   }
 }

@@ -44,7 +44,7 @@ worker.init({
  *     - categorize()
  *     - load()
  */
-// Pour chaque clé
+// Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
     description: pkg.name + "/index.js",

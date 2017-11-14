@@ -20,7 +20,7 @@ worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
   worker.LOGS = { // All logs available on this module
-    "SUCCESS": "TEI file created at ",
+    "SUCCESS": "File created at ",
     "IDENTIFIER_NOT_FOUND": "IDENTIFIER not found",
     "IDENTIFIER_DOES_NOT_MATCH": "IDENTIFIER does not match any category"
   };
@@ -34,7 +34,7 @@ worker.init = function(options) {
  */
 worker.doTheJob = function(data, next) {
   // Check resources are correctly loaded & MIME type of file & file is well formed
-  if (!Object.keys(worker.resources.tables).length ||  data.mimetype !== "application/xml" || !data.isWellFormed) {
+  if (!Object.keys(worker.resources.tables).length ||  data.mimetype !== worker.resources.parameters.input.mimetype || !data.isWellFormed) {
     return next(null, data);
   }
   // Errors & logs
@@ -43,7 +43,7 @@ worker.doTheJob = function(data, next) {
     logs: []
   };
   // Get the filename (without extension)
-  const documentId = path.basename(data.name, ".xml");
+  const documentId = path.basename(data.name, data.extension ||  worker.resources.parameters.input.extension);
   // Read MODS file
   fs.readFile(data.path, "utf-8", function(err, modsStr) {
     // I/O Errors
@@ -74,6 +74,7 @@ worker.doTheJob = function(data, next) {
     const tpl = {
         "date": worker.NOW, // Current date
         "module": worker.resources.module, // Configuration of module
+        "parameters": worker.resources.parameters, // Launch parameters of module
         "pkg": pkg, // Infos on module packages
         "document": { // Data of document
           "id": documentId,
@@ -110,7 +111,7 @@ worker.doTheJob = function(data, next) {
         "path": path.join(output.directory, output.filename),
         "extension": worker.resources.enrichment.extension,
         "original": worker.resources.enrichment.original,
-        "mime": worker.resources.output.mime
+        "mimetype": worker.resources.output.mimetype
       };
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
@@ -151,7 +152,7 @@ worker.categorize = function(identifier, table) {
  * @return {Object} An object containing all the data loaded
  */
 worker.load = (options) => {
-  let result = options.config[pkg.name];
+  let result = options.config ? options.config[pkg.name] : null;
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
     for (let i = 0; i < result.categorizations.length; i++) {

@@ -20,8 +20,8 @@ const docWithBadDoctypeInXml = Object.assign({path: __dirname + '/data/test-bad-
 const docWithNotWellFormedXml = Object.assign({path: __dirname + '/data/test-not-wellformed.xml'}, baseDoc);
 const docWithUnknownDoctype = Object.assign({path: __dirname + '/data/test-unknown-doctype.xml'}, baseDoc);
 const docWithNotValidXml = Object.assign({path: __dirname + '/data/test-not-valid-dtd.xml'}, baseDoc);
-const configDir = path.resolve(__dirname, '../conf')
-const corpusname = 'default'
+const configDir = path.resolve(__dirname, '../conf');
+const corpusname = 'default';
 const pathToConf = path.resolve(configDir, corpusname, "sisyphe-conf.json");
 const config = require(pathToConf);
 
@@ -30,7 +30,7 @@ describe('doTheJob', function () {
   const testSisypheXml = Object.create(sisypheXml);
   testSisypheXml.init({configDir, corpusname, config, pathToConf});
 
-  it('should add some info about a wellformed XML and valid DTD', function (done) {
+  it('should add some info about a wellformed XML and valid DTD and valid xsd', function (done) {
     testSisypheXml.doTheJob(doc, (error, docOutput) => {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
@@ -42,6 +42,9 @@ describe('doTheJob', function () {
       expect(docOutput.doctype).to.have.property('pubid', 'my doctype of doom');
       expect(docOutput).to.have.property('isValidAgainstDTD');
       expect(docOutput.isValidAgainstDTD).to.be.true;
+      expect(docOutput.isValidAgainstSchema).to.be.true;
+      expect(docOutput.validatetSchemaInfo).to.be.a('string');
+      expect(docOutput.validationDTDInfos).to.be.a('string');
       expect(docOutput.doctype.sysid).to.be.a('string');
       expect(docOutput).to.have.property('someInfosIsValid');
       expect(docOutput.someInfosIsValid).to.be.false;
@@ -57,6 +60,11 @@ describe('doTheJob', function () {
       if (error) return done(error);
       expect(docOutput).to.have.property('isWellFormed');
       expect(docOutput.isWellFormed).to.be.a('boolean');
+      expect(docOutput.wellFormedErrors).to.be.an('array');
+      expect(docOutput.wellFormedErrors.length).to.be.at.least(1);
+      expect(docOutput.wellFormedErrors[0]).to.have.a.property('column');
+      expect(docOutput.wellFormedErrors[0]).to.have.a.property('line');
+      expect(docOutput.wellFormedErrors[0]).to.have.a.property('message');
       done();
     });
   });
@@ -86,8 +94,12 @@ describe('doTheJob', function () {
       expect(docOutput.isWellFormed).to.be.a('boolean');
       expect(docOutput).to.have.property('isValidAgainstDTD');
       expect(docOutput.isValidAgainstDTD).to.be.false;
-      // Waiting node-libxml to return errors
-      //expect(docOutput).to.have.property('error');
+      expect(docOutput).to.have.property('isValidAgainstSchema');
+      expect(docOutput.isValidAgainstSchema).to.be.false;
+      expect(docOutput).to.have.property('validationErrors');
+      expect(docOutput.validationErrors).to.be.an('object');
+      expect(docOutput).to.have.property('validationSchemaErrors');
+      expect(docOutput.validationErrors).to.be.an('object');
       done();
     });
   })
@@ -102,7 +114,11 @@ describe('getMetadataInfos', function () {
           "regex": "^([a-z]{8})$",
           "type": "String",
           "xpath": "/xpath/to/my/infos"
-        }, {
+        },{
+          "name": "multipleAttributesP",
+          "type": "Attribute",
+          "xpath": "//p//@someattribute"
+        },{
           "name": "substring",
           "regex": "\bwelcome\b/i",
           "type": "String",
@@ -172,8 +188,9 @@ describe('getMetadataInfos', function () {
       ]
     };
     const libxml = new Libxml();
-    const isWellformed = libxml.load('test/data/test-getxpaths.xml');
-    return sisypheXml.getMetadataInfos(confObjInput, libxml).map((metadata) => {
+    const isWellformed = libxml.loadXml('test/data/test-getxpaths.xml');
+    return sisypheXml.getMetadataInfos(confObjInput, libxml)
+    .map((metadata) => {
       expect(metadata).to.have.property('name');
       expect(metadata).to.have.property('type');
       if (metadata.hasOwnProperty('regex')) {
@@ -191,6 +208,9 @@ describe('getMetadataInfos', function () {
       if (metadata.hasOwnProperty('value') && metadata.type === 'Attribute') {
         expect(metadata.value).to.be.a('string');
       }
+    }).then(function(){
+      libxml.freeXml();
+      libxml.clearAll();
     })
   })
 });

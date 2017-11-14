@@ -11,6 +11,7 @@
       "type": "String",
       "xpath": "/xpath/to/my/infos"
     }],
-    "dtd": ["mydoctype.dtd"]
+    "dtd": ["mydoctype.dtd"],
+    "schema" : ["default.xsd"]
   }
 }

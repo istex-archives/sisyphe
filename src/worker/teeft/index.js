@@ -11,7 +11,7 @@ const utils = require("worker-utils"),
   Lemmatizer = require("javascript-lemmatizer"),
   snowballFactory = require("snowball-stemmers");
 
-let worker = {};
+const worker = {};
 
 /**
  * Init Function (called by sisyphe)
@@ -27,10 +27,7 @@ worker.init = function(options) {
   worker.TermExtraction = require("./lib/termextractor.js");
   // Tagger + filter + extractor + lemmatizer
   worker.tagger = new worker.Tagger(worker.lexicon);
-  worker.filter = new worker.DefaultFilter({
-    "minOccur": 1,
-    "noLimitStrength": 2
-  });
+  worker.filter = new worker.DefaultFilter(worker.resources.parameters.filter);
   worker.extractor = new worker.TermExtraction({
     "filter": worker.filter
   });
@@ -46,7 +43,7 @@ worker.init = function(options) {
   worker.SPECIFIC_TERM = new RegExp(/^([^a-zA-Z0-9]*|[!\-;:,.?]*)(\w+)([^a-zA-Z0-9]*|[!\-;:,.?]*)$/g); // RegExp of a term between punctuation
   worker.SEPARATOR = "#"; // Char separator
   worker.LOGS = { // All logs available on this module
-    "SUCCESS": "TEI file created at ",
+    "SUCCESS": "File created at ",
     "ERROR_EXTRACTION": "Extracted terms not found",
     "ERROR_VALIDATION": "Valid terms not found",
     "ERROR_LEMMATIZATION": "Lemmatized terms not found",
@@ -63,7 +60,7 @@ worker.init = function(options) {
  */
 worker.doTheJob = function(data, next) {
   // Check resources are correctly loaded & MIME type of file
-  if (!worker.resources || data.mimetype !== "text/plain") {
+  if (!worker.resources || data.mimetype !== worker.resources.parameters.input.mimetype) {
     return next(null, data);
   }
   // Errors & logs
@@ -72,7 +69,7 @@ worker.doTheJob = function(data, next) {
     logs: []
   };
   // Get the filename (without extension)
-  const documentId = path.basename(data.name, ".txt");
+  const documentId = path.basename(data.name, data.extension || worker.resources.parameters.input.extension);
   // Read TXT file
   fs.readFile(data.path, "utf-8", function(err, txt) {
     // I/O Errors
@@ -143,7 +140,7 @@ worker.doTheJob = function(data, next) {
         "path": path.join(output.directory, output.filename),
         "extension": worker.resources.enrichment.extension,
         "original": worker.resources.enrichment.original,
-        "mime": worker.resources.output.mime
+        "mimetype": worker.resources.output.mimetype
       };
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
@@ -382,7 +379,7 @@ worker.index = function(data) {
  * @return {Object} An object containing all the data loaded
  */
 worker.load = (options) => {
-  let result = options.config[pkg.name];
+  let result = options.config ? options.config[pkg.name] : null;
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
     result.dictionary = require(path.join(folder, result.dictionary));

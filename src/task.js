@@ -39,6 +39,14 @@ Task.getJobCounts = function () {
   return this.queue.getJobCounts();
 };
 
+/**
+ * @returns Promise
+ */
+Task.exit = function () {
+  this.queue.removeAllListeners()
+  return this.queue.close()
+};
+
 Task.on = function () {
   return this.queue.on.call(this.queue, ...arguments);
 };
