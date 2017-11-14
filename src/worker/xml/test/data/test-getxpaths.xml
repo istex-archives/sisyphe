@@ -8,6 +8,8 @@
         <title/>
         <p>lorem ipsum dolor sit amet</p>
         <p>lorem ipsum dolor sit amet</p>
+        <p someattribute="test">blabla</p>
+        <p someattribute="test3">blabla</p>
     </my>
 </to>
 </xpath>
