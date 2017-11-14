@@ -72,7 +72,8 @@ Those URL NEED to be updated when merge branch will be ok.
 - [OUT](https://github.com/istex/sisyphe/tree/master/src/worker/out) Will export data to json file & ElasticSearch database
 - [NB](https://github.com/istex/sisyphe/tree/master/src/worker/nb) Try to assing some categories to an XML document by using its abstract
 - [MULTICAT](https://github.com/istex/sisyphe/tree/master/src/worker/multicat) Try to assing some categories to an XML document by using its identifiers
-- [TEEFT](https://github.com/istex/sisyphe/tree/master/src/worker/teeft) Will extract keywords of a fulltext
+- [TEEFT](https://github.com/istex/sisyphe/tree/master/src/worker/teeft) Try to extract keywords of a fulltext
+- [SKEEFT](https://github.com/istex/sisyphe/tree/master/src/worker/skeeft) Try to extract keywords of a structured fulltext by using teeft algorithm and text structuration
 
 
 ### Developpement on worker

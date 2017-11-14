@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <title>Sample title for unit test of skeeft</title>
+  <abstract>This is an abstract used in unit test</abstract>
+  <introduction>This is an introduction used in unit test</introduction>
+  <methods_and_materials>This is a methods and materials used in unit test</methods_and_materials>
+  <results>This is results used in unit test of skeeft</results>
+  <discussion>This is a discussion used in unit test</discussion>
+</root>

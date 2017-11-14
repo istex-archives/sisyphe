@@ -23,7 +23,7 @@ worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
   worker.LOGS = { // All logs available on this module
-    "SUCCESS": "TEI file created at ",
+    "SUCCESS": "File created at ",
     "ABSTRACTS_NOT_FOUND": "Abstracts not found",
     "ABSTRACT_TAG_LANG_NOT_FOUND": "Abstract with correct tag lang not found",
     "ABSTRACT_DETECTED_LANG_NOT_FOUND": "Abstract with correct detected lang not found",
@@ -40,7 +40,7 @@ worker.init = function(options) {
  */
 worker.doTheJob = function(data, next) {
   // Check resources are correctly loaded & MIME type of file & file is well formed
-  if (!Object.keys(worker.resources.trainings).length ||  data.mimetype !== "application/xml" || !data.isWellFormed) {
+  if (!Object.keys(worker.resources.trainings).length ||  data.mimetype !== worker.resources.parameters.input.mimetype || !data.isWellFormed) {
     return next(null, data);
   }
   // Errors & logs
@@ -49,7 +49,7 @@ worker.doTheJob = function(data, next) {
     logs: []
   };
   // Get the filename (without extension)
-  const documentId = path.basename(data.name, ".xml");
+  const documentId = path.basename(data.name, data.extension || worker.resources.parameters.input.extension);
   // Read MODS file
   fs.readFile(data.path, "utf-8", function(err, modsStr) {
     // I/O Errors
@@ -58,9 +58,9 @@ worker.doTheJob = function(data, next) {
       return next(null, data);
     }
     // Get the identifier in the MODS file
-    const $ = utils.XML.load(modsStr),
+    const $ = utils.XML.load(modsStr);
+    let abstracts = [],
       abstract = $("abstract[lang=\"" + worker.resources.parameters.lang + "\"]").text();
-    let abstracts = [];
     // Abstract with the correct lang not found
     if (!abstract) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ABSTRACT_TAG_LANG_NOT_FOUND);
@@ -144,7 +144,7 @@ worker.doTheJob = function(data, next) {
           "path": path.join(output.directory, output.filename),
           "extension": worker.resources.enrichment.extension,
           "original": worker.resources.enrichment.original,
-          "mime": worker.resources.output.mime
+          "mimetype": worker.resources.output.mimetype
         };
         // Save enrichments in data
         data.enrichments = utils.enrichments.save(data.enrichments, {

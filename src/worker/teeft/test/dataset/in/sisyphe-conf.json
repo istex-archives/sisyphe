@@ -1,9 +1,17 @@
 {
   "teeft": {
     "parameters": {
+      "input": {
+        "mimetype": "text/plain",
+        "extension": ".txt"
+      },
       "lang": "en",
       "truncate": true,
-      "sort": true
+      "sort": true,
+      "filter": {
+        "minOccur": 1,
+        "noLimitStrength": 2
+      }
     },
     "module": {
       "label": "rd-teeft",
@@ -18,7 +26,7 @@
     "stopwords": "stopwords.json",
     "output": {
       "extension": ".txt",
-      "mime": "text/plain",
+      "mimetype": "text/plain",
       "type": "enrichment"
     },
     "enrichment": {

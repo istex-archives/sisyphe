@@ -1,0 +1,5 @@
+resources/config.json
+node_modules
+test/dataset/out
+.package.json.bkp
+package-lock.json

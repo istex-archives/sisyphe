@@ -7,7 +7,10 @@
 const utils = require("worker-utils"),
   pkg = require("./package.json"),
   fs = require("fs"),
-  path = require("path");
+  path = require("path"),
+  teeft = require("../teeft/"),
+  Matrix = require("./lib/matrix.js"),
+  extend = require("util")._extend;
 
 const worker = {};
 
@@ -19,22 +22,44 @@ const worker = {};
 worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
   worker.resources = worker.load(options);
+  // Init teeft
+  teeft.init(options);
+  // Define extractors, one used only to extract title keywords, the other processing fulltext.
+  worker.extractors = {
+    "title": extend({}, teeft),
+    "fulltext": extend({}, teeft)
+  };
+  // Define filters, one used only to extract title keywords, the other processing fulltext.
+  worker.filters = {
+    "title": new teeft.DefaultFilter(worker.resources.parameters.filters.title),
+    "fulltext": new teeft.DefaultFilter(worker.resources.parameters.filters.fulltext),
+  };
+  // Set correct filter for each extractor
+  worker.extractors.title.extractor = new teeft.TermExtraction({
+    "filter": worker.filters.title
+  });
+  worker.extractors.title.resources.sort = false;
+  worker.extractors.title.resources.truncate = false;
+  worker.extractors.fulltext.extractor = new teeft.TermExtraction({
+    "filter": worker.filters.fulltext
+  });
+  worker.extractors.fulltext.resources.sort = worker.resources.sort;
+  worker.extractors.fulltext.resources.truncate = worker.resources.truncate;
   worker.LOGS = { // All logs available on this module
     "SUCCESS": "File created at ",
-    "IDENTIFIER_NOT_FOUND": "IDENTIFIER not found",
-    "IDENTIFIER_DOES_NOT_MATCH": "IDENTIFIER does not match any category"
+    "ERROR_TERMS": "Selected terms not found"
   };
 }
 
 /**
- * Categorize a XML document (called by sisyphe)
+ * Index a fulltext (called by sisyphe)
  * @param {Object} data data of the current docObject
  * @param {Function} next Callback funtion
  * @return {undefined} Asynchronous function
  */
 worker.doTheJob = function(data, next) {
   // Check resources are correctly loaded & MIME type of file & file is well formed
-  if (!Object.keys(worker.resources.tables).length ||  data.mimetype !== worker.resources.parameters.input.mimetype || !data.isWellFormed) {
+  if (!worker.resources || data.mimetype !== worker.resources.parameters.input.mimetype || !data.isWellFormed) {
     return next(null, data);
   }
   // Errors & logs
@@ -43,7 +68,7 @@ worker.doTheJob = function(data, next) {
     logs: []
   };
   // Get the filename (without extension)
-  const documentId = path.basename(data.name, data.extension ||  worker.resources.parameters.input.extension);
+  const documentId = path.basename(data.name, data.extension || worker.resources.parameters.input.extension);
   // Read MODS file
   fs.readFile(data.path, "utf-8", function(err, modsStr) {
     // I/O Errors
@@ -51,25 +76,14 @@ worker.doTheJob = function(data, next) {
       data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
-    // Get the identifier in the MODS file
-    const $ = utils.XML.load(modsStr);
-    let categories = [];
-    for (let i = 0, l = worker.resources.categorizations.length; i < l; i++) {
-      const identifier = $(worker.resources.categorizations[i].identifier).text();
-      // Identifier not found
-      if (!identifier) {
-        data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_NOT_FOUND);
-        return next(null, data);
-      }
-      // Get categories for this identifier
-      categories = categories.concat(worker.categorize(identifier, worker.resources.categorizations[i].id));
-    }
-    // If no categories were found
-    if (!categories.length) {
-      data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_DO_NOT_MATCH);
+    // Get the terms exrated by skeeft
+    const terms = worker.index(modsStr, worker.resources.parameters.selectors, worker.resources.parameters.criterion);
+    // If there is no term extracted
+    if (terms.length === 0) {
+      data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_TERMS);
       return next(null, data);
     }
-    worker.NOW = utils.dates.now(); // Get the formated current date (String)
+    worker.NOW = utils.dates.now(); // Date du jour formatée (string)
     // Build the structure of the template
     const tpl = {
         "date": worker.NOW, // Current date
@@ -78,9 +92,8 @@ worker.doTheJob = function(data, next) {
         "pkg": pkg, // Infos on module packages
         "document": { // Data of document
           "id": documentId,
-          "categories": categories
-        },
-        categorizations: worker.resources.categorizations // Infos on used categorizations
+          "terms": terms // Selected terms
+        }
       },
       // Build path & filename of enrichment file
       output = utils.files.createPath({
@@ -90,19 +103,14 @@ worker.doTheJob = function(data, next) {
         "label": pkg.name,
         "extension": worker.resources.output.extension
       });
-    // If no categories were found
-    if (!categories.length) {
-      data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_DO_NOT_MATCH);
-      return next(null, data);
-    }
     // Write enrichment data
     utils.enrichments.write({
       "template": worker.resources.template,
       "data": tpl,
       "output": output
     }, function(err) {
-      // I/O Error
       if (err) {
+        // I/O Error
         data[pkg.name].errors.push(err.toString());
         return next(null, data);
       }
@@ -126,24 +134,41 @@ worker.doTheJob = function(data, next) {
 };
 
 /**
- * Return each categories of a given Idenfier for a given table
- * @param {String} identifier Identifier of a docObject
- * @param {String} table Identifier of a table
- * @return {Array} An array containing all categories associated with this identifier for this table
+ * Index a fulltext (called by sisyphe)
+ * @param {String} xmlString Fulltext (XML formated string)
+ * @param {Object} selectors Used selectors
+ * @param {String} criterion Criterion used (sort)
+ * @return {Array} List of extracted terms
  */
-worker.categorize = function(identifier, table) {
-  let result = [];
-  if (worker.resources.tables.hasOwnProperty(table) && worker.resources.tables[table].hasOwnProperty(identifier)) {
-    const values = worker.resources.tables[table][identifier]; // All categegories associated with this identifier
-    // Add category to the list
-    if (values) {
-      result.push({
-        "id": table,
-        "values": values
+worker.index = function(xmlString, selectors, criterion) {
+  const $ = utils.XML.load(xmlString),
+    titleWords = worker.extractors.title.extractor.extract(
+      worker.extractors.title.lemmatize(
+        worker.extractors.title.tagger.tag(worker.extractors.title.tokenize($(selectors.title).text()))
+      )
+    ), // Get terms in title (weighting)
+    indexations = selectors.segments.map(function(el, i) {
+      return worker.extractors.fulltext.index($(el).text());
+    }), // Get terms for each parts of fulltext
+    data = indexations.map(function(el, i) {
+      return el.keywords.map(function(e, j) {
+        let cp = extend({
+            segment: selectors.segments[i]
+          },
+          e
+        );
+        return cp;
       });
-    };
-  }
-  return result;
+    }).reduce(function(acc, cur) {
+      return acc.concat(cur);
+    }, []), // Regroup terms
+    m = new Matrix(); // Matrix of text representation
+  m.init(data, selectors);
+  const filled = m.fill(criterion),
+    stats = m.stats(filled),
+    select = m.select(stats, titleWords),
+    sorted = m.sort(select);
+  return sorted
 };
 
 /**
@@ -151,13 +176,10 @@ worker.categorize = function(identifier, table) {
  * @param {Object} options Options passed by sisyphe
  * @return {Object} An object containing all the data loaded
  */
-worker.load = (options) => {
-  let result = options.config ? options.config[pkg.name] : null;
+worker.load = function(options) {
+  let result = options.config[pkg.name];
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
-    for (let i = 0; i < result.categorizations.length; i++) {
-      result.tables[result.categorizations[i].id] = require(path.join(folder, result.categorizations[i].file));
-    }
     result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');
   } else {
     result = require("./conf/sisyphe-conf.json");

@@ -31,7 +31,7 @@ sisyphe.init = async function (session) {
   session.workers.map(worker => {
     if(!workersConf.includes(worker)) throw new Error(`${worker} doesn't exist`)
   });
-  let pathToConf = null
+  session.pathToConf = null
   session.configFilename = 'sisyphe-conf.json'
   session.sharedConfigDir = session.configDir ? path.resolve(session.configDir, "shared") : null // stanard path for the shared configuration directory
   // We search the nearest config in configDir
@@ -39,12 +39,11 @@ sisyphe.init = async function (session) {
   for (let folder of confContents) {
     let currPath = path.join(session.configDir, folder);
     if (fs.lstatSync(currPath).isDirectory() && session.corpusname.includes(folder)) {
-      pathToConf = path.resolve(session.configDir, folder, session.configFilename);
+      session.pathToConf = path.resolve(session.configDir, folder, session.configFilename);
       break;
     }
   }
-  console.log(pathToConf)
-  session.config = fs.existsSync(pathToConf) ? require(pathToConf) : null; // Object representation of sisyphe configuration (or null)
+  session.config = fs.existsSync(session.pathToConf) ? require(session.pathToConf) : null; // Object representation of sisyphe configuration (or null)
   this.session = session
   if (!session.hasOwnProperty("now")) session.now = Date.now();
   if (!session.hasOwnProperty('silent')) session.silent = false
