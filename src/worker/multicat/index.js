@@ -5,130 +5,119 @@
 
 /* Module Require */
 const utils = require("worker-utils"),
-  config = require("./config.json"),
   pkg = require("./package.json"),
   fs = require("fs"),
   path = require("path");
 
 const worker = {};
 
-worker.init = (options = {
-  corpusname: "default"
-}) => {
+/**
+ * Init Function (called by sisyphe)
+ * @param {Object} options Options passed by sisyphe
+ * @return {undefined} Return undefined
+ */
+worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
-
-  worker.resources = require("multicat-resources");
-  /* Constantes */
-  worker.NOW = utils.dates.now(); // Date du jour formatée (String)
-  worker.LOGS = { // Logs des différents cas possibles (et gérés par le module)
+  worker.resources = worker.load(options);
+  worker.LOGS = { // All logs available on this module
     "SUCCESS": "TEI file created at ",
     "IDENTIFIER_NOT_FOUND": "IDENTIFIER not found",
     "IDENTIFIER_DOES_NOT_MATCH": "IDENTIFIER does not match any category"
   };
 }
 
-/*
- ** ------------------------------------------------------------------------------
- ** Coeur du Code Métier
- ** ------------------------------------------------------------------------------
+/**
+ * Categorize a XML document (called by sisyphe)
+ * @param {Object} data data of the current docObject
+ * @param {Function} next Callback funtion
+ * @return {undefined} Asynchronous function
  */
 worker.doTheJob = function(data, next) {
-
-  // Vérification du type de fichier
-  if (data.mimetype !== "application/xml" || !data.isWellFormed) {
+  // Check resources are correctly loaded & MIME type of file & file is well formed
+  if (!Object.keys(worker.resources.tables).length ||  data.mimetype !== "application/xml" || !data.isWellFormed) {
     return next(null, data);
   }
-
-  // Variables d'erreurs et de logs
+  // Errors & logs
   data[pkg.name] = {
     errors: [],
     logs: []
   };
-
-  // Récupération des données utiles
+  // Get the filename (without extension)
   const documentId = path.basename(data.name, ".xml");
-
-  // Lecture du fichier MODS
+  // Read MODS file
   fs.readFile(data.path, "utf-8", function(err, modsStr) {
-
-    // Lecture impossible
+    // I/O Errors
     if (err) {
       data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
-
-    // Récupération de l'identifier
+    // Get the identifier in the MODS file
     const $ = utils.XML.load(modsStr);
     let categories = [];
-
     for (let i = 0, l = worker.resources.categorizations.length; i < l; i++) {
-
       const identifier = $(worker.resources.categorizations[i].identifier).text();
-
-      // Identifier introuvable
+      // Identifier not found
       if (!identifier) {
         data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_NOT_FOUND);
         return next(null, data);
       }
-
-      // Récupération des catégories qui correspondent à l'identifier
+      // Get categories for this identifier
       categories = categories.concat(worker.categorize(identifier, worker.resources.categorizations[i].id));
     }
-    // Pas de catégorie correspondante
+    // If no categories were found
     if (!categories.length) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_DO_NOT_MATCH);
       return next(null, data);
     }
-
-    // Construction de la structure de données pour le template
+    worker.NOW = utils.dates.now(); // Get the formated current date (String)
+    // Build the structure of the template
     const tpl = {
-        "date": worker.NOW,
-        "module": config, // Infos sur la configuration du module
-        "pkg": pkg, // Infos sur la configuration du module
-        "document": { // Infos sur le document
+        "date": worker.NOW, // Current date
+        "module": worker.resources.module, // Configuration of module
+        "pkg": pkg, // Infos on module packages
+        "document": { // Data of document
           "id": documentId,
           "categories": categories
         },
-        categorizations: worker.resources.categorizations // Infos sur les catégorisations utilisées
+        categorizations: worker.resources.categorizations // Infos on used categorizations
       },
-      // Récupération du directory & filename de l"ouput
+      // Build path & filename of enrichment file
       output = utils.files.createPath({
-        outputPath: worker.outputPath,
-        id: documentId,
-        type: "enrichments",
-        label: pkg.name,
-        // extension: ["_", config.version, "_", config.training, ".tei.xml"].join(")
-        extension: ".tei.xml"
+        "outputPath": worker.outputPath,
+        "id": documentId,
+        "type": worker.resources.output.type,
+        "label": pkg.name,
+        "extension": worker.resources.output.extension
       });
-
-    // Récupération du fragment de TEI
+    // If no categories were found
+    if (!categories.length) {
+      data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.IDENTIFIER_DO_NOT_MATCH);
+      return next(null, data);
+    }
+    // Write enrichment data
     utils.enrichments.write({
       "template": worker.resources.template,
       "data": tpl,
       "output": output
     }, function(err) {
-
-      // Lecture/Écriture impossible
+      // I/O Error
       if (err) {
         data[pkg.name].errors.push(err.toString());
         return next(null, data);
       }
-
-      // Création de l"objet enrichement représentant l'enrichissement produit
+      // Create an Object representation of created enrichment
       const enrichment = {
         "path": path.join(output.directory, output.filename),
-        "extension": "tei",
-        "original": false,
-        "mime": "application/tei+xml"
+        "extension": worker.resources.enrichment.extension,
+        "original": worker.resources.enrichment.original,
+        "mime": worker.resources.output.mime
       };
-
-      // Sauvegarde de l"enrichissement dans le data
+      // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
         "enrichment": enrichment,
-        "label": config.label
+        "label": worker.resources.module.label
       });
-
-      // Tout s"est bien passé
+      // All clear
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.SUCCESS + output.filename);
       return next(null, data);
     });
@@ -136,16 +125,16 @@ worker.doTheJob = function(data, next) {
 };
 
 /**
- * Retourne les catégories associés à un Identifier pour une Table donnée
- * @param {String} identifier Identifier à tester
- * @param {String} table Table à tester
- * @return {Array} Tableau contenant les catégories associées à l'Identifier pour cette Table
+ * Return each categories of a given Idenfier for a given table
+ * @param {String} identifier Identifier of a docObject
+ * @param {String} table Identifier of a table
+ * @return {Array} An array containing all categories associated with this identifier for this table
  */
 worker.categorize = function(identifier, table) {
   let result = [];
   if (worker.resources.tables.hasOwnProperty(table) && worker.resources.tables[table].hasOwnProperty(identifier)) {
-    const values = worker.resources.tables[table][identifier]; // Contient la liste des catégories rattachées à l"Identifier
-    // Ajout de la catégorie à la liste
+    const values = worker.resources.tables[table][identifier]; // All categegories associated with this identifier
+    // Add category to the list
     if (values) {
       result.push({
         "id": table,
@@ -153,7 +142,25 @@ worker.categorize = function(identifier, table) {
       });
     };
   }
+  return result;
+};
 
+/**
+ * Load all resources needed in this module
+ * @param {Object} options Options passed by sisyphe
+ * @return {Object} An object containing all the data loaded
+ */
+worker.load = (options) => {
+  let result = options.config ? options.config[pkg.name] : null;
+  const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
+  if (folder && result) {
+    for (let i = 0; i < result.categorizations.length; i++) {
+      result.tables[result.categorizations[i].id] = require(path.join(folder, result.categorizations[i].file));
+    }
+    result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');
+  } else {
+    result = require("./conf/sisyphe-conf.json");
+  }
   return result;
 };
 

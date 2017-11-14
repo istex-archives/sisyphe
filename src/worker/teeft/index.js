@@ -6,7 +6,6 @@
 /* Module Require */
 const utils = require("worker-utils"),
   pkg = require("./package.json"),
-  config = require("./config.json"),
   fs = require("fs"),
   path = require("path"),
   Lemmatizer = require("javascript-lemmatizer"),
@@ -14,41 +13,39 @@ const utils = require("worker-utils"),
 
 let worker = {};
 
-worker.init = function(options = {
-  outputPath: "default"
-}) {
+/**
+ * Init Function (called by sisyphe)
+ * @param {Object} options Options passed by sisyphe
+ * @return {undefined} Return undefined
+ */
+worker.init = function(options) {
   worker.outputPath = options.outputPath || path.join("out/", pkg.name);
-
-  worker.resources = require("teeft-resources");
+  worker.resources = worker.load(options);
   worker.Tagger = require("./lib/tagger.js");
   worker.lexicon = require("./lib/lexicon.js");
   worker.DefaultFilter = require("./lib/defaultfilter.js");
   worker.TermExtraction = require("./lib/termextractor.js");
-
   // Tagger + filter + extractor + lemmatizer
   worker.tagger = new worker.Tagger(worker.lexicon);
   worker.filter = new worker.DefaultFilter({
-    "minOccur": 1, // 10 par défaut
-    "noLimitStrength": 2 // 2 par défaut
+    "minOccur": 1,
+    "noLimitStrength": 2
   });
   worker.extractor = new worker.TermExtraction({
     "filter": worker.filter
   });
   worker.lemmatizer = new Lemmatizer();
   worker.stemmer = snowballFactory.newStemmer("english");
-
-  /* Constantes */
-  worker.NOW = utils.dates.now(); // Date du jour formatée (string)
-  worker.NOT_ALPHANUMERIC = new RegExp("\\W", "g"); // RegExp d"un caractère non alphanumérique
-  worker.DIGIT = new RegExp("\\d", "g"); // RegExp d"un chiffre
-  worker.NOUN_TAG = new RegExp(/(\|)?N[A-Z]{1,3}(\|)?/g); // RegExp de toutes les formes du tag de nom
-  worker.VERB_TAG = new RegExp(/(\|)?V[A-Z]{1,3}(\|)?/g); // RegExp de toutes les formes du tag de verbe
-  worker.MAX_NOT_ALPHANUMERIC = 2; // Nombre max de caractère non alpha numérique
-  worker.MAX_DIGIT = 2; // Nombre max de numérique
-  worker.MIN_LENGTH = 4; // Longueur minimale d"un terme (incluse)
-  worker.SPECIFIC_TERM = new RegExp(/^([^a-zA-Z0-9]*|[!\-;:,.?]*)(\w+)([^a-zA-Z0-9]*|[!\-;:,.?]*)$/g); // RegExp permettant de découper un terme entouré par de la ponctuation
-  worker.SEPARATOR = "#";
-  worker.LOGS = { // Logs des différents cas possibles (et gérés par le module)
+  worker.NOT_ALPHANUMERIC = new RegExp("\\W", "g"); // RegExp of alphanumerique char
+  worker.DIGIT = new RegExp("\\d", "g"); // RegExp of number
+  worker.NOUN_TAG = new RegExp(/(\|)?N[A-Z]{1,3}(\|)?/g); // RegExp of noun tag
+  worker.VERB_TAG = new RegExp(/(\|)?V[A-Z]{1,3}(\|)?/g); // RegExp of verb tag
+  worker.MAX_NOT_ALPHANUMERIC = 2; // limit of alphanumeric char
+  worker.MAX_DIGIT = 2; // Limit of digit
+  worker.MIN_LENGTH = 4; // Minimum length of token
+  worker.SPECIFIC_TERM = new RegExp(/^([^a-zA-Z0-9]*|[!\-;:,.?]*)(\w+)([^a-zA-Z0-9]*|[!\-;:,.?]*)$/g); // RegExp of a term between punctuation
+  worker.SEPARATOR = "#"; // Char separator
+  worker.LOGS = { // All logs available on this module
     "SUCCESS": "TEI file created at ",
     "ERROR_EXTRACTION": "Extracted terms not found",
     "ERROR_VALIDATION": "Valid terms not found",
@@ -58,127 +55,102 @@ worker.init = function(options = {
   };
 }
 
-/*
- ** ------------------------------------------------------------------------------
- ** Coeur du Code Métier
- ** ------------------------------------------------------------------------------
+/**
+ * Index a fulltext (called by sisyphe)
+ * @param {Object} data data of the current docObject
+ * @param {Function} next Callback funtion
+ * @return {undefined} Asynchronous function
  */
 worker.doTheJob = function(data, next) {
-  // Vérification du type de fichier
-  if (data.mimetype !== "text/plain") {
+  // Check resources are correctly loaded & MIME type of file
+  if (!worker.resources || data.mimetype !== "text/plain") {
     return next(null, data);
   }
-
-  // Variables d"erreurs et de logs
+  // Errors & logs
   data[pkg.name] = {
     errors: [],
     logs: []
   };
-
-  const documentId = path.basename(data.name, ".xml");
-
-  // Lecture du fichier TXT
+  // Get the filename (without extension)
+  const documentId = path.basename(data.name, ".txt");
+  // Read TXT file
   fs.readFile(data.path, "utf-8", function(err, txt) {
-
-    // Lecture impossible
+    // I/O Errors
     if (err) {
       data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
-
-    /**
-     * Représentation d"un texte dans rd-teeft
-     * {
-     *   keywords: [], // Mots clés du texte
-     *   extraction: [], // Extraction sur tous le texte
-     *   terms: { // Toutes les termes présent dans le texte, sous leurs différentes formes
-     *     tagged: [], // taggés
-     *     sanitized: [], // sanitizés
-     *     lemmatized: [], // lemmatizés
-     *   },
-     *   tokens: [], // Tous les tokens présent dans le texte
-     *   statistics: {} // Toutes les statistiques sur le texte
-     * }
-     */
+    // Get the text representation
     const text = worker.index(txt);
-
-    // S"il n"y a aucun tokens dans tout le texte, arrêt des traitements en cours
+    // If there is no token, log it
     if (text.tokens.length === 0) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_TOKENIZATION);
       return next(null, data);
     }
-
-    // S"il n"y a aucun terme taggé dans tout le texte, arrêt des traitements en cours
+    // If there is no tagged term, log it
     if (text.terms.tagged.length === 0) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_TAGGER);
       return next(null, data);
     }
-
-    // S"il n"y a aucun terme lemmatizé dans tout le texte, arrêt des traitements en cours
+    // If there is no lemmatized term, log it
     if (text.terms.lemmatized.length === 0) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_LEMMATIZATION);
       return next(null, data);
     }
-
-    // S"il n"y a aucun terme sanitizé dans tout le texte, arrêt des traitements en cours
+    // If there is no sanitized term, log it
     if (text.terms.sanitized.length === 0) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_VALIDATION);
       return next(null, data);
     }
-
-    // S"il n"y a aucun terme extrait dans tout le texte, arrêt des traitements en cours
+    // If there is no extracted term, log it
     if (text.extraction.keys.length === 0) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_EXTRACTION);
       return next(null, data);
     }
-
-    // Construction de la structure de données pour le templates
+    worker.NOW = utils.dates.now(); // Date du jour formatée (string)
+    // Build the structure of the template
     const tpl = {
-        "date": worker.NOW,
-        "module": config, // Infos sur la configuration du module
-        "pkg": worker.resources.pkg, // Infos sur le module
-        "document": { // Infos sur le document
+        "date": worker.NOW, // Current date
+        "module": worker.resources.module, // Configuration of module
+        "parameters": worker.resources.parameters, // Launch parameters of module
+        "pkg": pkg, // Infos on module packages
+        "document": { // Data of document
           "id": documentId,
-          "terms": text.keywords // Termes indexés
+          "terms": text.keywords
         }
       },
-      // Récupération du directory & filename de l"ouput
+      // Build path & filename of enrichment file
       output = utils.files.createPath({
-        outputPath: worker.outputPath,
-        id: documentId,
-        type: "enrichments",
-        label: config.label,
-        // extension: ["_", config.version, "_", config.resource, ".tei.xml"].join(")
-        extension: ".tei.xml"
+        "outputPath": worker.outputPath,
+        "id": documentId,
+        "type": worker.resources.output.type,
+        "label": pkg.name,
+        "extension": worker.resources.output.extension
       });
-
-    // Récupération du fragment de TEI
+    // Write enrichment data
     utils.enrichments.write({
       "template": worker.resources.template,
       "data": tpl,
       "output": output
     }, function(err) {
       if (err) {
-        // Lecture/Écriture impossible
+        // I/O Error
         data[pkg.name].errors.push(err.toString());
         return next(null, data);
       }
-
-      // Création de l"objet enrichement représentant l"enrichissement produit
-      let enrichment = {
+      // Create an Object representation of created enrichment
+      const enrichment = {
         "path": path.join(output.directory, output.filename),
-        "extension": "tei",
-        "original": false,
-        "mime": "application/tei+xml"
+        "extension": worker.resources.enrichment.extension,
+        "original": worker.resources.enrichment.original,
+        "mime": worker.resources.output.mime
       };
-
-      // Sauvegarde de l"enrichissement dans le data
+      // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
         "enrichment": enrichment,
-        "label": config.label
+        "label": worker.resources.module.label
       });
-
-      // Tout s"est bien passé
+      // All clear
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.SUCCESS + output.filename);
       return next(null, data);
     });
@@ -186,9 +158,9 @@ worker.doTheJob = function(data, next) {
 };
 
 /**
- * Tokenize un texte
- * @param {String} text Texte à tokenizer
- * @return {Array} Liste des termes nettoyés
+ * Extract token from a text
+ * @param {String} text Fulltext
+ * @return {Array} Array of tokens
  */
 worker.tokenize = function(text) {
   const words = text.split(/\s/g);
@@ -214,9 +186,9 @@ worker.tokenize = function(text) {
 };
 
 /**
- * Retourne la traduction du tag
- * @param {str} tag Tag affecté par la classe Tagger
- * @return {str} tag compris par la classe Lemmatizer ou false
+ * Translate the tag of Tagger to Lemmatizer
+ * @param {String} tag Tag given by Tagger
+ * @return {String} Tag who match with a Lemmatizer tag (or false)
  */
 worker.translateTag = function(tag) {
   let result = false;
@@ -233,9 +205,9 @@ worker.translateTag = function(tag) {
 };
 
 /**
- * Filtre les termes ne respectant pas les conditions
- * @param {Array} terms Termes à filtrer
- * @return {Array} Liste de termes filtrés
+ * Sanitize list of terms (with some filter)
+ * @param {Array} terms List of terms
+ * @return {Array} Liste of sanitized terms
  */
 worker.sanitize = function(terms) {
   let result = [];
@@ -255,21 +227,20 @@ worker.sanitize = function(terms) {
 };
 
 /**
- * Lemmatize des termes taggés (en traduisant le tag)
- * @param {Array} terms Termes taggés à lemmatizer
- * @return {Array} Liste de termes lemmatizé
+ * Lemmatize a list of tagged terms (add a property lemma & stem)
+ * @param {Array} terms List of tagged terms
+ * @return {Array} List of tagged terms with a lemma
  */
 worker.lemmatize = function(terms) {
   let result = [];
   for (let i = 0; i < terms.length; i++) {
     const trslTag = worker.translateTag(terms[i].tag);
     let lemma = terms[i].term;
-
-    // Si la traduction est possible
+    // If translation is possible
     if (trslTag) {
       const _lemma = worker.lemmatizer.lemmas(terms[i].term, trslTag);
       if (_lemma.length > 0) {
-        lemma = _lemma[_lemma.length - 1][0]; // Récupération du terme lemmatizé
+        lemma = _lemma[_lemma.length - 1][0]; // Get the first lemma
       }
     }
     result.push({
@@ -283,9 +254,10 @@ worker.lemmatize = function(terms) {
 };
 
 /**
- * Compare deux objets entre eux en fonction de leur propriété "specificity"
- * @param {Object} a Objet a
- * @return {Object} b Objet b
+ * Compare the specificity of two objects between them
+ * @param {Object} a First object
+ * @param {Object} b Second object
+ * @return {Number} -1, 1, or 0
  */
 worker.compare = function(a, b) {
   if (a.specificity > b.specificity)
@@ -297,141 +269,129 @@ worker.compare = function(a, b) {
 };
 
 /**
- * Index du text
- * @param {String} data Données à indexer, sous forme de chaîne de caractères
- * @return {Object} Retourne une représentation du text indexé
+ * Index a fulltext
+ * @param {String} data Fulltext who need to be indexed
+ * @return {Object} Return a representation of the fulltext (indexation & more informations/statistics about tokens/terms)
  */
 worker.index = function(data) {
-  // Représentation d'un texte par défaut
+  // Default value
   const text = {
-    "keywords": [], // Mots clés du texte
-    "extraction": { // Extraction sur tout le texte
+    "keywords": [], // Keywords
+    "extraction": { // Extraction (terms)
       "terms": {},
       "keys": []
     },
-    "terms": { // Toutes les termes présent dans le texte, sous leurs différentes formes
-      "tagged": [], // taggés
-      "sanitized": [], // sanitizés
-      "lemmatized": [] // lemmatizés
+    "terms": { // All terms
+      "tagged": [], // tagged
+      "sanitized": [], // sanitized
+      "lemmatized": [] // lemmatized
     },
-    "tokens": [], // Tous les tokens présent dans le texte
-    "statistics": { // Toutes les statistiques sur le texte
-      // fréquences
+    "tokens": [], // Token from fulltext
+    "statistics": { // Somme statistics about 
+      // frequencies
       "frequencies": {
         "max": 0,
         "total": 0
       },
-      // spécificités
+      // specificities
       "specificities": {
         "avg": 0,
         "max": 0
       }
     }
   };
-
-  // Tokenization du texte & Ajout d"une séparation à la fin de chaque segment de texte (pour l"extraction)
+  // Get tokens
   text.tokens = worker.tokenize(data);
-
-  // S"il n"y a aucun tokens dans tout le texte, arrêt des traitements en cours
+  // If there is no token, end of process
   if (text.tokens.length === 0) return text;
-
   // Tag des tokens
   text.terms.tagged = worker.tagger.tag(text.tokens);
-
-  // S"il n"y a aucun terme taggé dans tout le texte, arrêt des traitements en cours
+  // If there is no tagged term, end of process
   if (text.terms.tagged.length === 0) return text;
-
-  // Lemmatization des termes taggés
+  // Lemmatize tagged terms
   text.terms.lemmatized = worker.lemmatize(text.terms.tagged);
-
-  // S"il n"y a aucun terme lemmatizé dans tout le texte, arrêt des traitements en cours
+  // If there is no lemmatized term, end of process
   if (text.terms.lemmatized.length === 0) return text;
-
-  // Retrait de tous les termes qui ne correspondent pas au format souhaité
+  // Sanitize all lemmatized terms
   text.terms.sanitized = worker.sanitize(text.terms.lemmatized);
-
-  // S"il n"y a aucun terme sanitizé dans tout le texte, arrêt des traitements en cours
+  // If there is no sanitized term, end of process
   if (text.terms.sanitized.length === 0) return text;
-
-  // Configuration du Filter
+  // Configure Filter
   worker.extractor.get("filter").configure(text.tokens.length);
-
-  // Exctraction des termes
-  text.extraction.terms = worker.extractor.extract(text.terms.sanitized); // Données sous forme d"objet
-  text.extraction.keys = Object.keys(text.extraction.terms); // Liste des termes extraits
-
-  // S"il n"y a aucun terme extrait dans tout le texte, arrêt des traitements en cours
+  // Extract terms
+  text.extraction.terms = worker.extractor.extract(text.terms.sanitized);
+  text.extraction.keys = Object.keys(text.extraction.terms); // List of keys
+  // If there is no extracted term, end of process
   if (text.extraction.keys.length === 0) return text;
-
-  // Calcul des statistiques sur les fréquences d"apparitions de chaque terme
+  // Calculate some statistics of fréquencies
   for (let i = 0; i < text.extraction.keys.length; i++) {
-
-    // Clé du term dans text.extraction.terms
+    // Key in text.extraction.terms
     const key = text.extraction.keys[i];
-
-    // Fréquence maximale pour ce texte
+    // Max frequency
     if (text.statistics.frequencies.max < text.extraction.terms[key].frequency) {
       text.statistics.frequencies.max = text.extraction.terms[key].frequency;
     }
-
-    // Fréquence totale pour ce texte
+    // Total frequency
     text.statistics.frequencies.total += text.extraction.terms[key].frequency;
   }
-
-  // Valeur par défaut
+  // Default value
   let dValue = Math.pow(10, -5);
-
-  // Calcul des scores de chaque terme + Calcul du total des fréquences
+  // Calculate of scores for each term & Calculate the total of frequencies
   for (let i = 0; i < text.extraction.keys.length; i++) {
-
-    // Clé du term dans text.extraction.terms
+    // Key in text.extraction.terms
     const key = text.extraction.keys[i];
-
-    // Valeur de la pondération du terme qui dépend de sa "représentativité" dans le vocabulaire (dictionnary.json)
+    // Value of term weighting in function of its representativity in the vocabulary (dictionnary.json)
     const weighting = worker.resources.dictionary[key] || dValue;
-
-    // Specificité = (fréquence d"apparition du terme) / (pondération)
+    // Specificity = (frequency) / (weighting)
     text.extraction.terms[key].specificity = ((text.extraction.terms[key].frequency / text.statistics.frequencies.total) / weighting);
-
-    // Calcul de la spécificité maximale de ce segment
+    // Calculate the max specificity
     if (text.statistics.specificities.max < text.extraction.terms[key].specificity) {
       text.statistics.specificities.max = text.extraction.terms[key].specificity;
     }
   }
-
-  // Normalisation de la spécificité de chaque terme présent dans le texte & Somme de toutes les spécificités normalisée
+  // Normalize the specificity of each term & Sum of all normalized specificities
   for (let i = 0; i < text.extraction.keys.length; i++) {
-
-    // Clé du term dans text.extraction.terms
+    // Key in text.extraction.terms
     const key = text.extraction.keys[i];
-
     text.extraction.terms[key].specificity /= text.statistics.specificities.max;
     text.statistics.specificities.avg += text.extraction.terms[key].specificity;
   }
-
-  // Calcul de la spécificité moyenne dans tout le document
+  // Calcul of average specificity
   text.statistics.specificities.avg /= text.extraction.keys.length;
-
-  // Liste des termes indexés
+  // Liste of indexed terms (keywords)
   text.keywords = [];
-
-  // Sélection des résultats finaux
+  // Select final results
   for (let i = 0; i < text.extraction.keys.length; i++) {
-
-    // Clé du term dans text.extraction.terms
+    // Key in text.extraction.terms
     const key = text.extraction.keys[i];
-
-    if (!config.truncate || (text.extraction.terms[key].specificity >= text.statistics.specificities.avg)) {
+    if (!worker.resources.parameters.truncate || (text.extraction.terms[key].specificity >= text.statistics.specificities.avg)) {
       text.extraction.terms[key].term = key;
       text.keywords.push(text.extraction.terms[key]);
     }
   }
-
-  // Si le résultat doit être trié
-  if (config.sort) {
+  // If result need to be sorted
+  if (worker.resources.parameters.sort) {
     text.keywords = text.keywords.sort(worker.compare);
   }
   return text;
+};
+
+/**
+ * Load all resources needed in this module
+ * @param {Object} options Options passed by sisyphe
+ * @return {Object} An object containing all the data loaded
+ */
+worker.load = (options) => {
+  let result = options.config ? options.config[pkg.name] : null;
+  const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
+  if (folder && result) {
+    result.dictionary = require(path.join(folder, result.dictionary));
+    result.stopwords = require(path.join(folder, result.stopwords));
+    result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');
+  } else {
+    result = require("./conf/sisyphe-conf.json");
+  }
+  return result;
 };
 
 module.exports = worker;

@@ -1,6 +1,6 @@
 {
   "name": "nb",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Module Sisyphe de catégorisation par méthode statistique: Bayésien Naïf",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,6 @@
     "line-reader": "^0.4.0",
     "minimist": "^1.2.0",
     "mocha": "^3.5.3",
-    "nb-resources": "git+https://github.com/NicolasKieffer/nb-resources.git",
     "process": "^0.11.3",
     "worker-utils": "git+https://github.com/NicolasKieffer/worker-utils.git"
   }

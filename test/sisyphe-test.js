@@ -65,21 +65,5 @@ describe(`${pkg.name}/Sisyphe.js`, function() {
       Sisyphe.init(neededOptions).catch(err => done());
     });
   });
-  describe("#launch", function() {
-    this.timeout(10000);
-    it("launch should throw error", function(done) {
-      Sisyphe.init(goodSession).then(_ => {
-        return Sisyphe.launch().then(_ => done());
-      });
-    });
-  });
-  describe("#launch2", function() {
-    this.timeout(10000);
-    it("launch should throw error", function(done) {
-      Sisyphe.init(goodSession).then(_ => {
-        return Sisyphe.launch().then(_ => done());
-      });
-    });
-  });
 });
 

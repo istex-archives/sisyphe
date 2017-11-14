@@ -9,7 +9,7 @@ sisyphe-pdf
 Sisyphe PDF will add some kind of informations about PDF files  (Pdf verison, author, Software used to build it & date ...)
 If a file is not a PDF it will just "next" it.
 
-![sisyphe-pdf-out](/worker/sisyphe-pdf/sisyphe-pdf-out.png)
+![sisyphe-pdf-out](/src/worker/pdf/sisyphe-pdf-out.png)
 
 
 ### How it works ?

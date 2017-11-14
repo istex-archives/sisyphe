@@ -1,7 +1,9 @@
-/* global __dirname, require, process, it */
+/* global module */
+/* jslint node: true */
+/* jslint indent: 2 */
 'use strict';
 
-let pkg = require('../package.json'),
+const pkg = require('../package.json'),
   worker = require('../index.js'),
   Tagger = require('../lib/tagger.js'),
   lexicon = require('../lib/lexicon.js'),
@@ -13,15 +15,16 @@ let pkg = require('../package.json'),
   TU = require('auto-tu');
 
 // Tagger + filter + extractor + lemmatizer
-let tagger = new Tagger(lexicon),
+const tagger = new Tagger(lexicon),
   filter = new DefaultFilter(),
   extractor = new TermExtraction({
     'filter': filter
   }),
   lemmatizer = new Lemmatizer();
 
-// Données de test
-let data = require('./dataset/in/data.json'),
+// Test dataset for each tested function
+const data = require('./dataset/in/data.json'),
+  originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
     'worker': require('./dataset/in/test.worker.json'),
     'tagger': require('./dataset/in/test.tagger.json'),
@@ -29,14 +32,15 @@ let data = require('./dataset/in/data.json'),
     'extractor': require('./dataset/in/test.extractor.json')
   };
 
-// Mapping indiquant quelle fonction de test et quelles données utiliser pour chaque fonction
-let wrappers = {
+// Wrappers used for each tested function
+const wrappers = {
   'worker': {
     'doTheJob': testOf_doTheJob,
+    'load': testOf_load,
     'index': testOf_index,
     'tokenize': null,
     'translateTag': testOf_translateTag,
-    'sanitize': null,
+    'sanitize': testOf_sanitize,
     'lemmatize': null
   },
   'tagger': {
@@ -51,19 +55,23 @@ let wrappers = {
   }
 };
 
-let objects = {
+// Tested object (only functions are "automatically" tested)
+const objects = {
   'worker': worker,
   'tagger': tagger,
   'filter': filter,
   'extractor': extractor
 };
 
+// Call of init function (shoulb be done by sisyphe usually)
 worker.init({
-  "outputPath": "./test/dataset/out/"
+  "outputPath": "test/dataset/out",
+  "config": JSON.parse(JSON.stringify(originalConfigTest)),
+  "sharedConfigDir": "test/dataset/in/shared"
 });
 
 /**
- * Test des fonctions de :
+ * Test of functions of :
  *   - worker :
  *     - doTheJob()
  *     - tokenize()
@@ -90,42 +98,52 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 });
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
  * - worker.doTheJob()
  */
 function testOf_doTheJob(fn, item, cb) {
-  let docObject = data[item.key];
+  const docObject = data[item.key];
   return fn(docObject, function(err, res) {
-    item.result.include = worker.LOGS[item.key]; // Contiendra la valeur de l'erreur attendu
-    let value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // Contiendra la valeur renvoyer par le module
+    item.result.include = worker.LOGS[item.key]; // will contain the expected value
+    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // will contain the returned value
     return cb(value);
   });
 }
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
  * - worker.index()
  */
 function testOf_index(fn, item, cb) {
   fs.readFile(item.arguments.path, 'utf-8', function(err, res) {
     if (err) throw err;
-    let result = fn(res);
+    const result = fn(res);
     return cb(result.keywords);
   });
 }
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
+ * - worker.load()
+ */
+function testOf_load(fn, item, cb) {
+  item.arguments.options.config = (item.arguments.options.config) ? JSON.parse(JSON.stringify(originalConfigTest)) : {}; // If we need a config in this test, we will use the configTest
+  const value = fn(item.arguments.options);
+  return cb(Object.keys(value.stopwords));
+}
+
+/**
+ * Wrapper of :
  * - worker.translateTag()
  */
 function testOf_translateTag(fn, item, cb) {
-  // Récupération de tous les tags présents dans le lexicon
-  let tags = {};
+  // Get all tags in lexicon
+  const tags = {};
   for (let key in lexicon) {
     tags[lexicon[key]] = true;
   }
-  // Récupération de tous les résultats possibles avec les tags présents dans le lexicon
-  let results = {};
+  // Get all possible results with available tag in lexicon
+  const results = {};
   for (let key in tags) {
     results[fn(key)] = true;
   }
@@ -133,7 +151,24 @@ function testOf_translateTag(fn, item, cb) {
 }
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
+ * - worker.sanitize()
+ */
+function testOf_sanitize(fn, item, cb) {
+  const value = fn(item.arguments),
+    invalid = worker.tagger.tag(worker.SEPARATOR)[0],
+    result = value.reduce(function(sum, current) {
+      if (current.tag === invalid.tag) {
+        return sum + 1;
+      } else {
+        return sum;
+      }
+    }, 0);
+  return cb(result);
+}
+
+/**
+ * Wrapper of :
  * - filter.configure()
  */
 function testOf_configure(fn, item, cb) {
@@ -145,7 +180,7 @@ function testOf_configure(fn, item, cb) {
 }
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
  * - filter.call()
  */
 function testOf_call(fn, item, cb) {
@@ -153,10 +188,10 @@ function testOf_call(fn, item, cb) {
 }
 
 /**
- * Fonction de test à appliquée pour :
+ * Wrapper of :
  * - filter.extract()
  */
 function testOf_extract(fn, item, cb) {
-  let result = Object.keys(fn(item.arguments));
+  const result = Object.keys(fn(item.arguments));
   return cb(result);
 }

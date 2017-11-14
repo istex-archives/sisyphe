@@ -15,6 +15,51 @@
     "logs": "logs",
     "result": {}
   }],
+  "load": [{
+    "label": "Devrait charger correctement les resources",
+    "arguments": {
+      "options": {
+        "config": true,
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
+    },
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config)",
+    "arguments": {
+      "options": {
+        "config": null,
+        "sharedConfigDir": "./test/dataset/in/shared"
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": true,
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }, {
+    "label": "Devrait charger les resources par défaut (no config & sharedConfigDir)",
+    "arguments": {
+      "options": {
+        "config": null,
+        "sharedConfigDir": ""
+      }
+    },
+    "result": {
+      "length": 0
+    }
+  }],
   "index": [{
     "label": "Devrait renvoyer des mots clés",
     "arguments": {
@@ -62,22 +107,35 @@
     }
   }],
   "sanitize": [{
-    "label": "Devrait renvoyer un tableau contenant 4 séparateurs",
+    "label": "Devrait renvoyer un tableau contenant 3 séparateurs",
     "arguments": [{
       "term": "this",
-      "tag": "DT"
+      "tag": "DT",
+      "lemma": "this",
+      "stem": "this"
     }, {
       "term": "is",
-      "tag": "VBZ"
+      "tag": "VBZ",
+      "lemma": "be",
+      "stem": "is"
     }, {
       "term": "a",
-      "tag": "DT"
+      "tag": "DT",
+      "lemma": "a",
+      "stem": "a"
+    }, {
+      "term": "sample",
+      "tag": "NN",
+      "lemma": "sample",
+      "stem": "sampl"
     }, {
       "term": "test",
-      "tag": "NN"
+      "tag": "NN",
+      "lemma": "test",
+      "stem": "test"
     }],
     "result": {
-      "lengh": 4
+      "equal": 3
     }
   }, {
     "label": "Devrait renvoyer un tableau vide",

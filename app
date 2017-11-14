@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 "use strict";
 
 const bluebird = require("bluebird");
@@ -32,6 +33,7 @@ program
   .parse(process.argv);
 
 let workers = require(path.resolve(__dirname, "src", "worker.json")).workers;
+
 if (program.list) {
   console.log("List of available workers");
   workers.map(worker => {
@@ -83,6 +85,16 @@ if (program.removeModule) {
   });
 }
 
+let debugMod = false,
+  debugPort = null;
+for(let arg of process.execArgv){
+  if(arg.includes('inspect') || arg.includes('debug')) {
+    debugMod = true;
+    debugPort = parseInt(arg.split('=')[1]) || null;
+    break;
+  }
+}
+
 /***************************/
 /* Build configuration file*/
 /***************************/
@@ -93,6 +105,8 @@ const session = {
   inputPath: path.resolve(program.args[0]),
   numCPUs: program.thread || numCPUs,
   now,
+  debugMod,
+  debugPort,
   outputPath: path.resolve(`./out`, now.toString() + "-" + program.corpusname),
   workers,
   silent: program.quiet
@@ -134,3 +148,5 @@ function appender(xs) {
 // process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
 // //catches uncaught exceptions
 // process.on("uncaughtException", exitHandler.bind(null, { exit: true }));
+
+// Check if debug or inspect mod is enable
