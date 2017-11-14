@@ -177,7 +177,7 @@ worker.index = function(xmlString, selectors, criterion) {
  * @return {Object} An object containing all the data loaded
  */
 worker.load = function(options) {
-  let result = options.config[pkg.name];
+  let result = options.config ? options.config[pkg.name] : null;
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
     result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');

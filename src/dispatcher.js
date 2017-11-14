@@ -166,7 +166,6 @@ Dispatcher.exit = function (signal) {
  */
 Dispatcher.exitWithoutResurrect = function () {
   Dispatcher.stillJobToDo.cancel();
-  console.log(Dispatcher.stillJobToDo)
   this.removeAllListeners()
   this.tasks.exit()
 };
