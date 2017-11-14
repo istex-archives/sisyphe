@@ -31,11 +31,11 @@ if (program.corpusname === 'default' || program.configDir === 'none') {
   process.exit(0);
 }
 
-let pathToConf;
+let pathToConf = null;
 const inputPath = path.resolve(program.args[0]),
   configFilename = 'sisyphe-conf.json', // standard name for a configuration file in sisyphe
   configDir = program.configDir ? path.resolve(program.configDir) : null,
-  confContents = fs.readdirSync(configDir);
+  confContents = configDir ? fs.readdirSync(configDir) : []; // confContent have to be an emtpty array if confDir is not define
 // We search the nearest config in configDir
 for (let folder of confContents) {
   let currPath = path.join(configDir, folder);
@@ -44,12 +44,27 @@ for (let folder of confContents) {
     break;
   }
 }
+
+// Check if debug or inspect mod is enable
+let debugMod = false,
+  debugPort = null;
+for(let arg of process.execArgv){
+  if(arg.includes('inspect') || arg.includes('debug')) {
+    debugMod = true;
+    debugPort = parseInt(arg.split('=')[1]) || null;
+    break;
+  }
+}
+
 const sharedConfigDir = configDir ? path.resolve(configDir, "shared") : null, // stanard path for the shared configuration directory
   config = pathToConf ? require(pathToConf) : null, // Object representation of sisyphe configuration (or null)
   silent = program.silent,
-  now = Date.now(),
-  options = {
+  now = Date.now();
+
+const  options = {
   corpusname: program.corpusname,
+  debugMod,
+  debugPort,
   sharedConfigDir,
   configDir,
   pathToConf,
@@ -58,7 +73,7 @@ const sharedConfigDir = configDir ? path.resolve(configDir, "shared") : null, //
   inputPath,
   numCPUs: program.thread || numCPUs,
   now,
-  outputPath: path.resolve(`./out`, now.toString() + '-' + program.corpusname)
+  outputPath: path.resolve('out', now.toString() + '-' + program.corpusname)
 };
 
 let workers = require(path.resolve(__dirname, 'src', 'worker.json')).workers;
