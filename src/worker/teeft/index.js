@@ -378,8 +378,8 @@ worker.index = function(data) {
  * @param {Object} options Options passed by sisyphe
  * @return {Object} An object containing all the data loaded
  */
-worker.load = function(options) {
-  let result = options.config[pkg.name];
+worker.load = (options) => {
+  let result = options.config ? options.config[pkg.name] : null;
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
     result.dictionary = require(path.join(folder, result.dictionary));

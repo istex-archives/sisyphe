@@ -205,7 +205,7 @@ worker.categorize = function(text) {
  * @return {Object} An object containing all the data loaded
  */
 worker.load = function(options) {
-  let result = options.config[pkg.name];
+  let result = options.config ? options.config[pkg.name] : null;
   const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
   if (folder && result) {
     for (let key in result.trainings) {

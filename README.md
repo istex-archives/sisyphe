@@ -32,11 +32,15 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
 `./app.js --help` Will output help
 
 ### Options
-    -V, --version            output the version number
-    -n, --corpusname <name>  Corpus name
-    -c, --config-dir <path>  Configuration folder path
-    -s, --silent             Silence output
-    -h, --help               output usage information
+    -V, --version               output the version number
+    -n, --corpusname <name>     Corpus name
+    -s, --select <name>         Select all module to deal with
+    -c, --config-dir <path>     Configuration folder path
+    -t, --thread <number>       The number of process which sisyphe will take
+    -r, --remove-module <name>  Remove module name from the workflow
+    -q, --quiet                 Silence output
+    -l, --list                  List all available workers
+    -h, --help                  output usage information
 
 ### How it works ?
 
