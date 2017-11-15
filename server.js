@@ -97,12 +97,12 @@ app.post("/launch", async function(req, res) {
     console.log("launch");
     const command = req.body.command;
     let commandArray = [];
+    console.log(command.workers)
     if (command.name) commandArray.push("-n", command.name);
     if (command.config) commandArray.push("-c", command.config);
-    if (command.disable)
-      command.disable.map(worker => commandArray.push("-r", worker.name));
+    if (command.workers) commandArray.push("-s", command.workers);
     if (command.path) commandArray.push(command.path);
-    if (!command.debug) commandArray.push("-s");
+    if (!command.debug) commandArray.push("-q");
     console.log(`launch: ${commandArray}`);
     res.send(true);
     sisyphe = cp.spawn(`./app`, commandArray);

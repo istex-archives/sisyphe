@@ -6,20 +6,20 @@ const os = require('os');
 
 /**
  * Manage all Dispatchers. When a Dispatcher is finished, the next one is called
- * @constructor 
+ * @constructor
  */
 const Manufactory = {};
 
 /**
  * @param {Object} options Options for dispatcher
- * @param {String} options.corpusName Corpus name 
+ * @param {String} options.corpusName Corpus name
  * @param {String} options.configDir Path to config
  * @param {Number} options.numCPUs Number of cpu to use
  * @param {Number} options.now Session start
  * @param {String} options.outputPath Where to put results
  * @returns {Manufactory}
  */
-Manufactory.init = function (options = { inputPath: '.', numCPUs: os.cpus().length }) {
+Manufactory.init = function (options = { inputPath: '.', numCPUs: os.cpus().length , debugMod: false}) {
   this.workers = [];
   this.options = options;
   this.pathToAnalyze = options.inputPath;
@@ -90,10 +90,12 @@ Manufactory.createDispatchers = function () {
  * @returns {Promise}
  */
 Manufactory.createOverseersForDispatchers = function () {
+  let nb = 0;
   return Promise.map(this.dispatchers, dispatcher => {
     return Promise.map(Array.from(Array(this.numCPUs).keys()), numero => {
+      nb++;
       const overseer = Object.create(Overseer);
-      return overseer.init(dispatcher.options.name, this.options).then(overseer => {
+      return overseer.init(dispatcher.options.name, this.options, nb).then(overseer => {
         dispatcher.addPatient(overseer);
         return overseer;
       });
@@ -119,6 +121,16 @@ Manufactory.bindDispatchers = function () {
     });
   });
   return this;
+};
+
+/**
+ * Exit all dispatcher
+ * @returns {Manufactory}
+ */
+Manufactory.exit = function () {
+  return Promise.map(this.dispatchers, dispatcher=>{
+    return dispatcher.exitWithoutResurrect();
+  })
 };
 
 module.exports = Manufactory;

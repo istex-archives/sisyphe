@@ -85,7 +85,7 @@ worker.init({
  *   - extractor :
  *     - extract()
  */
-// Pour chaque clé
+// Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
     description: pkg.name + '/index.js',
@@ -102,10 +102,9 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
  * - worker.doTheJob()
  */
 function testOf_doTheJob(fn, item, cb) {
-  const docObject = data[item.key];
-  return fn(docObject, function(err, res) {
+  return fn(data[item.key], function(err, res) {
     item.result.include = worker.LOGS[item.key]; // will contain the expected value
-    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // will contain the returned value
+    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1];  // will contain the returned value
     return cb(value);
   });
 }

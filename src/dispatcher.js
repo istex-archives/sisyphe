@@ -65,9 +65,9 @@ Dispatcher.addToWaitingQueue = function (overseer) {
 Dispatcher.getPatient = function () {
   return new Promise(resolve => {
     if (this.waitingQueue.length !== 0) return resolve(this.waitingQueue.shift());
-    const checkPatientIsAvailable = setInterval(() => {
+    this.checkPatientIsAvailable = setInterval(() => {
       if (this.waitingQueue.length !== 0) {
-        clearInterval(checkPatientIsAvailable);
+        clearInterval(this.checkPatientIsAvailable);
         resolve(this.waitingQueue.shift());
       }
     }, 10);
@@ -159,6 +159,15 @@ Dispatcher.exit = function (signal) {
     };
     this.emit('error', error);
   });
+};
+
+/**
+ * Just exit the dispatcher
+ */
+Dispatcher.exitWithoutResurrect = function () {
+  Dispatcher.stillJobToDo.cancel();
+  this.removeAllListeners()
+  this.tasks.exit()
 };
 
 /**

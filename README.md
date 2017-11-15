@@ -32,11 +32,15 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
 `./app.js --help` Will output help
 
 ### Options
-    -V, --version            output the version number
-    -n, --corpusname <name>  Corpus name
-    -c, --config-dir <path>  Configuration folder path
-    -s, --silent             Silence output
-    -h, --help               output usage information
+    -V, --version               output the version number
+    -n, --corpusname <name>     Corpus name
+    -s, --select <name>         Select all module to deal with
+    -c, --config-dir <path>     Configuration folder path
+    -t, --thread <number>       The number of process which sisyphe will take
+    -r, --remove-module <name>  Remove module name from the workflow
+    -q, --quiet                 Silence output
+    -l, --list                  List all available workers
+    -h, --help                  output usage information
 
 ### How it works ?
 
@@ -68,7 +72,8 @@ Those URL NEED to be updated when merge branch will be ok.
 - [OUT](https://github.com/istex/sisyphe/tree/master/src/worker/out) Will export data to json file & ElasticSearch database
 - [NB](https://github.com/istex/sisyphe/tree/master/src/worker/nb) Try to assing some categories to an XML document by using its abstract
 - [MULTICAT](https://github.com/istex/sisyphe/tree/master/src/worker/multicat) Try to assing some categories to an XML document by using its identifiers
-- [TEEFT](https://github.com/istex/sisyphe/tree/master/src/worker/teeft) Will extract keywords of a fulltext
+- [TEEFT](https://github.com/istex/sisyphe/tree/master/src/worker/teeft) Try to extract keywords of a fulltext
+- [SKEEFT](https://github.com/istex/sisyphe/tree/master/src/worker/skeeft) Try to extract keywords of a structured fulltext by using teeft algorithm and text structuration
 
 
 ### Developpement on worker

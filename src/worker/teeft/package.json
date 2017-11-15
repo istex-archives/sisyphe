@@ -16,7 +16,6 @@
     "javascript-lemmatizer": "0.0.2",
     "mocha": "^3.5.3",
     "snowball-stemmers": "^0.6.0",
-    "teeft-resources": "git+https://github.com/NicolasKieffer/teeft-resources.git",
     "worker-utils": "git+https://github.com/NicolasKieffer/worker-utils.git"
   }
 }
