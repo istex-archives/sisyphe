@@ -3,49 +3,56 @@
 /* jslint indent: 2 */
 'use strict';
 
-const Backbone = require('backbone');
+const DefaultFilter = function(options) {
 
-module.exports = Backbone.Model.extend({
-
-  defaults: {
-    minOccur: 10,
-    noLimitStrength: 2,
-    lengthSteps: {
-      values: [{
-        lim: 3000,
-        value: 4
-      }],
-      min: {
-        lim: 1000,
-        value: 1
+  // this reference
+  const self = this,
+    DEFAULT = { // Default values
+      "lengthSteps": {
+        "values": [{
+          "lim": 3000,
+          "value": 4
+        }],
+        "min": {
+          "lim": 1000,
+          "value": 1
+        },
+        "max": {
+          "lim": 6000,
+          "value": 7
+        }
       },
-      max: {
-        lim: 6000,
-        value: 7
-      }
-    }
-  },
+      "minOccur": 7,
+      "noLimitStrength": 2
+    };
 
-  call: function(occur, strength) {
-    return ((strength < this.get('noLimitStrength') && occur >= this.get('minOccur')) ||
-      (strength >= this.get('noLimitStrength')));
-  },
+  self.minOccur = (options && options.minOccur) ? options.minOccur : DEFAULT.minOccur;
+  self.noLimitStrength = (options && options.noLimitStrength) ? options.noLimitStrength : DEFAULT.noLimitStrength;
+  self.lengthSteps = (options && options.lengthSteps) ? options.lengthSteps : DEFAULT.lengthSteps;
 
-  configure: function(length) {
+  self.call = function(occur, strength) {
+    return ((strength < self.noLimitStrength && occur >= self.minOccur) || (strength >= self.noLimitStrength));
+  };
+
+  self.configure = function(length) {
     if (!isNaN(length)) {
-      if (length < this.get('lengthSteps').min.lim) {
-        this.set('minOccur', this.get('lengthSteps').min.value);
-        return this.get('lengthSteps').min.value;
+      if (length < self.lengthSteps.min.lim) {
+        self.minOccur = self.lengthSteps.min.value;
+        return self.lengthSteps.min.value;
       }
-      for (let i = 0; i < this.get('lengthSteps').values.length; i++) {
-        if (length < this.get('lengthSteps').values[i].lim) {
-          this.set('minOccur', this.get('lengthSteps').values[i].value);
-          return this.get('lengthSteps').values[i].value;
+      for (let i = 0; i < self.lengthSteps.values.length; i++) {
+        if (length < self.lengthSteps.values[i].lim) {
+          self.minOccur = self.lengthSteps.values[i].value;
+          return self.lengthSteps.values[i].value;
         }
       }
-      this.set('minOccur', this.get('lengthSteps').max.value);
-      return this.get('lengthSteps').max.value;
+      self.minOccur = self.lengthSteps.max.value;
+      return self.lengthSteps.max.value;
     }
     return null;
-  }
-});
+  };
+
+  return self;
+};
+
+module.exports = DefaultFilter;

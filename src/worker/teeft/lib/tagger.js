@@ -5,20 +5,20 @@
 
 const Tagger = function(lexicon) {
 
-  // référence à this
+  // this reference
   const self = this;
 
   self.lexicon = Object.create(null, {});
 
-  // Suppression des clés "réservées"
+  // Set all keys
   for (let keys in lexicon) {
     self.lexicon[keys] = lexicon[keys];
   }
 
   /**
-   * Tag les termes
-   * @param {Array} terms Liste de termes
-   * @return {Array} Liste des termes nettoyés
+   * Tag terms
+   * @param {Array} terms List of terms
+   * @return {Array} List of tagged terms
    */
   self.tag = function(terms) {
     let result = [];

@@ -12,7 +12,6 @@
   "dependencies": {
     "async": "^2.5.0",
     "auto-tu": "git+https://github.com/NicolasKieffer/auto-tu.git",
-    "backbone": "^1.3.3",
     "javascript-lemmatizer": "0.0.2",
     "mocha": "^3.5.3",
     "snowball-stemmers": "^0.6.0",

@@ -1,66 +1,66 @@
 /* global module */
 /* jslint node: true */
 /* jslint indent: 2 */
-'use strict';
+"use strict";
 
-const pkg = require('../package.json'),
-  worker = require('../index.js'),
-  Tagger = require('../lib/tagger.js'),
-  lexicon = require('../lib/lexicon.js'),
-  DefaultFilter = require('../lib/defaultfilter.js'),
-  TermExtraction = require('../lib/termextractor.js'),
-  fs = require('fs'),
-  Lemmatizer = require('javascript-lemmatizer'),
-  async = require('async'),
-  TU = require('auto-tu');
+const pkg = require("../package.json"),
+  worker = require("../index.js"),
+  Tagger = require("../lib/tagger.js"),
+  lexicon = require("../lib/lexicon.js"),
+  DefaultFilter = require("../lib/defaultfilter.js"),
+  TermExtraction = require("../lib/termextractor.js"),
+  fs = require("fs"),
+  Lemmatizer = require("javascript-lemmatizer"),
+  async = require("async"),
+  TU = require("auto-tu");
 
 // Tagger + filter + extractor + lemmatizer
 const tagger = new Tagger(lexicon),
   filter = new DefaultFilter(),
   extractor = new TermExtraction({
-    'filter': filter
+    "filter": filter
   }),
   lemmatizer = new Lemmatizer();
 
 // Test dataset for each tested function
-const data = require('./dataset/in/data.json'),
+const data = require("./dataset/in/data.json"),
   originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
-    'worker': require('./dataset/in/test.worker.json'),
-    'tagger': require('./dataset/in/test.tagger.json'),
-    'filter': require('./dataset/in/test.filter.json'),
-    'extractor': require('./dataset/in/test.extractor.json')
+    "worker": require("./dataset/in/test.worker.json"),
+    "tagger": require("./dataset/in/test.tagger.json"),
+    "filter": require("./dataset/in/test.filter.json"),
+    "extractor": require("./dataset/in/test.extractor.json")
   };
 
 // Wrappers used for each tested function
 const wrappers = {
-  'worker': {
-    'doTheJob': testOf_doTheJob,
-    'load': testOf_load,
-    'index': testOf_index,
-    'tokenize': null,
-    'translateTag': testOf_translateTag,
-    'sanitize': testOf_sanitize,
-    'lemmatize': null
+  "worker": {
+    "doTheJob": testOf_doTheJob,
+    "load": testOf_load,
+    "index": testOf_index,
+    "tokenize": null,
+    "translateTag": testOf_translateTag,
+    "sanitize": testOf_sanitize,
+    "lemmatize": null
   },
-  'tagger': {
-    'tag': null
+  "tagger": {
+    "tag": null
   },
-  'filter': {
-    'configure': testOf_configure,
-    'call': testOf_call
+  "filter": {
+    "configure": testOf_configure,
+    "call": testOf_call
   },
-  'extractor': {
-    'extract': testOf_extract
+  "extractor": {
+    "extract": testOf_extract
   }
 };
 
 // Tested object (only functions are "automatically" tested)
 const objects = {
-  'worker': worker,
-  'tagger': tagger,
-  'filter': filter,
-  'extractor': extractor
+  "worker": worker,
+  "tagger": tagger,
+  "filter": filter,
+  "extractor": extractor
 };
 
 // Call of init function (shoulb be done by sisyphe usually)
@@ -88,7 +88,7 @@ worker.init({
 // Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
-    description: pkg.name + '/index.js',
+    description: pkg.name + "/index.js",
     root: key,
     object: objects[key],
     dataset: datasets[key],
@@ -114,7 +114,7 @@ function testOf_doTheJob(fn, item, cb) {
  * - worker.index()
  */
 function testOf_index(fn, item, cb) {
-  fs.readFile(item.arguments.path, 'utf-8', function(err, res) {
+  fs.readFile(item.arguments.path, "utf-8", function(err, res) {
     if (err) throw err;
     const result = fn(res);
     return cb(result.keywords);

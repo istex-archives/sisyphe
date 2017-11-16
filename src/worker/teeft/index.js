@@ -314,7 +314,7 @@ worker.index = function(data) {
   // If there is no sanitized term, end of process
   if (text.terms.sanitized.length === 0) return text;
   // Configure Filter
-  worker.extractor.get("filter").configure(text.tokens.length);
+  worker.extractor.filter.configure(text.tokens.length);
   // Extract terms
   text.extraction.terms = worker.extractor.extract(text.terms.sanitized);
   text.extraction.keys = Object.keys(text.extraction.terms); // List of keys
