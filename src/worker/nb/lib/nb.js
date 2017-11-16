@@ -29,7 +29,6 @@ const Tokenizer = function(lower) {
 
 /* BayesData */
 const BayesData = function(name, pool) {
-
   const self = this;
 
   self.name = name || '';
@@ -43,7 +42,6 @@ const BayesData = function(name, pool) {
 
 /* Bayes */
 const Bayes = function(min, lower = false) {
-
   const self = this;
   /*
    * Calcul of probabilities (Robinson methodology)
@@ -64,6 +62,7 @@ const Bayes = function(min, lower = false) {
       q = Math.pow(_q, nth),
       Q = 1 - q,
       S = (P - Q) / (P + Q);
+
     return (1 + S) / 2;
   }
 
@@ -109,11 +108,6 @@ const Bayes = function(min, lower = false) {
     self.dirty = true;
   };
 
-  /*
-   * Par defaut obj = decouper sur les espaces.
-   * On ne change pas la casse
-   * Dans certaines applications, il faudra peut - etre tout en minuscules
-   */
   self.getTokens = function(obj) {
     return self._tokenizer.tokenize(obj);
   };
@@ -147,10 +141,11 @@ const Bayes = function(min, lower = false) {
         }
       }
     }
+
     return {
-      'category': category,
-      'probability': probability,
-      'probabilities': probabilities
+      "category": category,
+      "probability": probability,
+      "probabilities": probabilities
     };
   };
 
@@ -159,6 +154,7 @@ const Bayes = function(min, lower = false) {
       self.buildCache();
       self.dirty = false;
     }
+
     return self.cache;
   };
 
@@ -166,7 +162,6 @@ const Bayes = function(min, lower = false) {
    * fusionne corpus et calcule probas
    */
   self.buildCache = function() {
-
     self.cache = {};
     for (let k in self.pools) {
       if (k == '__Corpus__') {
@@ -219,6 +214,7 @@ const Bayes = function(min, lower = false) {
     if (probs.length > 2048) {
       probs = probs.slice(0, 2048);
     }
+
     return probs;
   }
 

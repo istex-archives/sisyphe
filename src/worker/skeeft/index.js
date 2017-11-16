@@ -45,6 +45,7 @@ worker.init = function(options) {
   });
   worker.extractors.fulltext.resources.sort = worker.resources.sort;
   worker.extractors.fulltext.resources.truncate = worker.resources.truncate;
+
   worker.LOGS = { // All logs available on this module
     "SUCCESS": "File created at ",
     "ERROR_TERMS": "Selected terms not found"
@@ -64,8 +65,8 @@ worker.doTheJob = function(data, next) {
   }
   // Errors & logs
   data[pkg.name] = {
-    errors: [],
-    logs: []
+    "errors": [],
+    "logs": []
   };
   // Get the filename (without extension)
   const documentId = path.basename(data.name, data.extension || worker.resources.parameters.input.extension);

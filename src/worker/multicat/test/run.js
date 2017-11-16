@@ -48,11 +48,11 @@ worker.init({
 // Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
-    description: pkg.name + "/index.js",
-    root: key,
-    object: objects[key],
-    dataset: datasets[key],
-    wrapper: wrappers[key]
+    "description": pkg.name + "/index.js",
+    "root": key,
+    "object": objects[key],
+    "dataset": datasets[key],
+    "wrapper": wrappers[key]
   });
   return callback();
 });

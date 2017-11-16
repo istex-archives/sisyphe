@@ -47,11 +47,11 @@ worker.init({
 // Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
-    description: pkg.name + "/index.js",
-    root: key,
-    object: objects[key],
-    dataset: datasets[key],
-    wrapper: wrappers[key]
+    "description": pkg.name + "/index.js",
+    "root": key,
+    "object": objects[key],
+    "dataset": datasets[key],
+    "wrapper": wrappers[key]
   });
   return callback();
 });
@@ -63,7 +63,7 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 function testOf_doTheJob(fn, item, cb) {
   return fn(data[item.key], function(err, res) {
     item.result.include = worker.LOGS[item.key]; // will contain the expected value
-    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1];  // will contain the returned value
+    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // will contain the returned value
     return cb(value);
   });
 }

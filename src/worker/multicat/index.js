@@ -39,8 +39,8 @@ worker.doTheJob = function(data, next) {
   }
   // Errors & logs
   data[pkg.name] = {
-    errors: [],
-    logs: []
+    "errors": [],
+    "logs": []
   };
   // Get the filename (without extension)
   const documentId = path.basename(data.name, data.extension ||  worker.resources.parameters.input.extension);
