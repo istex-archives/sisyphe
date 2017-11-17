@@ -67,55 +67,56 @@ Manufactory.final = function() {
 let saveFiles = []
 let saveDirectories = []
 const lot = 1000
-Manufactory.start = async function() {
+Manufactory.start = function() {
   let filesInLot = 0
   let nblots =0
   let walkerfs = this.dispatchers[0];
   let secondWorker = this.dispatchers[1];
-  if (this.firstStart) {
-    await walkerfs.tasks.add({ directory: this.pathToAnalyze });
-    walkerfs.on("result", async msg => {
-      let files = msg.data.files;
-      const directories = msg.data.directories;
-      if (filesInLot + files.length <= lot) {
-        filesInLot += +files.length
-        await addFiles(files)
-        await addDirectories(directories)
-      } else {
-        const complement = lot - filesInLot
-        filesInLot = lot;
-        await addFiles(files.splice(0, complement))
-        saveDirectories.push(...directories)
-        saveFiles.push(...files)
-      }
-    });
-  }
-
-  if (saveFiles.length >= lot) await addFiles(saveFiles.splice(0,lot))
-  else{
-    await addDirectories(saveDirectories)
-    await addFiles(saveFiles)
-    saveDirectories = []
-    saveFiles = []
-  }
-  if ((await walkerfs.tasks.getWaiting()).length) await walkerfs.start()
-  return Promise.each(this.dispatchers, async (dispatcher, index) => {
-    if (index === 0 ) return;
-    return dispatcher.start();
-  }).then(async _ => {
-    console.log('lot finish')
-    this.firstStart = false;
-    this.filesInLot = 0;  
-    if (saveFiles.length || saveDirectories.length) return this.start()
-  }).then(_=>{
-    console.log('complete')
+  return new Promise(async (resolve, reject) => {
+    if (this.firstStart) {
+      await walkerfs.tasks.add({ directory: this.pathToAnalyze });
+      walkerfs.on("result", async msg => {
+        let files = msg.data.files;
+        const directories = msg.data.directories;
+        if (filesInLot + files.length <= lot) {
+          filesInLot += +files.length
+          await addFiles(files)
+          await addDirectories(directories)
+        } else {
+          const complement = lot - filesInLot
+          filesInLot = lot;
+          await addFiles(files.splice(0, complement))
+          saveDirectories.push(...directories)
+          saveFiles.push(...files)
+        }
+      });
+    }
+  
+    if (saveFiles.length >= lot) await addFiles(saveFiles.splice(0,lot))
+    else{
+      await addDirectories(saveDirectories)
+      await addFiles(saveFiles)
+      saveDirectories = []
+      saveFiles = []
+    }
+    if ((await walkerfs.tasks.getWaiting()).length) await walkerfs.start()
+    return Promise.each(this.dispatchers, async (dispatcher, index) => {
+      if (index === 0 ) return;
+      return dispatcher.start();
+    }).then(async _ => {
+      this.firstStart = false;
+      this.filesInLot = 0;  
+      if (saveFiles.length || saveDirectories.length) return this.start()
+    }).then(_=>{
+      return resolve()
+    }).catch(err=>reject(err));
+    function addFiles(files) {
+      return Promise.map(files, file => secondWorker.tasks.add(file));
+    }
+    function addDirectories(directories) {
+      return Promise.map(directories, directory => walkerfs.tasks.add({directory}))
+    };
   });
-  function addFiles(files) {
-    return Promise.map(files, file => secondWorker.tasks.add(file));
-  }
-  function addDirectories(directories) {
-    return Promise.map(directories, directory => walkerfs.tasks.add({directory}))
-  };
 };
 /**
  * Create a Dispatchers, Tasks and bind them
