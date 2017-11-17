@@ -113,7 +113,7 @@ worker.doTheJob = function(data, next) {
         "pkg": pkg, // Infos on module packages
         "document": { // Data of document
           "id": documentId,
-          "terms": text.keywords
+          "keywords": text.keywords
         }
       },
       // Build path & filename of enrichment file
@@ -137,10 +137,13 @@ worker.doTheJob = function(data, next) {
       }
       // Create an Object representation of created enrichment
       const enrichment = {
-        "path": path.join(output.directory, output.filename),
-        "extension": worker.resources.enrichment.extension,
-        "original": worker.resources.enrichment.original,
-        "mimetype": worker.resources.output.mimetype
+        "keywords": text.keywords,
+        "output": {
+          "path": path.join(output.directory, output.filename),
+          "extension": worker.resources.enrichment.extension,
+          "original": worker.resources.enrichment.original,
+          "mimetype": worker.resources.output.mimetype
+        }
       };
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {

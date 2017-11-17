@@ -14,6 +14,6 @@ Parameters :
 
 ----------
 
-{{#document.terms}}
+{{#document.keywords}}
 {{term}} - {{frequency}} - {{specificity}}
-{{/document.terms}}
+{{/document.keywords}}
