@@ -166,7 +166,7 @@ worker.index = function(xmlString, selectors, criterion) {
     data = indexations.map(function(e, i) {
       return e.map(function(f, j) {
         return f.keywords.map(function(g, k) {
-          const key = selectors.segments[i] + ":nth-child(" + j + ")",
+          const key = selectors.segments[i] + ":nth-child(" + (j + 1) + ")",
             cp = extend({
               segment: key
             }, g);

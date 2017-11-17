@@ -14,6 +14,8 @@ let Matrix = function() {
   // 'this' reference
   let self = this;
 
+  self.BOOST = 50;
+
   /**
    * Init each values of this object
    * @param {Array} indexations Array filled with indexations of each segments
@@ -171,7 +173,7 @@ let Matrix = function() {
         let term = self.mapping[i][j];
         if (term) {
           let value = stats.FF.get([i, j]);
-          if (value >= stats.mFF.mean) {
+          if (value >= stats.mFF.mean || boost[term.term]) {
             if (!result[term.term]) {
               result[term.term] = {
                 "term": term.term,
@@ -188,7 +190,7 @@ let Matrix = function() {
             result[term.term].segments.push(term.segment);
             result[term.term].frequency += term.frequency;
             result[term.term].stats.sum += (value / stats.FF.get([i, termSize - 1]));
-            if (boost[term.term]) result[term.term].stats.boost = (result[term.term].stats.boost === 0) ? 500 : result[term.term].stats.boost;
+            if (boost[term.term]) result[term.term].stats.boost = (result[term.term].stats.boost === 0) ? self.BOOST : result[term.term].stats.boost;
             result[term.term].stats.frequency += 1;
           }
         }
@@ -196,7 +198,7 @@ let Matrix = function() {
     }
     // Calculate the factor of each result
     Object.keys(result).forEach(function(key) {
-      result[key].factor = (result[key].stats.sum / result[key].stats.frequency) + result[key].stats.boost;
+      result[key].factor = (result[key].stats.sum / result[key].stats.frequency) + (result[key].stats.boost * result[key].stats.frequency);
     });
     return result;
   };
