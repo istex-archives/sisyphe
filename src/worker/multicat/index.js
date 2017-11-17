@@ -108,10 +108,13 @@ worker.doTheJob = function(data, next) {
       }
       // Create an Object representation of created enrichment
       const enrichment = {
-        "path": path.join(output.directory, output.filename),
-        "extension": worker.resources.enrichment.extension,
-        "original": worker.resources.enrichment.original,
-        "mimetype": worker.resources.output.mimetype
+        "categories" : categories,
+        "output": {
+          "path": path.join(output.directory, output.filename),
+          "extension": worker.resources.enrichment.extension,
+          "original": worker.resources.enrichment.original,
+          "mimetype": worker.resources.output.mimetype
+        }
       };
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
