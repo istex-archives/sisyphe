@@ -37,6 +37,7 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
     -s, --select <name>         Select all module to deal with
     -c, --config-dir <path>     Configuration folder path
     -t, --thread <number>       The number of process which sisyphe will take
+    -b, --bundle <number>       Regroup jobs in bundle of jobs
     -r, --remove-module <name>  Remove module name from the workflow
     -q, --quiet                 Silence output
     -l, --list                  List all available workers
