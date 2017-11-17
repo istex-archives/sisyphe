@@ -103,10 +103,12 @@ Manufactory.start = async function() {
     if (index === 0 ) return;
     return dispatcher.start();
   }).then(async _ => {
-    console.log('finiiish')
+    console.log('lot finish')
     this.firstStart = false;
     this.filesInLot = 0;  
-    return this.start();
+    if (saveFiles.length || saveDirectories.length) return this.start()
+  }).then(_=>{
+    console.log('complete')
   });
   function addFiles(files) {
     return Promise.map(files, file => secondWorker.tasks.add(file));

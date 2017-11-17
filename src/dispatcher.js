@@ -120,7 +120,10 @@ Dispatcher.start = function () {
         delete overseer.fork._events.exit;
         delete overseer.fork._events.result
       });
-      delete this._events.stop;
+      if (Array.isArray(this._events.stop)) {
+        // console.log(this._events.stop)
+        delete this._events.stop.pop();
+      }
       this.tasks.pause()
       resolve();
     });
