@@ -122,15 +122,15 @@ sisyphe.launch = function() {
           process.stdout.write(" ==> " + currentWorker + " has finished\n");
         await monitoring.updateLog("info", currentWorker + " has finished");
         if (currentWorker === lastWorker) {
-          if (!this.session.silent)
-            console.log("└ All workers have completed their work");
-          await monitoring.updateLog(
-            "info",
-            "All workers have completed their work"
-          );
-          await client.hmsetAsync("monitoring", "end", Date.now());
-          await this.enterprise.exit()
-          this.exit();
+          // if (!this.session.silent)
+          //   console.log("└ All workers have completed their work");
+          // await monitoring.updateLog(
+          //   "info",
+          //   "All workers have completed their work"
+          // );
+          // await client.hmsetAsync("monitoring", "end", Date.now());
+          // await this.enterprise.exit()
+          // this.exit();
         }
       });
       dispatcher.on("error", async error => {

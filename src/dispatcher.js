@@ -115,14 +115,22 @@ Dispatcher.start = function () {
     });
     this.on('stop', async () => {
       await this.final();
-      this.killAllPatients();
+      this.patients.map(overseer => {
+        delete overseer.fork._events.message
+        delete overseer.fork._events.exit;
+        delete overseer.fork._events.result
+      });
+      delete this._events.stop;
+      this.tasks.pause()
       resolve();
     });
-    this.tasks.process(job => {
-      return this.getPatient().then(overseer => {
-        return overseer.send(job.data);
+    if (!this.tasks.queue._initializingProcess) {
+      this.tasks.process(job => {
+        return this.getPatient().then(overseer => {
+          return overseer.send(job.data);
+        }).catch(err=>{console.log(err)});
       });
-    });
+    } else this.tasks.resume()
   });
 };
 
