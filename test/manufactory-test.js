@@ -64,7 +64,8 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
           enterprise.bindDispatchers();
           enterprise.dispatchers.map((dispatcher, index, array) => {
             const isLastDispatcher = array.length === index + 1;
-            if (isLastDispatcher) {
+            const isFirstDispatcher = index === 0;
+            if (isLastDispatcher || isFirstDispatcher) {
               expect(dispatcher.listenerCount('result')).to.equal(0);
             } else {
               expect(dispatcher.listenerCount('result')).to.equal(1);
@@ -80,7 +81,8 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
       return enterprise.init().addWorker('walker-fs').addWorker('dumbWorker').initializeWorkers().then(() => {
         enterprise.dispatchers.map((dispatcher, index, array) => {
           const isLastDispatcher = array.length === index + 1;
-          if (isLastDispatcher) {
+          const isFirstDispatcher = index === 0;
+          if (isLastDispatcher || isFirstDispatcher) {
             expect(dispatcher.listenerCount('result')).to.equal(0);
           } else {
             expect(dispatcher.listenerCount('result')).to.equal(1);

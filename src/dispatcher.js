@@ -121,7 +121,6 @@ Dispatcher.start = function () {
         delete overseer.fork._events.result
       });
       if (Array.isArray(this._events.stop)) {
-        // console.log(this._events.stop)
         delete this._events.stop.pop();
       }
       this.tasks.pause()
@@ -133,7 +132,8 @@ Dispatcher.start = function () {
           return overseer.send(job.data);
         }).catch(err=>{console.log(err)});
       });
-    } else this.tasks.resume()
+    }
+    this.tasks.resume()
   });
 };
 

@@ -67,7 +67,6 @@ sisyphe.init = function(session) {
     this.session = session;
     if (!session.hasOwnProperty("now")) session.now = Date.now();
     if (!session.hasOwnProperty("silent")) session.silent = false;
-    if (!session.bundle) session.bundle = Infinity
     await client.flushallAsync();
     await client.hmsetAsync(
       "monitoring",

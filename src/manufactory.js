@@ -28,6 +28,7 @@ Manufactory.init = function(
   this.numCPUs = options.numCPUs;
   this.firstStart = true;
   this.nbFiles = 0;
+  this.bundle = options.bundle ? options.bundle : Infinity
   return this;
 };
 
@@ -76,21 +77,21 @@ Manufactory.start = function() {
       walkerfs.on("result", async msg => {
         let files = msg.data.files;
         const directories = msg.data.directories;
-        if (filesInBundle + files.length <= this.options.bundle) {
+        if (filesInBundle + files.length <= this.bundle) {
           filesInBundle += +files.length
           await addFiles(files)
           await addDirectories(directories)
         } else {
-          const complement = this.options.bundle - filesInBundle
-          filesInBundle = this.options.bundle;
+          const complement = this.bundle - filesInBundle
+          filesInBundle = this.bundle;
           await addFiles(files.splice(0, complement))
           saveDirectories.push(...directories)
           saveFiles.push(...files)
         }
       });
     }
-  
-    if (saveFiles.length >= this.options.bundle) await addFiles(saveFiles.splice(0,this.options.bundle))
+    
+    if (saveFiles.length >= this.bundle) await addFiles(saveFiles.splice(0,this.bundle))
     else{
       await addDirectories(saveDirectories)
       await addFiles(saveFiles)
@@ -104,7 +105,7 @@ Manufactory.start = function() {
     }).then(async _ => {
       this.firstStart = false;
       this.filesInBundle = 0;  
-      if (saveFiles.length || saveDirectories.length) return this.start()
+      if (saveFiles.length || saveDirectories.length || await (walkerfs.tasks.getWaiting().length)) return this.start()
     }).then(_=>{
       return resolve()
     }).catch(err=>reject(err));
