@@ -67,8 +67,7 @@ Manufactory.final = function() {
 let saveFiles = []
 let saveDirectories = []
 Manufactory.start = function() {
-  let filesInLot = 0
-  let nblots =0
+  let filesInBundle = 0
   let walkerfs = this.dispatchers[0];
   let secondWorker = this.dispatchers[1];
   return new Promise(async (resolve, reject) => {
@@ -77,13 +76,13 @@ Manufactory.start = function() {
       walkerfs.on("result", async msg => {
         let files = msg.data.files;
         const directories = msg.data.directories;
-        if (filesInLot + files.length <= this.options.bundle) {
-          filesInLot += +files.length
+        if (filesInBundle + files.length <= this.options.bundle) {
+          filesInBundle += +files.length
           await addFiles(files)
           await addDirectories(directories)
         } else {
-          const complement = this.options.bundle - filesInLot
-          filesInLot = this.options.bundle;
+          const complement = this.options.bundle - filesInBundle
+          filesInBundle = this.options.bundle;
           await addFiles(files.splice(0, complement))
           saveDirectories.push(...directories)
           saveFiles.push(...files)
@@ -104,7 +103,7 @@ Manufactory.start = function() {
       return dispatcher.start();
     }).then(async _ => {
       this.firstStart = false;
-      this.filesInLot = 0;  
+      this.filesInBundle = 0;  
       if (saveFiles.length || saveDirectories.length) return this.start()
     }).then(_=>{
       return resolve()
