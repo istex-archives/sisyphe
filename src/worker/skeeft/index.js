@@ -77,10 +77,10 @@ worker.doTheJob = function(data, next) {
       data[pkg.name].errors.push(err.toString());
       return next(null, data);
     }
-    // Get the terms exrated by skeeft
-    const terms = worker.index(modsStr, worker.resources.parameters.selectors, worker.resources.parameters.criterion);
+    // Get the keywords exrated by skeeft
+    const keywords = worker.index(modsStr, worker.resources.parameters.selectors, worker.resources.parameters.criterion);
     // If there is no term extracted
-    if (terms.length === 0) {
+    if (keywords.length === 0) {
       data[pkg.name].logs.push(documentId + "\t" + worker.LOGS.ERROR_TERMS);
       return next(null, data);
     }
@@ -93,7 +93,7 @@ worker.doTheJob = function(data, next) {
         "pkg": pkg, // Infos on module packages
         "document": { // Data of document
           "id": documentId,
-          "terms": terms // Selected terms
+          "keywords": keywords // Selected keywords
         }
       },
       // Build path & filename of enrichment file
@@ -117,14 +117,19 @@ worker.doTheJob = function(data, next) {
       }
       // Create an Object representation of created enrichment
       const enrichment = {
-        "path": path.join(output.directory, output.filename),
-        "extension": worker.resources.enrichment.extension,
-        "original": worker.resources.enrichment.original,
-        "mimetype": worker.resources.output.mimetype
+        "categories": keywords,
+        "output": {
+          "path": path.join(output.directory, output.filename),
+          "extension": worker.resources.enrichment.extension,
+          "original": worker.resources.enrichment.original,
+          "mimetype": worker.resources.output.mimetype
+        }
       };
       // Save enrichments in data
       data.enrichments = utils.enrichments.save(data.enrichments, {
-        "enrichment": enrichment,
+        "enrichment": {
+          enrichment
+        },
         "label": worker.resources.module.label
       });
       // All clear
@@ -139,32 +144,44 @@ worker.doTheJob = function(data, next) {
  * @param {String} xmlString Fulltext (XML formated string)
  * @param {Object} selectors Used selectors
  * @param {String} criterion Criterion used (sort)
- * @return {Array} List of extracted terms
+ * @return {Array} List of extracted keywords
  */
 worker.index = function(xmlString, selectors, criterion) {
   const $ = utils.XML.load(xmlString),
+    _selectors = {
+      "title": selectors.title,
+      "segments": {}
+    },
     titleWords = worker.extractors.title.extractor.extract(
       worker.extractors.title.lemmatize(
         worker.extractors.title.tagger.tag(worker.extractors.title.tokenize($(selectors.title).text()))
       )
-    ), // Get terms in title (weighting)
+    ), // Get keywords in title (weighting)
     indexations = selectors.segments.map(function(el, i) {
-      return worker.extractors.fulltext.index($(el).text());
-    }), // Get terms for each parts of fulltext
-    data = indexations.map(function(el, i) {
-      return el.keywords.map(function(e, j) {
-        let cp = extend({
-            segment: selectors.segments[i]
-          },
-          e
-        );
-        return cp;
-      });
+      return $(el).map(function(j, e) {
+        // return $(e).text();
+        return worker.extractors.fulltext.index($(e).text());
+      }).get();
+    }), // Get keywords for each parts of fulltext
+    data = indexations.map(function(e, i) {
+      return e.map(function(f, j) {
+        return f.keywords.map(function(g, k) {
+          const key = selectors.segments[i] + ":nth-child(" + j + ")",
+            cp = extend({
+              segment: key
+            }, g);
+          _selectors.segments[key] = true;
+          return cp;
+        });
+      }).reduce(function(acc, cur) {
+        return acc.concat(cur);
+      }, []);
     }).reduce(function(acc, cur) {
       return acc.concat(cur);
-    }, []), // Regroup terms
+    }, []), // Regroup keywords
     m = new Matrix(); // Matrix of text representation
-  m.init(data, selectors);
+  _selectors.segments = Object.keys(_selectors.segments);
+  m.init(data, _selectors);
   const filled = m.fill(criterion),
     stats = m.stats(filled),
     select = m.select(stats, titleWords),

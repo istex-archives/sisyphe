@@ -155,7 +155,7 @@ let Matrix = function() {
   };
 
   /**
-   * Retourne les catégories calculées par le Bayésien Naïf
+   * -----
    * @param {Object} stats Statistics of Text (result of Matrix.stats())
    * @param {Object} boost List of boosted terms (Object with key = term)
    * @return {Object} Return an object with selected terms
@@ -174,19 +174,30 @@ let Matrix = function() {
           if (value >= stats.mFF.mean) {
             if (!result[term.term]) {
               result[term.term] = {
-                term: term.term,
-                segments: [],
-                frequency: 0,
-                factor: 0
+                "term": term.term,
+                "segments": [],
+                "frequency": 0,
+                "factor": 0,
+                "stats": {
+                  "sum": 0,
+                  "boost": 0,
+                  "frequency": 0
+                }
               };
             }
             result[term.term].segments.push(term.segment);
             result[term.term].frequency += term.frequency;
-            result[term.term].factor += (value / stats.FF.get([i, termSize - 1])) + (boost[term.term] ? 500 : 0);
+            result[term.term].stats.sum += (value / stats.FF.get([i, termSize - 1]));
+            if (boost[term.term]) result[term.term].stats.boost = (result[term.term].stats.boost === 0) ? 500 : result[term.term].stats.boost;
+            result[term.term].stats.frequency += 1;
           }
         }
       }
     }
+    // Calculate the factor of each result
+    Object.keys(result).forEach(function(key) {
+      result[key].factor = (result[key].stats.sum / result[key].stats.frequency) + result[key].stats.boost;
+    });
     return result;
   };
 

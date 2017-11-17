@@ -18,6 +18,6 @@ Parameters :
 
 ----------
 
-{{#document.terms}}
-{{term}} - {{structure}} - {{frequency}} - {{factor}}
-{{/document.terms}}
+{{#document.keywords}}
+{{term}} - {{segments}} - {{frequency}} - {{factor}}
+{{/document.keywords}}
