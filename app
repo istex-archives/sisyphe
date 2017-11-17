@@ -19,6 +19,7 @@ program
   .option("-s, --select <name>", "Select all module to deal with")
   .option("-c, --config-dir <path>", "Configuration folder path")
   .option("-t, --thread <number>", "The number of process which sisyphe will take")
+  .option("-b, --bundle <number>", "Regroup jobs in bundle of jobs")
   .option("-r, --remove-module <name>", "Remove module name from the workflow", appender(), [])
   .option("-q, --quiet", "Silence output", false)
   .option("-l, --list", "List all available workers", false)
@@ -86,7 +87,8 @@ const session = {
   debugPort,
   outputPath: path.resolve(`./out`, now.toString() + "-" + program.corpusname),
   workers,
-  silent: program.quiet
+  silent: program.quiet,
+  bundle: program.bundle
 };
 
 /*****************/

@@ -66,7 +66,6 @@ Manufactory.final = function() {
  */
 let saveFiles = []
 let saveDirectories = []
-const lot = 1000
 Manufactory.start = function() {
   let filesInLot = 0
   let nblots =0
@@ -78,13 +77,13 @@ Manufactory.start = function() {
       walkerfs.on("result", async msg => {
         let files = msg.data.files;
         const directories = msg.data.directories;
-        if (filesInLot + files.length <= lot) {
+        if (filesInLot + files.length <= this.options.bundle) {
           filesInLot += +files.length
           await addFiles(files)
           await addDirectories(directories)
         } else {
-          const complement = lot - filesInLot
-          filesInLot = lot;
+          const complement = this.options.bundle - filesInLot
+          filesInLot = this.options.bundle;
           await addFiles(files.splice(0, complement))
           saveDirectories.push(...directories)
           saveFiles.push(...files)
@@ -92,7 +91,7 @@ Manufactory.start = function() {
       });
     }
   
-    if (saveFiles.length >= lot) await addFiles(saveFiles.splice(0,lot))
+    if (saveFiles.length >= this.options.bundle) await addFiles(saveFiles.splice(0,this.options.bundle))
     else{
       await addDirectories(saveDirectories)
       await addFiles(saveFiles)
