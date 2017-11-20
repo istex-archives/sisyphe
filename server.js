@@ -101,6 +101,7 @@ app.post("/launch", async function(req, res) {
     if (command.name) commandArray.push("-n", command.name);
     if (command.config) commandArray.push("-c", command.config);
     if (command.workers) commandArray.push("-s", command.workers);
+    if (command.bundle) commandArray.push("-b", command.bundle);
     if (command.path) commandArray.push(command.path);
     if (!command.debug) commandArray.push("-q");
     console.log(`launch: ${commandArray}`);
