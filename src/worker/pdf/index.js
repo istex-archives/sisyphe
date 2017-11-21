@@ -10,7 +10,9 @@ if(os.platform() === 'darwin' || os.platform() === 'linux'){
 }
 
 sisyphePdf.init = function (options) {
-  this.myPdfModule.init(options);
+  if(os.platform() === 'darwin' || os.platform() === 'linux'){
+    this.myPdfModule.init(options);
+  }
 };
 
 sisyphePdf.doTheJob = function (docObject, next) {
