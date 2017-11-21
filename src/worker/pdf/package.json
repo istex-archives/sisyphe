@@ -8,9 +8,12 @@
   },
   "author": "",
   "license": "MIT",
+  "optionalDependencies": {
+    "popplonode": "^1.8.1"
+  },
   "dependencies": {
     "bluebird": "^3.5.0",
-    "popplonode": "^1.7.2",
+    "pdfjs-dist": "^2.0.142",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
