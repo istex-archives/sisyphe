@@ -11,6 +11,7 @@ Parameters :
 
 ----------
 
+level - code (verbalization) - probability
 {{#document.categories}}
 {{level}} - {{code}} ({{verbalization}}) - {{probability}}
 {{/document.categories}}

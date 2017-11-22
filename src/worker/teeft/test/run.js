@@ -1,67 +1,37 @@
 /* global module */
 /* jslint node: true */
 /* jslint indent: 2 */
-'use strict';
+"use strict";
 
-const pkg = require('../package.json'),
-  worker = require('../index.js'),
-  Tagger = require('../lib/tagger.js'),
-  lexicon = require('../lib/lexicon.js'),
-  DefaultFilter = require('../lib/defaultfilter.js'),
-  TermExtraction = require('../lib/termextractor.js'),
-  fs = require('fs'),
-  Lemmatizer = require('javascript-lemmatizer'),
-  async = require('async'),
-  TU = require('auto-tu');
+const pkg = require("../package.json"),
+  worker = require("../index.js"),
+  Tagger = require("../lib/tagger.js"),
+  lexicon = require("../lib/lexicon.js"),
+  DefaultFilter = require("../lib/defaultfilter.js"),
+  TermExtraction = require("../lib/termextractor.js"),
+  fs = require("fs"),
+  Lemmatizer = require("javascript-lemmatizer"),
+  async = require("async"),
+  TU = require("auto-tu");
 
 // Tagger + filter + extractor + lemmatizer
 const tagger = new Tagger(lexicon),
   filter = new DefaultFilter(),
   extractor = new TermExtraction({
-    'filter': filter
+    "filter": filter
   }),
   lemmatizer = new Lemmatizer();
 
 // Test dataset for each tested function
-const data = require('./dataset/in/data.json'),
+const data = require("./dataset/in/data.json"),
   originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
-    'worker': require('./dataset/in/test.worker.json'),
-    'tagger': require('./dataset/in/test.tagger.json'),
-    'filter': require('./dataset/in/test.filter.json'),
-    'extractor': require('./dataset/in/test.extractor.json')
+    "worker": require("./dataset/in/test.worker.json"),
+    "teeft": require("./dataset/in/test.teeft.json"),
+    "tagger": require("./dataset/in/test.tagger.json"),
+    "filter": require("./dataset/in/test.filter.json"),
+    "extractor": require("./dataset/in/test.extractor.json")
   };
-
-// Wrappers used for each tested function
-const wrappers = {
-  'worker': {
-    'doTheJob': testOf_doTheJob,
-    'load': testOf_load,
-    'index': testOf_index,
-    'tokenize': null,
-    'translateTag': testOf_translateTag,
-    'sanitize': testOf_sanitize,
-    'lemmatize': null
-  },
-  'tagger': {
-    'tag': null
-  },
-  'filter': {
-    'configure': testOf_configure,
-    'call': testOf_call
-  },
-  'extractor': {
-    'extract': testOf_extract
-  }
-};
-
-// Tested object (only functions are "automatically" tested)
-const objects = {
-  'worker': worker,
-  'tagger': tagger,
-  'filter': filter,
-  'extractor': extractor
-};
 
 // Call of init function (shoulb be done by sisyphe usually)
 worker.init({
@@ -70,10 +40,46 @@ worker.init({
   "sharedConfigDir": "test/dataset/in/shared"
 });
 
+// Wrappers used for each tested function
+const wrappers = {
+  "worker": {
+    "doTheJob": testOf_doTheJob,
+    "load": testOf_load
+  },
+  "teeft": {
+    "index": testOf_index,
+    "tokenize": null,
+    "translateTag": testOf_translateTag,
+    "sanitize": testOf_sanitize,
+    "lemmatize": null
+  },
+  "tagger": {
+    "tag": null
+  },
+  "filter": {
+    "configure": testOf_configure,
+    "call": testOf_call
+  },
+  "extractor": {
+    "extract": testOf_extract
+  }
+};
+
+// Tested object (only functions are "automatically" tested)
+const objects = {
+  "worker": worker,
+  "teeft": worker.teeft,
+  "tagger": tagger,
+  "filter": filter,
+  "extractor": extractor
+};
+
 /**
  * Test of functions of :
  *   - worker :
  *     - doTheJob()
+ *     - init()
+ *   - teeft :
  *     - tokenize()
  *     - translateTag()
  *     - sanitize()
@@ -82,13 +88,14 @@ worker.init({
  *     - tag()
  *   - filer :
  *     - configure()
+ *     - call()
  *   - extractor :
  *     - extract()
  */
 // Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
-    description: pkg.name + '/index.js',
+    description: pkg.name + "/index.js",
     root: key,
     object: objects[key],
     dataset: datasets[key],
@@ -104,20 +111,8 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 function testOf_doTheJob(fn, item, cb) {
   return fn(data[item.key], function(err, res) {
     item.result.include = worker.LOGS[item.key]; // will contain the expected value
-    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1];  // will contain the returned value
+    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // will contain the returned value
     return cb(value);
-  });
-}
-
-/**
- * Wrapper of :
- * - worker.index()
- */
-function testOf_index(fn, item, cb) {
-  fs.readFile(item.arguments.path, 'utf-8', function(err, res) {
-    if (err) throw err;
-    const result = fn(res);
-    return cb(result.keywords);
   });
 }
 
@@ -133,7 +128,19 @@ function testOf_load(fn, item, cb) {
 
 /**
  * Wrapper of :
- * - worker.translateTag()
+ * - teeft.index()
+ */
+function testOf_index(fn, item, cb) {
+  fs.readFile(item.arguments.path, "utf-8", function(err, res) {
+    if (err) throw err;
+    const result = fn(res);
+    return cb(result.keywords);
+  });
+}
+
+/**
+ * Wrapper of :
+ * - teeft.translateTag()
  */
 function testOf_translateTag(fn, item, cb) {
   // Get all tags in lexicon
@@ -151,11 +158,11 @@ function testOf_translateTag(fn, item, cb) {
 
 /**
  * Wrapper of :
- * - worker.sanitize()
+ * - teeft.sanitize()
  */
 function testOf_sanitize(fn, item, cb) {
   const value = fn(item.arguments),
-    invalid = worker.tagger.tag(worker.SEPARATOR)[0],
+    invalid = worker.teeft.tagger.tag(worker.teeft.SEPARATOR)[0],
     result = value.reduce(function(sum, current) {
       if (current.tag === invalid.tag) {
         return sum + 1;

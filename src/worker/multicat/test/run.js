@@ -6,6 +6,7 @@
 /* Module Require */
 const pkg = require("../package.json"),
   worker = require("../index.js"),
+  Classifier = require("../lib/classifier.js"),
   path = require("path"),
   async = require("async"),
   TU = require("auto-tu");
@@ -14,22 +15,9 @@ const pkg = require("../package.json"),
 const data = require("./dataset/in/data.json"),
   originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
-    "worker": require("./dataset/in/test.worker.json")
+    "worker": require("./dataset/in/test.worker.json"),
+    "classifier": require("./dataset/in/test.classifier.json")
   };
-
-// Wrappers used for each tested function
-const wrappers = {
-  "worker": {
-    "doTheJob": testOf_doTheJob,
-    "categorize": testOf_categorize,
-    "load": testOf_load
-  }
-};
-
-// Tested object (only functions are "automatically" tested)
-const objects = {
-  "worker": worker
-};
 
 // Call of init function (shoulb be done by sisyphe usually)
 worker.init({
@@ -38,21 +26,38 @@ worker.init({
   "sharedConfigDir": "test/dataset/in/shared"
 });
 
+// Wrappers used for each tested function
+const wrappers = {
+  "worker": {
+    "doTheJob": testOf_doTheJob,
+    "load": testOf_load
+  },
+  "classifier": {
+    "classify": testOf_classify,
+  }
+};
+
+// Tested object (only functions are "automatically" tested)
+const objects = {
+  "worker": worker,
+  "classifier": worker.classifier
+};
+
 /**
  * Test of functions of :
  *   - worker :
  *     - doTheJob()
- *     - categorize()
+ *     - classify()
  *     - load()
  */
 // Test loop
 async.eachSeries(Object.keys(datasets), function(key, callback) {
   TU.start({
-    description: pkg.name + "/index.js",
-    root: key,
-    object: objects[key],
-    dataset: datasets[key],
-    wrapper: wrappers[key]
+    "description": pkg.name + "/index.js",
+    "root": key,
+    "object": objects[key],
+    "dataset": datasets[key],
+    "wrapper": wrappers[key]
   });
   return callback();
 });
@@ -71,18 +76,18 @@ function testOf_doTheJob(fn, item, cb) {
 
 /**
  * Wrapper of :
- * - worker.categorize()
- */
-function testOf_categorize(fn, item, cb) {
-  return cb(fn(item.arguments.identifier, item.arguments.table));
-}
-
-/**
- * Wrapper of :
  * - worker.load()
  */
 function testOf_load(fn, item, cb) {
   item.arguments.options.config = (item.arguments.options.config) ? JSON.parse(JSON.stringify(originalConfigTest)) : {}; // If we need a config in this test, we will use the configTest
   const value = fn(item.arguments.options);
   return cb(Object.keys(value.tables));
+}
+
+/**
+ * Wrapper of :
+ * - classifier.classify()
+ */
+function testOf_classify(fn, item, cb) {
+  return cb(fn(item.arguments.identifier, item.arguments.table));
 }

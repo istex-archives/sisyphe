@@ -64,22 +64,5 @@
     "result": {
       "length": 0
     }
-  }],
-  "categorize": [{
-    "label": "Devrait renvoyer une ou plusieurs catégorie(s)",
-    "arguments": {
-      "path": "./test/dataset/in/corpus/SUCCESS.txt"
-    },
-    "result": {
-      "length": 1
-    }
-  }, {
-    "label": "Devrait renvoyer aucune catégorie",
-    "arguments": {
-      "path": "./test/dataset/in/corpus/CATEGORY_NOT_FOUND.txt"
-    },
-    "result": {
-      "length": 0
-    }
   }]
 }

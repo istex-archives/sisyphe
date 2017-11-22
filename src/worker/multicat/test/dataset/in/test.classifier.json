@@ -1,0 +1,21 @@
+{
+  "classify": [{
+    "label": "Devrait renvoyer une ou plusieurs catégorie(s)",
+    "arguments": {
+      "identifier": "0049-4488",
+      "table": "test"
+    },
+    "result": {
+      "length": 1
+    }
+  }, {
+    "label": "Devrait renvoyer aucune catégorie WoS",
+    "arguments": {
+      "identifier": "invalid-issn",
+      "table": "test"
+    },
+    "result": {
+      "length": 0
+    }
+  }]
+}
