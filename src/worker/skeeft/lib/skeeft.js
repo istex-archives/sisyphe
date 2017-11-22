@@ -19,14 +19,20 @@ const Skeeft = function(options) {
     "filters": {
       "title": null,
       "fulltext": null
-    }
+    },
+    "dictionary": {},
+    "stopwords": {}
   };
   this.teeft = {
     "title": new Teeft({
-      "filter": (options && options.filters && options.filters.title) ? options.filters.title : DEFAULT.filters.title
+      "filter": (options && options.filters && options.filters.title) ? options.filters.title : DEFAULT.filters.title,
+      "dictionary": (options && options.dictionary) ? options.dictionary : DEFAULT.dictionary,
+      "stopwords": (options && options.stopwords) ? options.stopwords : DEFAULT.stopwords,
     }),
     "fulltext": new Teeft({
-      "filter": (options && options.filters && options.filters.fulltext) ? options.filters.fulltext : DEFAULT.filters.fulltext
+      "filter": (options && options.filters && options.filters.fulltext) ? options.filters.fulltext : DEFAULT.filters.fulltext,
+      "dictionary": (options && options.dictionary) ? options.dictionary : DEFAULT.dictionary,
+      "stopwords": (options && options.stopwords) ? options.stopwords : DEFAULT.stopwords,
     })
   };
   this.filters = {

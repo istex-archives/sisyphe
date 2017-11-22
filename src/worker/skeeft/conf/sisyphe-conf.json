@@ -58,6 +58,8 @@
     "resources": "teeft"
   },
   "template": "",
+  "stopwords": {},
+  "dictionary": {},
   "output": {
     "extension": ".txt",
     "mimetype": "text/plain",

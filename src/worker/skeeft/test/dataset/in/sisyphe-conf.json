@@ -59,6 +59,8 @@
       "resources": "teeft"
     },
     "template": "fragment.tpl",
+    "stopwords": "stopwords.json",
+    "dictionary": "dictionary.json",
     "output": {
       "extension": ".txt",
       "mime": "text/plain",
