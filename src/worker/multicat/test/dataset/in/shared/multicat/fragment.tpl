@@ -8,6 +8,7 @@ Parameters :
 
 ----------
 
+level - value
 {{#document.categories}}
   {{#values}}
     {{#.}}
