@@ -9,11 +9,12 @@ Parameters :
   - truncate : {{parameters.truncate}}
   - sort : {{parameters.sort}}
   - filter :
-    - minOccur : {{parameters.filter.minOccur}}
-    - noLimitStrength : {{parameters.filter.noLimitStrength}}
+    - minOccur : {{filter.minOccur}}
+    - noLimitStrength : {{filter.noLimitStrength}}
 
 ----------
 
+term - frequency - specificity
 {{#document.keywords}}
 {{term}} - {{frequency}} - {{specificity}}
 {{/document.keywords}}

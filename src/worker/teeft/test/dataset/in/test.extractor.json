@@ -33,7 +33,7 @@
       "lemma": "are"
     }],
     "result": {
-      "length": 1
+      "length": 3
     }
   }, {
     "label": "Devrait extraire un mono-terme (par défaut)",
@@ -55,7 +55,7 @@
       "lemma": "usefull"
     }],
     "result": {
-      "length": 1
+      "length": 4
     }
   }]
 }

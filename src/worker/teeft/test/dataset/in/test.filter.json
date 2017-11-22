@@ -1,13 +1,13 @@
 {
   "configure": [{
-    "label": "Devrait renvoyer la valeur null",
+    "label": "Should return null",
     "arguments": ["a", {}],
     "values": [null, null],
     "result": {
       "equal": true
     }
   }, {
-    "label": "Devrait renvoyer un integer",
+    "label": "Should return an integer (default case)",
     "arguments": [1, 2000, 100000],
     "values": [1, 4, 7],
     "result": {
@@ -15,7 +15,7 @@
     }
   }],
   "call": [{
-    "label": "Devrait renvoyer true (par défaut)",
+    "label": "Should return true (default case)",
     "arguments": {
       "occur": 10,
       "length": 1
@@ -24,7 +24,7 @@
       "equal": true
     }
   }, {
-    "label": "Devrait renvoyer true (par défaut)",
+    "label": "Should return true (default case)",
     "arguments": {
       "occur": 3,
       "length": 2
@@ -33,7 +33,7 @@
       "equal": true
     }
   }, {
-    "label": "Devrait renvoyer false (par défaut)",
+    "label": "Should return false (default case)",
     "arguments": {
       "occur": 10,
       "length": 1
