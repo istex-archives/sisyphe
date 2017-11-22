@@ -1,23 +1,22 @@
 Fichier générée le {{date}}
-{{pkg.name}} - v{{pkg.version}} - {{module.resources}}
+{{pkg.name}} - v{{pkg.version}} - {{module.resource}}
 
 Parameters :
   - input : (target file)
-    - mimetype : {{{parameters.mime}}}
-    - extension : {{{parameters.extension}}}
+    - mimetype : {{{parameters.input.mimetype}}}
+    - extension : {{{parameters.input.extension}}}
   - language : {{parameters.lang}}
-  - truncate : {{parameters.truncate}}
-  - sort : {{parameters.sort}}
   - filters :
     - title :
-      - minOccur : {{parameters.filters.title.minOccur}}
-      - noLimitStrength : {{parameters.filters.title.noLimitStrength}}
+      - minOccur : {{filters.title.minOccur}}
+      - noLimitStrength : {{filters.title.noLimitStrength}}
     - fulltext :
-      - minOccur : {{parameters.filters.fulltext.minOccur}}
-      - noLimitStrength : {{parameters.filters.fulltext.noLimitStrength}}
+      - minOccur : {{filters.fulltext.minOccur}}
+      - noLimitStrength : {{filters.fulltext.noLimitStrength}}
 
 ----------
 
+term - segments - frequency - factor
 {{#document.keywords}}
 {{term}} - {{segments}} - {{frequency}} - {{factor}}
 {{/document.keywords}}

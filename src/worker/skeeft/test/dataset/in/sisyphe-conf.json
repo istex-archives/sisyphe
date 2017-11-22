@@ -6,8 +6,6 @@
         "extension": ".xml"
       },
       "lang": "en",
-      "truncate": true,
-      "sort": true,
       "selectors": {
         "title": "title",
         "segments": [
