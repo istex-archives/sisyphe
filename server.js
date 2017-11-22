@@ -7,7 +7,10 @@ const fs = Promise.promisifyAll(require("fs"));
 var bodyParser = require("body-parser");
 const { spawn } = require("child_process");
 const GitManager = require("gitmanager");
-const gitManager = new GitManager();
+let gitManager
+try {
+  gitManager = new GitManager();
+} catch (error) {}
 let sisyphe = null;
 var app = express();
 app.use(serveStatic(path.join(__dirname, "out")));
