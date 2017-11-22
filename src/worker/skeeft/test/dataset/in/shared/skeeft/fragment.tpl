@@ -1,5 +1,5 @@
 Fichier générée le {{date}}
-{{pkg.name}} - v{{pkg.version}} - {{module.resource}}
+{{pkg.name}} - v{{pkg.version}} - {{module.resources}}
 
 Parameters :
   - input : (target file)

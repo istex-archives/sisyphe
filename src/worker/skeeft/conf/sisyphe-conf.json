@@ -55,7 +55,7 @@
       "id": "istex-rd",
       "label": "ISTEX-RD"
     },
-    "resource": "teeft"
+    "resources": "teeft"
   },
   "template": "",
   "output": {
