@@ -104,17 +104,17 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
         .addWorker('dumbWorker')
         .initializeWorkers()
         .then(() => {
-          let firstresult = true
+          let firstresult = true;
           enterprise.dispatchers[1].on('result', msg => {
             expect(msg).to.have.property('type');
             expect(msg).to.have.property('data');
             expect(msg.data).to.be.an('object');
             if (firstresult) {
-              firstresult = false
-              done()
+              firstresult = false;
+              done();
             }
           });
-          return enterprise.start()
+          return enterprise.start();
         });
     });
   });

@@ -28,7 +28,7 @@ Task.add = function (obj) {
   return this.queue.add(obj, {removeOnComplete: true, attempts: 200000});
 };
 
-Task.process = async function(fun, queue) {
+Task.process = async function (fun, queue) {
   return this.queue.process(fun);
   // console.log('lkj')
   // if (!this.queue) {
@@ -40,16 +40,16 @@ Task.process = async function(fun, queue) {
   //   if (job) await fun(job).catch(err=>{});
   // }
   // process.bind(this, fun, this.queue)()
-}
-Task.pause = async function() {
+};
+Task.pause = async function () {
   return this.queue.pause();
 };
 
-Task.getWaiting = async function() {
+Task.getWaiting = async function () {
   return this.queue.getWaiting();
 };
 
-Task.resume = async function() {
+Task.resume = async function () {
   return this.queue.resume();
 };
 
@@ -64,8 +64,8 @@ Task.getJobCounts = function () {
  * @returns Promise
  */
 Task.exit = function () {
-  this.queue.removeAllListeners()
-  return this.queue.close()
+  this.queue.removeAllListeners();
+  return this.queue.close();
 };
 
 Task.on = function () {
