@@ -88,9 +88,9 @@ Skeeft.prototype.index = function(xmlString, selectors, criterion) {
     m = new Matrix(); // Matrix of text representation
   _selectors.segments = Object.keys(_selectors.segments);
   m.init(data, _selectors);
-  const filled = m.fill(criterion),
+  const filled = m.fill(Teeft.statistics[criterion]),
     stats = m.stats(filled),
-    select = m.select(stats, titleWords, criterion),
+    select = m.select(stats, titleWords, Teeft.statistics[criterion]),
     sorted = m.sort(select);
   return sorted
 };
