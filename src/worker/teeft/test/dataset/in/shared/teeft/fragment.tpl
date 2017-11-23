@@ -14,7 +14,7 @@ Parameters :
 
 ----------
 
-term - frequency - specificity
+term - frequency - specificity - probability
 {{#document.keywords}}
-{{term}} - {{frequency}} - {{specificity}}
+{{term}} - {{frequency}} - {{specificity}} - {{probability}}
 {{/document.keywords}}
