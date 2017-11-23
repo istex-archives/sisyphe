@@ -6,6 +6,7 @@ Parameters :
     - mimetype : {{{parameters.input.mimetype}}}
     - extension : {{{parameters.input.extension}}}
   - language : {{parameters.lang}}
+  - criterion : {{parameters.criterion}}
   - filters :
     - title :
       - minOccur : {{filters.title.minOccur}}

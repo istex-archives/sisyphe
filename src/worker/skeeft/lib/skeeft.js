@@ -90,7 +90,7 @@ Skeeft.prototype.index = function(xmlString, selectors, criterion) {
   m.init(data, _selectors);
   const filled = m.fill(criterion),
     stats = m.stats(filled),
-    select = m.select(stats, titleWords),
+    select = m.select(stats, titleWords, criterion),
     sorted = m.sort(select);
   return sorted
 };
