@@ -19,14 +19,20 @@ const Skeeft = function(options) {
     "filters": {
       "title": null,
       "fulltext": null
-    }
+    },
+    "dictionary": {},
+    "stopwords": {}
   };
   this.teeft = {
     "title": new Teeft({
-      "filter": (options && options.filters && options.filters.title) ? options.filters.title : DEFAULT.filters.title
+      "filter": (options && options.filters && options.filters.title) ? options.filters.title : DEFAULT.filters.title,
+      "dictionary": (options && options.dictionary) ? options.dictionary : DEFAULT.dictionary,
+      "stopwords": (options && options.stopwords) ? options.stopwords : DEFAULT.stopwords,
     }),
     "fulltext": new Teeft({
-      "filter": (options && options.filters && options.filters.fulltext) ? options.filters.fulltext : DEFAULT.filters.fulltext
+      "filter": (options && options.filters && options.filters.fulltext) ? options.filters.fulltext : DEFAULT.filters.fulltext,
+      "dictionary": (options && options.dictionary) ? options.dictionary : DEFAULT.dictionary,
+      "stopwords": (options && options.stopwords) ? options.stopwords : DEFAULT.stopwords,
     })
   };
   this.filters = {
@@ -82,9 +88,9 @@ Skeeft.prototype.index = function(xmlString, selectors, criterion) {
     m = new Matrix(); // Matrix of text representation
   _selectors.segments = Object.keys(_selectors.segments);
   m.init(data, _selectors);
-  const filled = m.fill(criterion),
+  const filled = m.fill(Teeft.statistics[criterion]),
     stats = m.stats(filled),
-    select = m.select(stats, titleWords),
+    select = m.select(stats, titleWords, Teeft.statistics[criterion]),
     sorted = m.sort(select);
   return sorted
 };

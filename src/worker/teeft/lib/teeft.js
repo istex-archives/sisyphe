@@ -40,6 +40,13 @@ const Teeft = function(options) {
   return this;
 };
 
+/* Static const */
+Teeft.statistics = {
+  "frequency": "frequency",
+  "specificity": "specificity",
+  "probability": "probability"
+};
+
 /**
  * Extract token from a text
  * @param {String} text Fulltext
@@ -225,8 +232,10 @@ Teeft.prototype.index = function(data, options) {
     const key = text.extraction.keys[i];
     // Value of term weighting in function of its representativity in the vocabulary (dictionnary.json)
     const weighting = this.dictionary[key] || dValue;
-    // Specificity = (frequency) / (weighting)
+    // Specificity = (frequency / totalFrequency) / (weighting)
     text.extraction.terms[key].specificity = ((text.extraction.terms[key].frequency / text.statistics.frequencies.total) / weighting);
+    // Probability = (frequency / totalFrequency)
+    text.extraction.terms[key].probability = (text.extraction.terms[key].frequency / text.statistics.frequencies.total);
     // Calculate the max specificity
     if (text.statistics.specificities.max < text.extraction.terms[key].specificity) {
       text.statistics.specificities.max = text.extraction.terms[key].specificity;

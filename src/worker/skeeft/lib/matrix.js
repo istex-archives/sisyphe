@@ -20,6 +20,8 @@ let Matrix = function(options) {
   return this;
 };
 
+Matrix.SelectCriterion = "frequency";
+
 
 /**
  * Init each values of this object
@@ -159,9 +161,10 @@ Matrix.prototype.stats = function(m) {
  * -----
  * @param {Object} stats Statistics of Text (result of Matrix.stats())
  * @param {Object} boost List of boosted terms (Object with key = term)
+ * @param {String} criterion Criterion used by skeeft (frequency or specificity)
  * @return {Object} Return an object with selected terms
  */
-Matrix.prototype.select = function(stats, boost = {}) {
+Matrix.prototype.select = function(stats, boost = {}, criterion = Matrix.SelectCriterion) {
   let result = {},
     size = stats.FF.size(),
     segSize = size[0],
@@ -178,27 +181,27 @@ Matrix.prototype.select = function(stats, boost = {}) {
               "strength": term.strength,
               "term": term.term,
               "segments": [],
-              "frequency": 0,
               "factor": 0,
               "stats": {
                 "sum": 0,
                 "boost": 0,
-                "frequency": 0
               }
             };
+            result[term.term][criterion] = term[criterion];
+            result[term.term].stats[criterion] = 0;
           }
           result[term.term].segments.push(term.segment);
-          result[term.term].frequency += term.frequency;
+          result[term.term][criterion] += term[criterion];
           result[term.term].stats.sum += (value / stats.FF.get([i, termSize - 1]));
           if (boost[term.term]) result[term.term].stats.boost = (result[term.term].stats.boost === 0) ? this.boost : result[term.term].stats.boost;
-          result[term.term].stats.frequency += 1;
+          result[term.term].stats[criterion] += 1;
         }
       }
     }
   }
   // Calculate the factor of each result
   Object.keys(result).forEach(function(key) {
-    result[key].factor = (result[key].stats.sum / result[key].stats.frequency) + (result[key].stats.boost * result[key].stats.frequency * result[key].strength);
+    result[key].factor = (result[key].stats.sum / result[key].stats[criterion]) + (result[key].stats.boost * result[key].stats[criterion] * result[key].strength);
   });
   return result;
 };

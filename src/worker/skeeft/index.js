@@ -21,7 +21,9 @@ const worker = {
     this.resources = this.load(options);
     // Get a Skeeft instance
     this.skeeft = new Skeeft({
-      "filters": this.resources.parameters.filters
+      "filters": this.resources.parameters.filters,
+      "dictionary": this.resources.dictionary,
+      "stopwords": this.resources.stopwords
     });
     this.LOGS = { // All logs available on this module
       "SUCCESS": "File created at ",
@@ -127,6 +129,8 @@ const worker = {
     let result = options.config ? options.config[pkg.name] : null;
     const folder = options.sharedConfigDir ? path.resolve(options.sharedConfigDir, pkg.name) : null;
     if (folder && result) {
+      result.dictionary = require(path.join(folder, result.dictionary));
+      result.stopwords = require(path.join(folder, result.stopwords));
       result.template = fs.readFileSync(path.join(folder, result.template), 'utf-8');
     } else {
       result = require("./conf/sisyphe-conf.json");
