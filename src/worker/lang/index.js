@@ -8,7 +8,7 @@ const sisypheLangDetect = {};
 
 sisypheLangDetect.doTheJob = function(data, next) {
   // This module only detect on plain & xml like file mimetype
-  if (data.mimetype !== 'application/xml' && data.mimetype !== 'text/plain' && data.mimetype !== 'text/html' && data.mimetype !== 'application/xhtml+xml' || !data.fulltext) {
+  if (data.mimetype !== 'application/xml' && data.mimetype !== 'text/plain' && data.mimetype !== 'text/html' && data.mimetype !== 'application/xhtml+xml' && !data.fulltext) {
     return next(null,data)
   }
   let isHTML = (data.mimetype === 'application/xml' || data.mimetype === 'text/html' || data.mimetype === 'application/xhtml+xml');
