@@ -90,9 +90,9 @@ app.get('/download/latest', async function (req, res) {
   console.log(pathToLastSession)
   klaw(pathToLastSession)
     .pipe(excludeDirFilter)
-    .on("data", item => items.push({path:item.path}))
+    .on("data", item => items.push({ path: item.path.split("out")[1] }))
     .on("end", _ => {
-      res.status(200).json(items)
+      res.status(200).json(items);
     });
 });
 app.get('/ping', function (req, res) {
