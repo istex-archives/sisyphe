@@ -6,6 +6,8 @@ const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 var bodyParser = require('body-parser');
 const GitManager = require('gitmanager');
+const klaw = require("klaw");
+const through2 = require("through2");
 let gitManager;
 try {
   gitManager = new GitManager();
@@ -77,12 +79,21 @@ app.get('/status', function (req, res) {
     .catch(err => res.status(500).json({ err }));
 });
 
+const excludeDirFilter = through2.obj(function(item, enc, next) {
+  if (!item.stats.isDirectory()) this.push(item);
+  next();
+});
 app.get('/download/latest', async function (req, res) {
-  const outDir = path.resolve(__dirname, "out")
-  const sessions = await fs.readdirAsync(outDir)
-  const session = path.resolve(outDir, sessions.sort().pop());
-  let sessionsFiles = getFiles(session, session.split("/").pop() + "/");
-  res.send(sessionsFiles);
+  const items = []
+  const sessions = await fs.readdirAsync(path.resolve(__dirname, 'out'))
+  const pathToLastSession = path.resolve(__dirname, "out", sessions.sort().pop());
+  console.log(pathToLastSession)
+  klaw(pathToLastSession)
+    .pipe(excludeDirFilter)
+    .on("data", item => items.push({path:item.path}))
+    .on("end", _ => {
+      res.status(200).json(items)
+    });
 });
 app.get('/ping', function (req, res) {
   res.send('pong');
@@ -92,7 +103,6 @@ app.post('/stop', function (req, res) {
     sisyphe.kill('SIGTERM');
     sisyphe = null;
   }
-
   res.send('stop');
 });
 app.post('/launch', async function (req, res) {
@@ -131,25 +141,3 @@ app.post('/readdir', async function (req, res) {
 });
 console.log('listen to port 3264');
 app.listen(3264);
-
-function getFiles (pathdir, parent = '', root = 'true') {
-  let files = fs.readdirSync(pathdir).map(docs => {
-    const absolute = path.resolve(pathdir, docs);
-    if (fs.lstatSync(absolute).isDirectory()) {
-      parent += path.basename(absolute) + '/';
-      return getFiles(absolute, parent, false);
-    }
-    return { path: parent + docs };
-  });
-  if (root) {
-    files = flatten(files);
-  }
-  return files;
-}
-function flatten (arr) {
-  return arr.reduce(function (flat, toFlatten) {
-    return flat.concat(
-      Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
-    );
-  }, []);
-}
