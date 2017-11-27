@@ -78,9 +78,10 @@ app.get('/status', function (req, res) {
 });
 
 app.get('/download/latest', async function (req, res) {
-  const sessions = await fs.readdirAsync('out');
-  const session = path.resolve('out/', sessions.sort().pop());
-  let sessionsFiles = getFiles(session, session.split('/').pop() + '/');
+  const outDir = path.resolve(__dirname, "out")
+  const sessions = await fs.readdirAsync(outDir)
+  const session = path.resolve(outDir, sessions.sort().pop());
+  let sessionsFiles = getFiles(session, session.split("/").pop() + "/");
   res.send(sessionsFiles);
 });
 app.get('/ping', function (req, res) {

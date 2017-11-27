@@ -85,7 +85,7 @@ const session = {
   now,
   debugMod,
   debugPort,
-  outputPath: path.resolve(`./out`, now.toString() + "-" + program.corpusname),
+  outputPath: path.resolve(__dirname, `./out`, now.toString() + "-" + program.corpusname),
   workers,
   silent: program.quiet,
   bundle: program.bundle
