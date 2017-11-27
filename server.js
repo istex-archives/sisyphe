@@ -109,7 +109,7 @@ app.post('/launch', async function (req, res) {
     if (!command.debug) commandArray.push('-q');
     console.log(`launch: ${commandArray}`);
     res.send(true);
-    sisyphe = cp.spawn(`./app`, commandArray);
+    sisyphe = cp.spawn(path.resolve(__dirname, `./app`), commandArray);
     sisyphe.stdout.pipe(process.stdout);
     sisyphe.on('exit', _ => {
       sisyphe = null;
