@@ -2,6 +2,7 @@
 
 const chai = require('chai'),
   expect = chai.expect,
+  os = require('os'),
   sisyphePdf = require('../index.js');
 
 const dataInput = {
@@ -38,12 +39,28 @@ describe('doTheJob', function () {
   })
 });
 
-describe('getPdfWordCount', function () {
-  it("should return a promise with the total number of words in the pdf", function () {
-    sisyphePdf.popplonode.load(dataInput.path);
-    return sisyphePdf.getPdfWordCount(1).then((pdfWordCount) => {
-      expect(pdfWordCount).to.be.a('number');
-      expect(pdfWordCount).to.equal(574);
+if(os.platform() !== 'darwin' && os.platform() !== 'linux'){
+  describe('getPdfMetaData', function () {
+    it("should return a promise with the PDF's metadata", function () {
+      return sisyphePdf.myPdfModule.getPdfMetaData(dataInput).then((pdfMetadata) => {
+        expect(pdfMetadata).to.have.property('info');
+        expect(pdfMetadata).to.have.property('metadata');
+        expect(pdfMetadata.info).to.have.property('PDFFormatVersion');
+        expect(pdfMetadata.info).to.have.property('Title');
+        expect(pdfMetadata.info).to.have.property('Author');
+      })
+    })
+  });
+}
+
+if(os.platform() === 'darwin' || os.platform() === 'linux'){
+  describe('getPdfWordCount', function () {
+    it("should return a promise with the total number of words in the pdf", function () {
+      sisyphePdf.myPdfModule.popplonode.load(dataInput.path);
+      return sisyphePdf.myPdfModule.getPdfWordCount(1).then((pdfWordCount) => {
+        expect(pdfWordCount).to.be.a('number');
+        expect(pdfWordCount).to.equal(574);
+      });
     });
   });
-});
+}

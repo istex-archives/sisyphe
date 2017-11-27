@@ -123,4 +123,14 @@ Manufactory.bindDispatchers = function () {
   return this;
 };
 
+/**
+ * Exit all dispatcher
+ * @returns {Manufactory}
+ */
+Manufactory.exit = function () {
+  return Promise.map(this.dispatchers, dispatcher=>{
+    return dispatcher.exitWithoutResurrect();
+  })
+};
+
 module.exports = Manufactory;
