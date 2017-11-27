@@ -31,7 +31,13 @@
       "term": "are",
       "tag": "V",
       "lemma": "are"
-    }, {
+    }],
+    "result": {
+      "length": 3
+    }
+  }, {
+    "label": "Devrait extraire un mono-terme (par défaut)",
+    "arguments": [{
       "term": "sample",
       "tag": "JJ",
       "lemma": "sample"
@@ -39,153 +45,17 @@
       "term": "test",
       "tag": "NN",
       "lemma": "test"
+    }, {
+      "term": "are",
+      "tag": "V",
+      "lemma": "are"
+    }, {
+      "term": "usefull",
+      "tag": "NN",
+      "lemma": "usefull"
     }],
     "result": {
-      "length": 1
-    }
-  }, {
-    "label": "Devrait extraire un mono-terme (par défaut)",
-    "arguments": [{
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }],
-    "result": {
-      "length": 1
-    }
-  }, {
-    "label": "Devrait extraire un mono-terme (par défaut)",
-    "arguments": [{
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }, {
-      "term": "test",
-      "tag": "NN",
-      "lemma": "test"
-    }, {
-      "term": "are",
-      "tag": "V",
-      "lemma": "are"
-    }],
-    "result": {
-      "length": 1
+      "length": 4
     }
   }]
 }

@@ -6,8 +6,6 @@
         "extension": ".xml"
       },
       "lang": "en",
-      "truncate": true,
-      "sort": true,
       "selectors": {
         "title": "title",
         "segments": [
@@ -58,9 +56,11 @@
         "id": "istex-rd",
         "label": "ISTEX-RD"
       },
-      "resource": "teeft"
+      "resources": "teeft"
     },
     "template": "fragment.tpl",
+    "stopwords": "stopwords.json",
+    "dictionary": "dictionary.json",
     "output": {
       "extension": ".txt",
       "mime": "text/plain",

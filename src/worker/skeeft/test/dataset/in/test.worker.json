@@ -50,25 +50,5 @@
     "result": {
       "length": 0
     }
-  }],
-  "index": [{
-    "label": "SUCCESS.xml",
-    "arguments": {
-      "path": "./test/dataset/in/corpus/SUCCESS.xml",
-      "selectors": {
-        "title": "title",
-        "segments": ["abstract",
-          "introduction",
-          "methods_and_materials",
-          "results",
-          "discussion"
-        ]
-      },
-      "criteria": "frequency"
-    },
-    "result": {
-      "not": true,
-      "length": 0
-    }
   }]
 }
