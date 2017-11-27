@@ -47,7 +47,7 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
 
 Just start Sisyphe on a folder with any files in it.
 
-`node app.js -c folderName ~/Documents/customfolder/corpus`
+`node app -c folderName ~/Documents/customfolder/corpus`
 
 
 Sisyphe is now working in background with all your computer thread.
