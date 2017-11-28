@@ -3,6 +3,5 @@
   "packages": [
     "src/worker/*"
   ],
-  "npmClient": "node_modules/.bin/npm",
   "version": "independent"
 }

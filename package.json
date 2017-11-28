@@ -37,7 +37,6 @@
     "chai-events": "0.0.1",
     "lerna": "^2.5.1",
     "mocha": "^3.5.3",
-    "npm": "^4.6.1",
     "nyc": "^11.3.0"
   },
   "optionalDependencies": {
