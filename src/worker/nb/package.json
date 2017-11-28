@@ -11,12 +11,12 @@
   "license": "GNU",
   "dependencies": {
     "async": "^2.5.0",
-    "auto-tu": "git+https://github.com/NicolasKieffer/auto-tu.git",
+    "auto-tu": "^1.0.0",
     "cld": "^2.4.7",
     "line-reader": "^0.4.0",
     "minimist": "^1.2.0",
     "mocha": "^3.5.3",
     "process": "^0.11.3",
-    "worker-utils": "git+https://github.com/NicolasKieffer/worker-utils.git"
+    "worker-utils": "^1.0.0"
   }
 }
