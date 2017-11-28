@@ -11,7 +11,6 @@
   "license": "GNU",
   "dependencies": {
     "async": "^2.5.0",
-    "auto-tu": "git+https://github.com/NicolasKieffer/auto-tu.git",
     "cld": "^2.4.7",
     "line-reader": "^0.4.0",
     "minimist": "^1.2.0",
