@@ -1,0 +1,23 @@
+{
+  "name": "langdetect",
+  "version": "1.0.0",
+  "description": "This worker is able to detect lang(s) of multiple files type",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "lang",
+    "detect"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "cld": "^2.4.7"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.3",
+    "chai": "^3.4.0"
+  }
+}

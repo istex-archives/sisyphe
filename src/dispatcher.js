@@ -32,9 +32,9 @@ Dispatcher.init = function (task, options) {
  * @returns {Dispatcher}
  */
 Dispatcher.addPatient = function (overseer) {
-  const self = this
-  overseer.fork.overseer = overseer
-  overseer.on('message', function(msg) {
+  const self = this;
+  overseer.fork.overseer = overseer;
+  overseer.on('message', function (msg) {
     if (msg.type === 'error') {
       const err = new Error(msg.message);
       [err.message, err.stack, err.code, err.infos] = [msg.message, msg.stack, msg.code, this.dataProcessing];
@@ -92,7 +92,7 @@ Dispatcher.stillJobToDo = debounce(function () {
 }, 500);
 
 /**
- * Launch dispatcher 
+ * Launch dispatcher
  * @return {Promise} resolve when dispatcher has finished all tasks
  */
 Dispatcher.start = function () {
@@ -115,14 +115,25 @@ Dispatcher.start = function () {
     });
     this.on('stop', async () => {
       await this.final();
-      this.killAllPatients();
+      this.patients.map(overseer => {
+        delete overseer.fork._events.message;
+        delete overseer.fork._events.exit;
+        delete overseer.fork._events.result;
+      });
+      if (Array.isArray(this._events.stop)) {
+        delete this._events.stop.pop();
+      }
+      this.tasks.pause();
       resolve();
     });
-    this.tasks.process(job => {
-      return this.getPatient().then(overseer => {
-        return overseer.send(job.data);
+    if (!this.tasks.queue._initializingProcess) {
+      this.tasks.process(job => {
+        return this.getPatient().then(overseer => {
+          return overseer.send(job.data);
+        }).catch(err => { console.log(err); });
       });
-    });
+    }
+    this.tasks.resume();
   });
 };
 
@@ -166,8 +177,8 @@ Dispatcher.exit = function (signal) {
  */
 Dispatcher.exitWithoutResurrect = function () {
   Dispatcher.stillJobToDo.cancel();
-  this.removeAllListeners()
-  this.tasks.exit()
+  this.removeAllListeners();
+  this.tasks.exit();
 };
 
 /**

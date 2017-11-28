@@ -1,4 +1,4 @@
-//Overseer
+// Overseer
 const fork = require('child_process').fork;
 const path = require('path');
 const Promise = require('bluebird');
@@ -24,8 +24,8 @@ Overseer.init = function (workerType, options, nbFork) {
   this.options = options;
   // check of casted value if important too
   let execOptions = (this.options && this.options.hasOwnProperty('debugMod') && this.options.hasOwnProperty('debugPort') && this.options.debugMod && this.options.debugPort)
-    ? {execArgv: [`--inspect-brk=${(options.debugPort || 9444) + nbFork}`] }
-    : {execArgv: []};
+    ? { execArgv: [`--inspect-brk=${(options.debugPort || 9444) + nbFork}`] }
+    : { execArgv: [] };
   this.fork = fork(path.join(__dirname, 'worker.js'), execOptions);
   this.dataProcessing = {};
   this.on = this.fork.on.bind(this.fork);

@@ -18,16 +18,9 @@ program
   .option("-n, --corpusname <name>", "Corpus name", "default")
   .option("-s, --select <name>", "Select all module to deal with")
   .option("-c, --config-dir <path>", "Configuration folder path")
-  .option(
-    "-t, --thread <number>",
-    "The number of process which sisyphe will take"
-  )
-  .option(
-    "-r, --remove-module <name>",
-    "Remove module name from the workflow",
-    appender(),
-    []
-  )
+  .option("-t, --thread <number>", "The number of process which sisyphe will take")
+  .option("-b, --bundle <number>", "Regroup jobs in bundle of jobs")
+  .option("-r, --remove-module <name>", "Remove module name from the workflow", appender(), [])
   .option("-q, --quiet", "Silence output", false)
   .option("-l, --list", "List all available workers", false)
   .parse(process.argv);
@@ -36,24 +29,22 @@ let workers = require(path.resolve(__dirname, "src", "worker.json")).workers;
 
 if (program.list) {
   console.log("List of available workers");
-  workers.map(worker => {
-    console.log(`  => ${worker}`);
-  });
+  workers.map(worker => console.log(`  => ${worker}`));
   console.log("Default order:");
   console.log("--select", workers.toString());
   process.exit(0);
 }
+
 // Corpusname is default, we stop here
 if (program.corpusname === "default" || program.configDir === "none") {
   program.outputHelp();
   process.exit(0);
 }
+
 if (program.select) {
   const inputWorkers = program.select.split(",");
   if (!inputWorkers.length)
-    return console.log(
-      "please reformat --select: <moduleName>,<moduleName>,..."
-    );
+    return console.log("please reformat --select: <moduleName>,<moduleName>,...");
   if (program.removeModule.length) {
     console.log("Error: --select and --remove are incompatible");
     process.exit(0);
@@ -64,33 +55,20 @@ if (program.select) {
       console.log(`${inputWorkers[i]} doesn't exist`);
       process.exit(0);
     }
-    if (
-      inputWorkers[i] === workersConf[0] ||
-      inputWorkers[i] === workersConf[1] ||
-      inputWorkers[i] === workersConf[workersConf.length - 1]
-    ) {
-      inputWorkers.splice(i, 1);
-    }
+    if (inputWorkers[i] === workersConf[0]) inputWorkers.splice(i, 1);
   }
-  workers = [
-    workersConf[0],
-    workersConf[1],
-    ...inputWorkers,
-    workersConf[workersConf.length - 1]
-  ];
+  workers = [workersConf[0], ...inputWorkers];
 }
-if (program.removeModule) {
-  workers = workers.filter(obj => {
-    return !program.removeModule.includes(obj);
-  });
-}
+if (program.removeModule) 
+  workers = workers.filter(obj => !program.removeModule.includes(obj));
 
-let debugMod = false,
-  debugPort = null;
-for(let arg of process.execArgv){
-  if(arg.includes('inspect') || arg.includes('debug')) {
+
+let debugMod = false
+let debugPort = null;
+for (let arg of process.execArgv) {
+  if (arg.includes("inspect") || arg.includes("debug")) {
     debugMod = true;
-    debugPort = parseInt(arg.split('=')[1]) || null;
+    debugPort = parseInt(arg.split("=")[1]) || null;
     break;
   }
 }
@@ -107,9 +85,10 @@ const session = {
   now,
   debugMod,
   debugPort,
-  outputPath: path.resolve(`./out`, now.toString() + "-" + program.corpusname),
+  outputPath: path.resolve(__dirname, `./out`, now.toString() + "-" + program.corpusname),
   workers,
-  silent: program.quiet
+  silent: program.quiet,
+  bundle: program.bundle
 };
 
 /*****************/
@@ -117,13 +96,8 @@ const session = {
 /*****************/
 sisyphe
   .init(session)
-  .then(() => {
-    return sisyphe.launch();
-  })
-  .catch(err => {
-    console.log(err);
-    monitoring.updateError(err);
-  });
+  .then(() => sisyphe.launch())
+  .catch(err => console.log(err));
 
 // Uses to filter workers
 function appender(xs) {
@@ -133,20 +107,3 @@ function appender(xs) {
     return xs;
   };
 }
-
-// /****************/
-// /* Manage error */
-// /****************/
-// //do something when app is closing
-// process.on("exit", exitHandler.bind(null, { exit: true }));
-// //catches ctrl+c event
-// process.on("SIGINT", exitHandler.bind(null, { exit: true }));
-// // catches normal exit event
-// process.on("SIGTERM", exitHandler.bind(null, { exit: true }));
-// // catches "kill pid" (for example: nodemon restart)
-// process.on("SIGUSR1", exitHandler.bind(null, { exit: true }));
-// process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
-// //catches uncaught exceptions
-// process.on("uncaughtException", exitHandler.bind(null, { exit: true }));
-
-// Check if debug or inspect mod is enable

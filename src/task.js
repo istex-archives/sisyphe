@@ -25,11 +25,32 @@ Task.init = function (options) {
  * @returns Promise
  */
 Task.add = function (obj) {
-  return this.queue.add(obj, {removeOnComplete: true});
+  return this.queue.add(obj, {removeOnComplete: true, attempts: 200000});
 };
 
-Task.process = function (functionProcess) {
-  this.queue.process(functionProcess);
+Task.process = async function (fun, queue) {
+  return this.queue.process(fun);
+  // console.log('lkj')
+  // if (!this.queue) {
+  //   this.queue = queue
+  // }
+  // if (true) {
+  //   const job = await this.queue.getNextJob().catch(err =>{});
+  //   console.log(job)
+  //   if (job) await fun(job).catch(err=>{});
+  // }
+  // process.bind(this, fun, this.queue)()
+};
+Task.pause = async function () {
+  return this.queue.pause();
+};
+
+Task.getWaiting = async function () {
+  return this.queue.getWaiting();
+};
+
+Task.resume = async function () {
+  return this.queue.resume();
 };
 
 /**
@@ -43,8 +64,8 @@ Task.getJobCounts = function () {
  * @returns Promise
  */
 Task.exit = function () {
-  this.queue.removeAllListeners()
-  return this.queue.close()
+  this.queue.removeAllListeners();
+  return this.queue.close();
 };
 
 Task.on = function () {
