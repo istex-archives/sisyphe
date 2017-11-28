@@ -7,7 +7,6 @@ const fs = Promise.promisifyAll(require('fs'));
 var bodyParser = require('body-parser');
 const GitManager = require('gitmanager');
 const klaw = require("klaw");
-const through2 = require("through2");
 let gitManager;
 try {
   gitManager = new GitManager();
@@ -79,18 +78,16 @@ app.get('/status', function (req, res) {
     .catch(err => res.status(500).json({ err }));
 });
 
-const excludeDirFilter = through2.obj(function(item, enc, next) {
-  if (!item.stats.isDirectory()) this.push(item);
-  next();
-});
 app.get('/download/latest', async function (req, res) {
   const items = []
   const sessions = await fs.readdirAsync(path.resolve(__dirname, 'out'))
   const pathToLastSession = path.resolve(__dirname, "out", sessions.sort().pop());
-  console.log(pathToLastSession)
   klaw(pathToLastSession)
-    .pipe(excludeDirFilter)
-    .on("data", item => items.push({ path: item.path.split("out")[1] }))
+    .on("data", item => { 
+      if(item && fs.statSync(item.path).isFile()){
+        items.push({ path: item.path.split("out")[1] })
+      }
+    })
     .on("end", _ => {
       res.status(200).json(items);
     });
@@ -119,8 +116,8 @@ app.post('/launch', async function (req, res) {
     if (!command.debug) commandArray.push('-q');
     console.log(`launch: ${commandArray}`);
     res.send(true);
-    sisyphe = cp.spawn(path.resolve(__dirname, `./app`), commandArray);
-    sisyphe.stdout.pipe(process.stdout);
+    sisyphe = cp.fork(path.resolve(__dirname, `app`), commandArray);
+    // sisyphe.stdout.pipe(process.stdout);
     sisyphe.on('exit', _ => {
       sisyphe = null;
     });
