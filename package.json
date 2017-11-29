@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "lerna bootstrap --hoist",
     "server": "node server.js",
     "test": "mocha && lerna run --ignore *-worker test",
     "coverage": "nyc --reporter=text --reporter=html mocha",
+    "postinstall-unix" : "lerna bootstrap --hoist",
+    "postinstall-win" : "lerna bootstrap",
     "updated": "lerna updated",
     "publish": "lerna publish --skip-npm && git push --follow-tags"
   },
