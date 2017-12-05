@@ -22,5 +22,9 @@ addons:
       - libpoppler-cpp-dev
       - poppler-utils
 
+install:
+  - npm install
+  - npm run bootstrap-unix
+
 notifications:
   email: false
