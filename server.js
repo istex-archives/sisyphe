@@ -85,7 +85,7 @@ app.get('/download/latest', async function (req, res) {
   klaw(pathToLastSession)
     .on("data", item => { 
       if(item && fs.statSync(item.path).isFile()){
-        items.push({ path: item.path.split("out")[1] })
+        items.push({ path: item.path.split("out").pop() })
       }
     })
     .on("end", _ => {

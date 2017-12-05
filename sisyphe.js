@@ -131,7 +131,7 @@ sisyphe.launch = function () {
   });
 };
 
-process.stdin.resume();
+// process.stdin.resume();
 
 sisyphe.exit = async function (err) {
   if (err) {
