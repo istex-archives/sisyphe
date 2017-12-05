@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "bootstrap-win": "lerna bootstrap",
-    "bootstrap-unix": "lerna bootstrap --hoist",
+    "postinstall": "lerna bootstrap",
     "server": "node server.js",
     "test": "mocha && lerna run --ignore *-worker test",
     "coverage": "nyc --reporter=text --reporter=html mocha",
