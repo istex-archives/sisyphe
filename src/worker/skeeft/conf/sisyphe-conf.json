@@ -5,8 +5,6 @@
       "extension": ".xml"
     },
     "lang": "en",
-    "truncate": true,
-    "sort": true,
     "selectors": {
       "title": "title",
       "segments": [
@@ -57,9 +55,11 @@
       "id": "istex-rd",
       "label": "ISTEX-RD"
     },
-    "resource": "teeft"
+    "resources": "teeft"
   },
   "template": "",
+  "stopwords": {},
+  "dictionary": {},
   "output": {
     "extension": ".txt",
     "mimetype": "text/plain",

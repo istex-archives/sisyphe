@@ -1,232 +1,279 @@
 /* global module */
 /* jslint node: true */
 /* jslint indent: 2 */
-'use strict';
+"use strict";
 
 /* Module Require */
-const fs = require('fs');
+const fs = require("fs");
 
-/* Exported objects */
-
-/* Tokenizer */
+/**
+ * Constructor
+ * @param {Boolean} lower Define if toLowerCase function is applied
+ * @return this
+ */
 const Tokenizer = function(lower) {
-  const self = this,
-    re = new RegExp('\\w+', 'gm');
-
-  self.lower = lower || false;
-
-  self.tokenize = function(str) {
+  const re = new RegExp("\\w+", "gm");
+  this.lower = lower || false;
+  this.tokenize = function(str) {
     if (lower) {
       str = str.toLowerCase();
     }
     return str.match(re);
   };
-
-  return self;
+  return this;
 };
 
-
-
-/* BayesData */
+/**
+ * Constructor
+ * @param {String} name Name of BayesData
+ * @param {Object} pool Pool of BayesData
+ * @return this
+ */
 const BayesData = function(name, pool) {
-
-  const self = this;
-
-  self.name = name || '';
-  self.training = [];
-  self.pool = pool || {};
-  self.tokenCount = 0;
-  self.trainCount = 0;
-
-  return self;
+  this.name = name || "";
+  this.training = [];
+  this.pool = pool || {};
+  this.tokenCount = 0;
+  this.trainCount = 0;
+  return this;
 };
 
-/* Bayes */
-const Bayes = function(min, lower = false) {
+/**
+ * Constructor
+ * @param {Object} options All options
+ *   {Number} min Minimum limit of guess probability
+ *   {Boolean} lower Define if toLowerCase function is applied
+ *   {Boolean} lower Define if toLowerCase function is applied
+ * @return this
+ */
+const Bayes = function(options) {
+  // Default values
+  const DEFAULT = {
+      "lower": false,
+      "dataClass": BayesData,
+      "pools": {},
+      "minProbability": 0,
+      "combiner": Bayes.robinson
+    },
+    lowerCase = (options && options.lower) ? options.lower : DEFAULT.lower;
+  this.dataClass = (options && options.dataClass) ? options.dataClass : DEFAULT.dataClass;
+  this.pools = (options && options.pool) ? options.pool : DEFAULT.pools;
+  this.minProbability = (options && options.minProbability) ? options.minProbability : DEFAULT.minProbability;
+  this.combiner = (options && options.combiner) ? options.combiner : DEFAULT.combiner;
+  this.defaultKey = "__Corpus__";
+  this.pools[this.defaultKey] = new this.dataClass(this.defaultKey);
+  this.trainCount = 0;
+  this.dirty = true;
+  this._tokenizer = new Tokenizer(lowerCase);
+  return this;
+};
 
-  const self = this;
-  /*
-   * Calcul of probabilities (Robinson methodology)
-   * P = 1 - prod(1 - p) ^ (1 / n)
-   * Q = 1 - prod(p) ^ (1 / n)
-   * S = (1 + (P - Q) / (P + Q)) / 2
-   */
-  self.robinson = function(probs) {
-    const nth = 1 / probs.length,
-      _p = probs.reduce(function(pValue, cValue, i, array) {
-        return pValue * (1 - cValue[1]);
-      }, 1),
-      p = Math.pow(_p, nth),
-      P = 1 - p,
-      _q = probs.slice(1).reduce(function(pValue, cValue, i, array) {
-        return pValue * cValue[1];
-      }, probs[0][1]),
-      q = Math.pow(_q, nth),
-      Q = 1 - q,
-      S = (P - Q) / (P + Q);
-    return (1 + S) / 2;
+/**
+ * Calcul of probabilities (Robinson methodology)
+ * P = 1 - prod(1 - p) ^ (1 / n)
+ * Q = 1 - prod(p) ^ (1 / n)
+ * S = (1 + (P - Q) / (P + Q)) / 2
+ * @param {Array} probs List of probabilities
+ * @return S
+ */
+Bayes.robinson = function(probs) {
+  const nth = 1 / probs.length,
+    _p = probs.reduce(function(pValue, cValue, i, array) {
+      return pValue * (1 - cValue[1]);
+    }, 1),
+    p = Math.pow(_p, nth),
+    P = 1 - p,
+    _q = probs.slice(1).reduce(function(pValue, cValue, i, array) {
+      return pValue * cValue[1];
+    }, probs[0][1]),
+    q = Math.pow(_q, nth),
+    Q = 1 - q,
+    S = (P - Q) / (P + Q);
+  return (1 + S) / 2;
+};
+
+/**
+ * Save data
+ * @param {String} path Path of file
+ * @param {Function} callback Callback
+ * @return undefined
+ */
+Bayes.prototype.save = function(path, callback) {
+  if (this.dirty) {
+    this.buildCache();
+    this.dirty = false;
   }
-
-  self.dataClass = BayesData;
-  self.corpus = new self.dataClass('__Corpus__');
-  self.pools = {};
-  self.pools['__Corpus__'] = self.corpus;
-  self.trainCount = 0;
-  self.dirty = true;
-  self.minProbability = min || 0;
-  self._tokenizer = new Tokenizer(lower);
-  self.combiner = self.robinson;
-
-  self.save = function(path, callback) {
-    if (self.dirty) {
-      self.buildCache();
-      self.dirty = false;
+  const data = JSON.stringify(this.cache);
+  fs.writeFile(path, data, function(err) {
+    if (callback) {
+      callback(err);
     }
-    const data = JSON.stringify(self.cache);
-    fs.writeFile(path, data, function(err) {
-      if (callback) {
-        callback(err);
+  });
+};
+
+/**
+ * Load data
+ * @param {Object} data Data loaded
+ * @return undefined
+ */
+Bayes.prototype.load = function(data) {
+  this.cache = data;
+  this.dirty = false;
+};
+
+/**
+ * Train Bayesian
+ * @param {String} pool Name of pool
+ * @param {String} item Text
+ * @param {String} uid Id of text
+ * @return undefined
+ */
+Bayes.prototype.train = function(pool, item, uid) {
+  const tokens = this.getTokens(item);
+  if (!this.pools[pool]) {
+    this.pools[pool] = new this.dataClass(pool);
+  }
+  this._train(this.pools[pool], tokens);
+  this.corpus.trainCount += 1;
+  this.pools[pool].trainCount += 1;
+  if (uid) {
+    this.pools[pool].training.append(uid);
+  }
+  this.dirty = true;
+};
+
+/**
+ * Call Tokenizer to get tokens
+ * @param {String} obj Text to tokenize
+ * @return Return list of tokens
+ */
+Bayes.prototype.getTokens = function(obj) {
+  return this._tokenizer.tokenize(obj);
+};
+
+/**
+ * Train Bayesian
+ * @param {String} pool Name of pool
+ * @param {Array} tokens List of tokens
+ * @return unefined
+ */
+Bayes.prototype._train = function(pool, tokens) {
+  let wc = 0;
+  for (let token in tokens) {
+    let count = pool.pool[tokens[token]] || 0;
+    pool.pool[tokens[token]] = count + 1;
+    count = this.corpus.pool[tokens[token]] || 0;
+    this.corpus.pool[tokens[token]] = count + 1;
+    wc++;
+  }
+  pool.tokenCount += wc;
+  this.corpus.tokenCount += wc;
+};
+
+/**
+ * Guess form trainings
+ * @param {String} msg Text to guess
+ * @return Return result with informations (category + probability + probabilities)
+ */
+Bayes.prototype.guess = function(msg) {
+  const tokens = this.getTokens(msg),
+    pools = this.poolProbs();
+  let probabilities = {},
+    probability = this.minProbability,
+    category = undefined;
+  for (let k in pools) {
+    const p = this.getProbs(pools[k].pool, tokens);
+    if (Object.keys(p).length != 0) {
+      probabilities[k] = this.combiner(p, k);
+      if (probabilities[k] > probability) {
+        probability = probabilities[k];
+        category = k;
       }
-    });
-  };
-
-  self.load = function(data) {
-    self.cache = data;
-    self.dirty = false;
-  };
-
-  self.train = function(pool, item, uid) {
-    const tokens = self.getTokens(item);
-    if (!self.pools[pool]) {
-      self.pools[pool] = new self.dataClass(pool);
     }
-    self._train(self.pools[pool], tokens);
-    self.corpus.trainCount += 1;
-    self.pools[pool].trainCount += 1;
-    if (uid) {
-      self.pools[pool].training.append(uid);
+  }
+  return {
+    "category": category,
+    "probability": probability,
+    "probabilities": probabilities
+  };
+};
+
+/**
+ * Calculate pool probabilities
+ * @return Return cached pool probabilities
+ */
+Bayes.prototype.poolProbs = function() {
+  if (this.dirty) {
+    this.buildCache();
+    this.dirty = false;
+  }
+  return this.cache;
+};
+
+/**
+ * Build cache of pools
+ * @return undefined
+ */
+Bayes.prototype.buildCache = function() {
+  this.cache = {};
+  for (let k in this.pools) {
+    if (k == this.defaultKey) {
+      continue;
     }
-    self.dirty = true;
-  };
-
-  /*
-   * Par defaut obj = decouper sur les espaces.
-   * On ne change pas la casse
-   * Dans certaines applications, il faudra peut - etre tout en minuscules
-   */
-  self.getTokens = function(obj) {
-    return self._tokenizer.tokenize(obj);
-  };
-
-  self._train = function(pool, tokens) {
-    let wc = 0;
-    for (let token in tokens) {
-      let count = pool.pool[tokens[token]] || 0;
-      pool.pool[tokens[token]] = count + 1;
-      count = self.corpus.pool[tokens[token]] || 0;
-      self.corpus.pool[tokens[token]] = count + 1;
-      wc++;
-    }
-    pool.tokenCount += wc;
-    self.corpus.tokenCount += wc;
-  };
-
-  self.guess = function(msg) {
-    const tokens = self.getTokens(msg),
-      pools = self.poolProbs();
-    let probabilities = {},
-      probability = self.minProbability,
-      category = undefined;
-    for (let k in pools) {
-      const p = self.getProbs(pools[k].pool, tokens);
-      if (Object.keys(p).length != 0) {
-        probabilities[k] = self.combiner(p, k);
-        if (probabilities[k] > probability) {
-          probability = probabilities[k];
-          category = k;
-        }
-      }
-    }
-    return {
-      'category': category,
-      'probability': probability,
-      'probabilities': probabilities
-    };
-  };
-
-  self.poolProbs = function() {
-    if (self.dirty) {
-      self.buildCache();
-      self.dirty = false;
-    }
-    return self.cache;
-  };
-
-  /*
-   * fusionne corpus et calcule probas
-   */
-  self.buildCache = function() {
-
-    self.cache = {};
-    for (let k in self.pools) {
-      if (k == '__Corpus__') {
+    const poolCount = this.pools[k].tokenCount,
+      themCount = Math.max(this.corpus.tokenCount - poolCount, 1);
+    this.cache[k] = new this.dataClass(k);
+    for (let word in this.corpus.pool) {
+      const thisCount = this.pools[k].pool[word];
+      if (thisCount == 0.0) {
         continue;
       }
-
-      const poolCount = self.pools[k].tokenCount,
-        themCount = Math.max(self.corpus.tokenCount - poolCount, 1);
-      self.cache[k] = new self.dataClass(k);
-
-      for (let word in self.corpus.pool) {
-        // pour chaque mot du corpus verifie si le pool contient ce mot
-        const thisCount = self.pools[k].pool[word];
-        if (thisCount == 0.0) {
-          continue;
-        }
-        const otherCount = self.corpus.pool[word] - thisCount;
-        let goodMetric;
-
-        if (poolCount) {
-          goodMetric = Math.min(1.0, otherCount / poolCount);
-        } else {
-          goodMetric = 1.0;
-        }
-        const badMetric = Math.min(1.0, thisCount / themCount);
-        const f = badMetric / (goodMetric + badMetric);
-
-        // SEUIL PROBABILITE
-        if (Math.abs(f - 0.5) >= 0.1) {
-          // BONNE_PROB, MAUVAISE_PROB
-          self.cache[k].pool[word] = Math.max(0.0001, Math.min(0.9999, f));
-        }
+      const otherCount = this.corpus.pool[word] - thisCount;
+      let goodMetric;
+      if (poolCount) {
+        goodMetric = Math.min(1.0, otherCount / poolCount);
+      } else {
+        goodMetric = 1.0;
+      }
+      const badMetric = Math.min(1.0, thisCount / themCount);
+      const f = badMetric / (goodMetric + badMetric);
+      if (Math.abs(f - 0.5) >= 0.1) {
+        this.cache[k].pool[word] = Math.max(0.0001, Math.min(0.9999, f));
       }
     }
-  };
-
-  /*
-   * extrait les probabilités de tokens ds message
-   */
-  self.getProbs = function(pool, words) {
-    const probs = [];
-    for (let k in words) {
-      if (pool[words[k]]) {
-        probs.push([words[k], pool[words[k]]]);
-      }
-    }
-    probs.sort(function(x, y) {
-      return (y[1] > x[1]) ? 1 : ((x[1] > y[1]) ? -1 : 0);
-    });
-    if (probs.length > 2048) {
-      probs = probs.slice(0, 2048);
-    }
-    return probs;
   }
+};
 
-  self.multiply = function(a, b) {
-    return a * b;
-  };
+/**
+ * Get probabilities of words
+ * @param {Object} pool Pool of probabilities
+ * @param {Object} words Words
+ * @return Return probabilities
+ */
+Bayes.prototype.getProbs = function(pool, words) {
+  const probs = [];
+  for (let k in words) {
+    if (pool[words[k]]) {
+      probs.push([words[k], pool[words[k]]]);
+    }
+  }
+  probs.sort(function(x, y) {
+    return (y[1] > x[1]) ? 1 : ((x[1] > y[1]) ? -1 : 0);
+  });
+  if (probs.length > 2048) {
+    probs = probs.slice(0, 2048);
+  }
+  return probs;
+};
 
-  return self;
+/**
+ * Multiply 2 Number betwen them
+ * @param {Number} a A Number
+ * @param {Number} b An other Number
+ * @return Return the result of multiplication
+ */
+Bayes.prototype.multiply = function(a, b) {
+  return a * b;
 };
 
 module.exports = Bayes;

@@ -10,9 +10,11 @@ Sisyphe is a generic NodeJS recursive folder analyser terminal application & a (
 ![Sisyphe-pic](./sisyphe.gif)
 
 ### Requirements
-Test with NodeJS@8.X, Redis@3.2.6
+Tested with NodeJS@8.X, Redis@3.2.6
 
-Example to run a quick local redis thanks to docker:
+Works on Linux/OSX/Windows
+
+Example to run a quick local redis (thanks to docker):
 ```bash
 docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
 ```
@@ -20,7 +22,7 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
 ### Install it
 
 1. Download the lastest Sisyphe version 
-2. Just do : `npm install`
+2. Just do : `npm install` (this will execute a npm postinstall)
 3. ... that's it.
 
 ### Test
@@ -37,6 +39,7 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
     -s, --select <name>         Select all module to deal with
     -c, --config-dir <path>     Configuration folder path
     -t, --thread <number>       The number of process which sisyphe will take
+    -b, --bundle <number>       Regroup jobs in bundle of jobs
     -r, --remove-module <name>  Remove module name from the workflow
     -q, --quiet                 Silence output
     -l, --list                  List all available workers
@@ -46,15 +49,18 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
 
 Just start Sisyphe on a folder with any files in it.
 
-`node app -c folderName ~/Documents/customfolder/corpus`
+`node app -n corpusname ~/Documents/customfolder/corpus`
+
+
+`node app -n corpusname -c ~/Documents/customfolder/corpusResources ~/Documents/customfolder/corpus`
 
 
 Sisyphe is now working in background with all your computer thread.
 Just take a coffee and wait , it will prevent you when it's done :)
 
-You should now have a file full of logs in `/yourcustomfolder/sisyphe/logs/sisyphe.log` (errors,info,duration..)
+The results of sisyphe are present @ `sisyphe/out/{timestamp}-corpusname/` (errors,info,duration..)
 
-For a control panel, go to [Sisyphe-monitor](https://github.com/istex/sisyphe-monitor)
+For a control panel & full binded app, go to [Sisyphe-monitor](https://github.com/istex/sisyphe-monitor)
 sisyphe has a server that allows to control it and to obtain more information on its execution.
 Simply run the server with `npm run server` to access these features
 
@@ -82,3 +88,8 @@ When you work on worker, just:
 - Commit your changes as easy
 - Do a `npm run updated` (to check what worker has changed)
 - Do a `npm run publish` (it will ask you to change version of module worker & publish it to github)
+
+
+### Modules informations
+ 
+Some bugs could occured with certains files with 'skeeft' on windows module please just disactivate it until we fix.

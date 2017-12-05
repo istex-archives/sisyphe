@@ -16,14 +16,24 @@ const data = require("./dataset/in/data.json"),
   originalConfigTest = require("./dataset/in/sisyphe-conf.json"),
   datasets = {
     "worker": require("./dataset/in/test.worker.json"),
+    "skeeft": require("./dataset/in/test.skeeft.json"),
     "matrix": require("./dataset/in/test.matrix.json")
   };
+
+// Call of init function (shoulb be done by sisyphe usually)
+worker.init({
+  "outputPath": "test/dataset/out",
+  "config": JSON.parse(JSON.stringify(originalConfigTest)),
+  "sharedConfigDir": "test/dataset/in/shared"
+});
 
 // Wrappers used for each tested function
 const wrappers = {
   "worker": {
     "doTheJob": testOf_doTheJob,
-    "load": testOf_load,
+    "load": testOf_load
+  },
+  "skeeft": {
     "index": testOf_index
   },
   "matrix": {
@@ -39,20 +49,17 @@ const wrappers = {
 // Tested object (only functions are "automatically" tested)
 const objects = {
   "worker": worker,
-  "matrix": new Matrix()
+  "matrix": new Matrix(),
+  "skeeft": worker.skeeft
 };
-
-// Call of init function (shoulb be done by sisyphe usually)
-worker.init({
-  "outputPath": "test/dataset/out",
-  "config": JSON.parse(JSON.stringify(originalConfigTest)),
-  "sharedConfigDir": "test/dataset/in/shared"
-});
 
 /**
  * Test of functions of :
  *   - worker :
  *     - doTheJob()
+ *     - init()
+ *   - skeeft :
+ *     - index()
  *   - matrix :
  *     - init()
  *     - fill()
@@ -80,7 +87,7 @@ async.eachSeries(Object.keys(datasets), function(key, callback) {
 function testOf_doTheJob(fn, item, cb) {
   return fn(data[item.key], function(err, res) {
     item.result.include = worker.LOGS[item.key]; // will contain the expected value
-    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1];  // will contain the returned value
+    const value = res[pkg.name][item.logs][res[pkg.name][item.logs].length - 1]; // will contain the returned value
     return cb(value);
   });
 }
@@ -97,7 +104,7 @@ function testOf_load(fn, item, cb) {
 
 /**
  * Wrapper of :
- * - worker.index()
+ * - skeeft.index()
  */
 function testOf_index(fn, item, cb) {
   fs.readFile(item.arguments.path, "utf-8", function(err, res) {

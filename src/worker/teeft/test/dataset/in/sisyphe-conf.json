@@ -10,7 +10,18 @@
       "sort": true,
       "filter": {
         "minOccur": 1,
-        "noLimitStrength": 2
+        "noLimitStrength": 2,
+        "lengthSteps": {
+          "values": [],
+          "min": {
+            "lim": 1,
+            "value": 1
+          },
+          "max": {
+            "lim": 1,
+            "value": 1
+          }
+        }
       }
     },
     "module": {

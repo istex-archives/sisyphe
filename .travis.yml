@@ -17,10 +17,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - cmake
-      - xmlstarlet
       - g++-4.8
-      - libpoppler-cpp-dev
-      - poppler-utils
 
 notifications:
   email: false

@@ -64,7 +64,8 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
           enterprise.bindDispatchers();
           enterprise.dispatchers.map((dispatcher, index, array) => {
             const isLastDispatcher = array.length === index + 1;
-            if (isLastDispatcher) {
+            const isFirstDispatcher = index === 0;
+            if (isLastDispatcher || isFirstDispatcher) {
               expect(dispatcher.listenerCount('result')).to.equal(0);
             } else {
               expect(dispatcher.listenerCount('result')).to.equal(1);
@@ -80,7 +81,8 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
       return enterprise.init().addWorker('walker-fs').addWorker('dumbWorker').initializeWorkers().then(() => {
         enterprise.dispatchers.map((dispatcher, index, array) => {
           const isLastDispatcher = array.length === index + 1;
-          if (isLastDispatcher) {
+          const isFirstDispatcher = index === 0;
+          if (isLastDispatcher || isFirstDispatcher) {
             expect(dispatcher.listenerCount('result')).to.equal(0);
           } else {
             expect(dispatcher.listenerCount('result')).to.equal(1);
@@ -92,20 +94,25 @@ describe(`${pkg.name}/src/manufactory.js`, function () {
 
   describe('#start', function () {
     this.timeout(5000);
-    it('should start manufactory', function () {
+    it('should start manufactory', function (done) {
       const enterprise = Object.create(Manufactory);
       const inputPath = path.join(__dirname, '/data');
       const numCPUs = 2;
-      return enterprise
+      enterprise
         .init({ inputPath, numCPUs })
         .addWorker('walker-fs')
         .addWorker('dumbWorker')
         .initializeWorkers()
         .then(() => {
+          let firstresult = true;
           enterprise.dispatchers[1].on('result', msg => {
             expect(msg).to.have.property('type');
             expect(msg).to.have.property('data');
             expect(msg.data).to.be.an('object');
+            if (firstresult) {
+              firstresult = false;
+              done();
+            }
           });
           return enterprise.start();
         });

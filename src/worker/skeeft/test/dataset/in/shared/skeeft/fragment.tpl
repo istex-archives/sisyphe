@@ -3,21 +3,21 @@ Fichier générée le {{date}}
 
 Parameters :
   - input : (target file)
-    - mimetype : {{{parameters.mime}}}
-    - extension : {{{parameters.extension}}}
+    - mimetype : {{{parameters.input.mimetype}}}
+    - extension : {{{parameters.input.extension}}}
   - language : {{parameters.lang}}
-  - truncate : {{parameters.truncate}}
-  - sort : {{parameters.sort}}
+  - criterion : {{parameters.criterion}}
   - filters :
     - title :
-      - minOccur : {{parameters.filters.title.minOccur}}
-      - noLimitStrength : {{parameters.filters.title.noLimitStrength}}
+      - minOccur : {{filters.title.minOccur}}
+      - noLimitStrength : {{filters.title.noLimitStrength}}
     - fulltext :
-      - minOccur : {{parameters.filters.fulltext.minOccur}}
-      - noLimitStrength : {{parameters.filters.fulltext.noLimitStrength}}
+      - minOccur : {{filters.fulltext.minOccur}}
+      - noLimitStrength : {{filters.fulltext.noLimitStrength}}
 
 ----------
 
-{{#document.terms}}
-{{term}} - {{structure}} - {{frequency}} - {{factor}}
-{{/document.terms}}
+term - segments - frequency - factor
+{{#document.keywords}}
+{{term}} - {{segments}} - {{frequency}} - {{factor}}
+{{/document.keywords}}
