@@ -21,7 +21,7 @@ docker run --name sisyphe-redis -p 6379:6379 redis:3.2.6
 
 ### Install it
 
-1. Download the lastest Sisyphe version 
+1. Download the latest Sisyphe version 
 2. Just do : `npm install` (this will execute a npm postinstall)
 3. ... that's it.
 
