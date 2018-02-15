@@ -55,12 +55,15 @@ sisypheXml.doTheJob = function (data, next) {
     if (!xmlFile) {
       data.isWellFormed = false;
       // Attention, syntax is different wellformedError:wellformedErrors 😖
-      data.wellFormedErrors = (this.libxml.wellformedErrors && this.libxml.wellformedErrors.length) ? this.libxml.wellformedErrors : null;
+      data.wellFormedErrors = (this.libxml.wellformedErrors && this.libxml.wellformedErrors.length) ? this.libxml.wellformedErrors : [];
       for (let property in data.wellFormedErrors) {
         if (data.wellFormedErrors[property].hasOwnProperty('message')) {
           Object.defineProperty(data.wellFormedErrors[property], 'message', {enumerable: true});
         }
       }
+      // only keep the 10 first errors 
+      // to save memory on big xml validation
+      data.wellFormedErrors.splice(10);
       return data;
     }
     let doctype = this.libxml.getDtd();
@@ -107,13 +110,16 @@ sisypheXml.doTheJob = function (data, next) {
       if (!result) {
         data.isValidAgainstDTD = false;
         // we set validation Error only if there are somes.
-        data.validationErrors = (this.libxml.validationDtdErrors && this.libxml.validationDtdErrors) ? this.libxml.validationDtdErrors : null;
+        data.validationErrors = (this.libxml.validationDtdErrors && this.libxml.validationDtdErrors) ? this.libxml.validationDtdErrors : {};
         for (let property in data.validationErrors) {
           for (let error of data.validationErrors[property]) {
             if (error.hasOwnProperty('message')) {
               Object.defineProperty(error, 'message', {enumerable: true});
             }
           }
+          // only keep the 10 first errors 
+          // to save memory on big xml validation
+          data.validationErrors[property].splice(10);
         }
       } else {
         data.isValidAgainstDTD = true;
@@ -129,13 +135,16 @@ sisypheXml.doTheJob = function (data, next) {
       if (!result) {
         data.isValidAgainstSchema = false;
         // we set validation Error only if there are somes.
-        data.validationSchemaErrors = (this.libxml.validationSchemaErrors && this.libxml.validationSchemaErrors) ? this.libxml.validationSchemaErrors : null;
+        data.validationSchemaErrors = (this.libxml.validationSchemaErrors && this.libxml.validationSchemaErrors) ? this.libxml.validationSchemaErrors : {};
         for (let property in data.validationSchemaErrors) {
           for (let error of data.validationSchemaErrors[property]) {
             if (error.hasOwnProperty('message')) {
               Object.defineProperty(error, 'message', {enumerable: true});
             }
           }
+          // only keep the 10 first errors 
+          // to save memory on big xml validation
+          data.validationSchemaErrors[property].splice(10);
         }
       }
       else {
