@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/istex/sisyphe.svg?branch=master)](https://travis-ci.org/istex/sisyphe)
 [![bitHound Overall Score](https://www.bithound.io/github/istex/sisyphe/badges/score.svg)](https://www.bithound.io/github/istex/sisyphe)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fistex%2Fsisyphe.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fistex%2Fsisyphe?ref=badge_shield)
 
 ![sisyphe](./logo-sisyphe.jpg)
 
@@ -93,3 +94,7 @@ When you work on worker, just:
 ### Modules informations
  
 Some bugs could occured with certains files with 'skeeft' on windows module please just disactivate it until we fix.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fistex%2Fsisyphe.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fistex%2Fsisyphe?ref=badge_large)
