@@ -20,6 +20,7 @@ const docWithBadDoctypeInXml = Object.assign({path: __dirname + '/data/test-bad-
 const docWithNotWellFormedXml = Object.assign({path: __dirname + '/data/test-not-wellformed.xml'}, baseDoc);
 const docWithUnknownDoctype = Object.assign({path: __dirname + '/data/test-unknown-doctype.xml'}, baseDoc);
 const docWithNotValidXml = Object.assign({path: __dirname + '/data/test-not-valid-dtd.xml'}, baseDoc);
+const docWithNamespaceXml = Object.assign({path: __dirname + '/data/test-tei.xml'}, baseDoc);
 const configDir = path.resolve(__dirname, '../conf');
 const corpusname = 'default';
 const pathToConf = path.resolve(configDir, corpusname, "sisyphe-conf.json");
@@ -103,6 +104,23 @@ describe('doTheJob', function () {
       done();
     });
   })
+
+  it('should add some info about a not valid XML', function (done) {
+    testSisypheXml.doTheJob(docWithNamespaceXml, (error, docOutput) => {
+      if (error) return done(error);
+      expect(docOutput.hostTitle).to.be.equal('Afrique : Archéologie et Arts');
+      expect(docOutput.issn).to.be.equal('1634-3123');
+      expect(docOutput.nbElementInBody).to.be.equal(1001);
+      expect(docOutput.nbKeywords).to.be.equal(11);
+      expect(docOutput.nbRefBibs).to.be.equal(75);
+      expect(docOutput.lang).to.be.equal('fr');
+      expect(docOutput.hasAbstract).to.be.equal(true);
+      expect(docOutput.doi).to.be.equal("10.4000/aaa.667");
+      expect(docOutput.articlePubYear).to.be.equal(2010);
+      done();
+    });
+  });
+
 });
 
 describe('getMetadataInfos', function () {
