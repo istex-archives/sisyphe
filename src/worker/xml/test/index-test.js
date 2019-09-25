@@ -108,15 +108,15 @@ describe('doTheJob', function () {
   it('should add some info about a not valid XML', function (done) {
     testSisypheXml.doTheJob(docWithNamespaceXml, (error, docOutput) => {
       if (error) return done(error);
-      expect(docOutput.hostTitle).to.be.equal('Afrique : Archéologie et Arts');
-      expect(docOutput.issn).to.be.equal('1634-3123');
-      expect(docOutput.nbElementInBody).to.be.equal(1001);
-      expect(docOutput.nbKeywords).to.be.equal(11);
-      expect(docOutput.nbRefBibs).to.be.equal(75);
+      expect(docOutput.hostTitle).to.be.equal('ISTEX : des articles très cools');
+      expect(docOutput.issn).to.be.equal('8765-4321');
+      expect(docOutput.nbElementInBody).to.be.equal(3);
+      expect(docOutput.nbKeywords).to.be.equal(3);
+      expect(docOutput.nbRefBibs).to.be.equal(2);
       expect(docOutput.lang).to.be.equal('fr');
       expect(docOutput.hasAbstract).to.be.equal(true);
-      expect(docOutput.doi).to.be.equal("10.4000/aaa.667");
-      expect(docOutput.articlePubYear).to.be.equal(2010);
+      expect(docOutput.doi).to.be.equal("10.9999/abc.12");
+      expect(docOutput.articlePubYear).to.be.equal(2019);
       done();
     });
   });
