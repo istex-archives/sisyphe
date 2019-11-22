@@ -57,7 +57,7 @@ sisypheXml.doTheJob = function (data, next) {
   (async () => {
     // Load xml, return false if not-wellformed, true if wellformed
     let xmlFile;
-    if (this.conf.ignoreNamespace && this.conf.ignoreNamespace !== '') {
+    if (this.isConfExist && this.conf.ignoreNamespace && this.conf.ignoreNamespace !== '') {
       let xmlString = await readFile(data.path,'utf8');
       xmlFile = this.libxml.loadXmlFromString(xmlString.replace(this.conf.ignoreNamespace,''));  
     } else
