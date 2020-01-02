@@ -12,7 +12,7 @@
     "publish": "lerna publish --skip-npm && git push --follow-tags"
   },
   "author": "",
-  "license": "MIT",
+  "license": "CeCILL",
   "dependencies": {
     "ansicolors": "^0.3.2",
     "blessed": "^0.1.81",
