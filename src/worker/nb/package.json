@@ -14,7 +14,7 @@
     "auto-tu": "^1.0.0",
     "cld": "^2.4.7",
     "line-reader": "^0.4.0",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "mocha": "^3.5.3",
     "process": "^0.11.3",
     "worker-utils": "^1.0.0"
