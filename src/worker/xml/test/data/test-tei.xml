@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.1.0" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://lodel.org/ns/tei/tei.openedition.1.6.1/document.xsd">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title level="a" type="main">
+          <hi xml:lang="fr">Analyser un corpus avec Sisyphe</hi>
+        </title>
+        <title type="sub">Un logiciel libre d'exploration et d'analyse de fichiers orienté XML et PDF</title>
+        <author>
+          <persName>
+            <forename>Jean-Michel</forename>
+            <surname>ISTEX</surname>
+          </persName>
+          <affiliation>
+                        INIST-CNRS<lb/>UPS 076<lb/>Équipe ISTEX<lb/>CNRS<lb/><hi rend="author-email">contact@istex.fr</hi>
+                    </affiliation>
+        </author>
+        <author>
+          <persName>
+            <forename>Gérard</forename>
+            <surname>MANSOIF</surname>
+          </persName>
+          <affiliation>
+                        Université des jeux de mots laids
+                    </affiliation>
+        </author>
+      </titleStmt>
+      <publicationStmt>
+        <publisher>CNRS - UPS 076 (Institut de l'Information Scientifique et Technique)</publisher>
+        <distributor>ISTEX</distributor>
+        <date type="published" when="2019">2019</date>
+        <availability>
+          <p>ISTEX www.istex.fr</p>
+        </availability>
+        <idno type="url">https://api.istex.fr/document/01234567890123456789</idno>
+        <idno type="doi">10.9999/abc.123</idno>
+      </publicationStmt>
+      <sourceDesc>
+        <biblFull>
+          <!-- sourceDesc/biblFull is Deprecated: please use sourceDesc/biblStruct instead -->
+          <titleStmt>
+            <title/>
+            <respStmt>
+              <resp>auteur</resp>
+              <name>Jean-Michel ISTEX</name>
+            </respStmt>
+            <respStmt>
+              <resp>auteur</resp>
+              <name>Gérard MANSOIF</name>
+            </respStmt>
+          </titleStmt>
+          <publicationStmt>
+            <publisher/>
+            <date>2019</date>
+            <idno type="pp">25-47</idno>
+          </publicationStmt>
+        </biblFull>
+        <biblStruct type="article">
+          <analytic>
+            <title level="a" type="main">Analyser un corpus avec Sisyphe</title>
+            <title type="sub">Un logiciel libre d'exploration et d'analyse de fichiers orienté XML et PDF</title>
+            <author>
+              <persName>
+                <forename>Jean-Michel</forename>
+                <surname>ISTEX</surname>
+              </persName>
+              <affiliation>
+                        INIST-CNRS<lb/>UPS 076<lb/>Équipe ISTEX<lb/>CNRS<lb/><hi rend="author-email">contact@istex.fr</hi>
+                    </affiliation>
+            </author>
+            <author>
+              <persName>
+                <forename>Gérard</forename>
+                <surname>MANSOIF</surname>
+              </persName>
+              <affiliation>
+                        Université des jeux de mots laids
+                    </affiliation>
+            </author>
+          </analytic>
+          <monogr>
+            <title level="j">ISTEX : des articles très cools</title>
+            <idno type="eISSN">9876-5432</idno>
+            <idno type="pISSN">8765-4321</idno>
+            <title level="m">Vrac</title>
+            <idno type="doi" subtype="issue">10.9999/abc.12</idno>
+            <idno type="url" subtype="issue">https://www/istex.fr/abc/12</idno>
+            <imprint>
+              <publisher>CNRS - UPS 076</publisher>
+              <biblScope unit="page">25-47</biblScope>
+              <biblScope unit="issue">6</biblScope>
+              <date type="published" when="2019">2019</date>
+            </imprint>
+          </monogr>
+        </biblStruct>
+      </sourceDesc>
+    </fileDesc>
+    <profileDesc>
+      <langUsage>
+        <language ident="fr">fr</language>
+      </langUsage>
+      <textClass>
+        <keywords scheme="geographical">
+          <list>
+            <item>France</item>
+          </list>
+        </keywords>
+        <keywords scheme="keyword" xml:lang="en">
+          <list>
+            <item>Archive</item>
+            <item>Documentation scientifique</item>
+          </list>
+        </keywords>
+      </textClass>
+    </profileDesc>
+  </teiHeader>
+  <text>
+    <front>
+      <div type="abstract" xml:lang="fr">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+    </front>
+    <body>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p><p> Nemo enim ipsam voluptatem quia <hi>voluptas</hi> sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
+    </body>
+    <back>
+      <div type="bibliography">
+        <listBibl>
+          <bibl>ma première réf</bibl>
+          <bibl>ma deuxième réf</bibl>
+        </listBibl>
+      </div>
+    </back>
+  </text>
+</TEI>

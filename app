@@ -20,6 +20,7 @@ program
   .option("-c, --config-dir <path>", "Configuration folder path")
   .option("-t, --thread <number>", "The number of process which sisyphe will take")
   .option("-b, --bundle <number>", "Regroup jobs in bundle of jobs")
+  .option("-o, --output-dir <dirname>","output directory where results are written","out")
   .option("-r, --remove-module <name>", "Remove module name from the workflow", appender(), [])
   .option("-q, --quiet", "Silence output", false)
   .option("-l, --list", "List all available workers", false)
@@ -77,6 +78,7 @@ for (let arg of process.execArgv) {
 /* Build configuration file*/
 /***************************/
 const now = Date.now();
+const outputDir = (program.outputDir.startsWith('/')) ? program.outputDir : path.join(__dirname, program.outputDir);
 const session = {
   corpusname: program.corpusname,
   configDir: program.configDir ? path.resolve(program.configDir) : null,
@@ -85,7 +87,7 @@ const session = {
   now,
   debugMod,
   debugPort,
-  outputPath: path.resolve(__dirname, `./out`, now.toString() + "-" + program.corpusname),
+  outputPath: path.resolve(outputDir, now.toString() + "-" + program.corpusname),
   workers,
   silent: program.quiet,
   bundle: program.bundle

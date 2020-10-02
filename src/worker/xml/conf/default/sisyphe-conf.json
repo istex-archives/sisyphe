@@ -10,8 +10,63 @@
       "regex": "^([a-z]{6})$",
       "type": "String",
       "xpath": "/xpath/to/my/infos"
-    }],
+    },
+      {
+        "name": "articleCategory",
+        "type": "String",
+        "xpath": "/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/@type"
+      },
+      {
+        "name": "articlePubYear",
+        "regex": "^([0-9]{4})$",
+        "type": "Number",
+        "xpath": "/TEI/teiHeader/fileDesc/publicationStmt/date"
+      },
+      {
+        "name": "issn",
+        "regex": "^(\\d{4})-?(\\d{3})([\\dX])$",
+        "type": "String",
+        "xpath": "/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/idno[@type=\"pISSN\"]"
+      },
+      {
+        "name": "doi",
+        "regex": "(10[.][0-9]{4,}[^\\s\"/<>]*/[^\\s\"<>]+)",
+        "type": "String",
+        "xpath": "/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/idno[@type='doi']"
+      },
+      {
+        "name": "hostTitle",
+        "type": "String",
+        "xpath": "/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/title[@level=\"j\"]"
+      },
+      {
+        "name": "hasAbstract",
+        "type": "Boolean",
+        "xpath": "/TEI/text/front/div[@type='abstract']"
+      },
+      {
+        "name": "nbKeywords",
+        "type": "Count",
+        "xpath": "/TEI/teiHeader/profileDesc/textClass/keywords/list/item"
+      },
+      {
+        "name": "nbRefBibs",
+        "type": "Count",
+        "xpath": "/TEI/text/back/div/listBibl/bibl"
+      },
+      {
+        "name": "nbElementInBody",
+        "type": "Count",
+        "xpath": "/TEI/text/body//*"
+      },
+      {
+        "name": "lang",
+        "type": "Attribute",
+        "xpath": "/TEI/teiHeader/profileDesc/langUsage/language"
+      }
+    ],
     "dtd": ["mydoctype.dtd"],
-    "schema" : ["default.xsd"]
+    "schema" : ["default.xsd"],
+    "ignoreNamespace":"xmlns=\"http://www.tei-c.org/ns/1.0\""
   }
 }

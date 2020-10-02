@@ -1,11 +1,16 @@
 'use strict';
 const assert = require('assert'),
+  util = require('util'),
   path = require('path'),
   fs = require('fs'),
   pkg = require('./package.json'),
   Libxml = require('node-libxml'),
   Promise = require('bluebird'),
   cloneDeep = require('lodash.clonedeep');
+
+// Convert fs.readFile into Promise version of same    
+const readFile = util.promisify(fs.readFile);
+
 
 function to(promise, errorExt) {
 
@@ -51,7 +56,13 @@ sisypheXml.doTheJob = function (data, next) {
   }
   (async () => {
     // Load xml, return false if not-wellformed, true if wellformed
-    let xmlFile = this.libxml.loadXml(data.path);
+    let xmlFile;
+    if (this.isConfExist && this.conf.ignoreNamespace && this.conf.ignoreNamespace !== '') {
+      let xmlString = await readFile(data.path,'utf8');
+      xmlFile = this.libxml.loadXmlFromString(xmlString.replace(this.conf.ignoreNamespace,''));  
+    } else
+      xmlFile = this.libxml.loadXml(data.path);
+
     if (!xmlFile) {
       data.isWellFormed = false;
       // Attention, syntax is different wellformedError:wellformedErrors 😖
