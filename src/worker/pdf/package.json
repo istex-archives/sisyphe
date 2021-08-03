@@ -11,7 +11,7 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "pdfjs-dist": "^2.0.142",
-    "xmldom": "^0.1.27"
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
