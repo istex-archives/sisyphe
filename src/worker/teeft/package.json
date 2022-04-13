@@ -10,7 +10,7 @@
   "author": "NicolasKieffer",
   "license": "GNU",
   "dependencies": {
-    "async": "^2.5.0",
+    "async": "^3.2.2",
     "auto-tu": "^1.0.0",
     "javascript-lemmatizer": "0.0.2",
     "lodash": "^4.17.4",
