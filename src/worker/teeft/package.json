@@ -14,8 +14,8 @@
     "auto-tu": "^1.0.0",
     "javascript-lemmatizer": "0.0.2",
     "lodash": "^4.17.4",
-    "mocha": "^3.5.3",
+    "mocha": "^10.2.0",
     "snowball-stemmers": "^0.6.0",
-    "worker-utils": "^1.0.0"
+    "worker-utils": "^1.1.1"
   }
 }
