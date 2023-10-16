@@ -3,6 +3,14 @@
 
 ![sisyphe](./logo-sisyphe.jpg)
 
+🚨🚨🚨
+
+🇬🇧 **This app is no longer maintained. It may depends on outdated dependences which cas cause installation problems or contains security vulnerabilities. Please use or fork it with caution.**
+
+🇫🇷 **Cette application n'est plus maintenue, elle est susceptible de s'appuyer sur des dépendances obsolètes pouvant empêcher son bon fonctionnement, voire comporter des failles de sécurité. Merci de de l'utiliser ou de la forker avec précaution.**
+
+🚨🚨🚨
+
 ## Sisyphe
 
 Sisyphe is a generic NodeJS recursive folder analyser terminal application & a ([lerna](https://github.com/lerna/lerna)) git [monorepo](https://github.com/babel/babel/blob/master/doc/design/monorepo.md).
